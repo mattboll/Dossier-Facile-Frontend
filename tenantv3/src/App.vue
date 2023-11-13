@@ -20,7 +20,8 @@ import HelloWorld from './components/HelloWorld.vue'
   <RouterView />
 </template>
 
-<style scoped>
+<style>
+@import '../node_modules/@gouvfr/dsfr/dist/dsfr/dsfr.min.css';
 header {
   line-height: 1.5;
   max-height: 100vh;

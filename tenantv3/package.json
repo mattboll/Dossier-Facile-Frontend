@@ -19,6 +19,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@gouvfr/dsfr": "^1.10.2",
     "pinia": "^2.1.7",
     "vue": "^3.3.4",
     "vue-i18n": "9",
