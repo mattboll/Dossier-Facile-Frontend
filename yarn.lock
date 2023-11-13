@@ -17334,6 +17334,11 @@ vue-toasted@^1.1.28:
   resolved "https://registry.npmjs.org/vue-toasted/-/vue-toasted-1.1.28.tgz"
   integrity sha512-UUzr5LX51UbbiROSGZ49GOgSzFxaMHK6L00JV8fir/CYNJCpIIvNZ5YmS4Qc8Y2+Z/4VVYRpeQL2UO0G800Raw==
 
+vue-toastification@^1.7.14:
+  version "1.7.14"
+  resolved "https://registry.yarnpkg.com/vue-toastification/-/vue-toastification-1.7.14.tgz#4d6af4085f7122463c2821a27f851898b265cc85"
+  integrity sha512-khZR8t3NWZ/JJ2MZxXLbesHrRJ8AKa75PY5Zq8yMifF9x8lHq8ljYkC0d2PD9yahooygQB5tcFyRDkbbIPx8hw==
+
 vue-toastification@^2.0.0-rc.5:
   version "2.0.0-rc.5"
   resolved "https://registry.npmjs.org/vue-toastification/-/vue-toastification-2.0.0-rc.5.tgz"
