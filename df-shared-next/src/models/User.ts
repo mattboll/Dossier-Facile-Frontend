@@ -31,7 +31,7 @@ export class User {
   apartmentSharing: ApartmentSharing = {
     tenants: [],
   };
-  guarantors?: Guarantor[];
+  guarantors: Guarantor[] = [];
   documents?: DfDocument[];
   allowCheckTax?: boolean;
   linkUrl?: string;
