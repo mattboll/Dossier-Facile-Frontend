@@ -4,7 +4,7 @@ import useTenantStore from './stores/tenant-store';
 import { User } from '@sentry/vue';
 import { computed } from 'vue';
 
-const { store } = useTenantStore();
+const store = useTenantStore();
 
   const isFunnel = computed(() => store.isFunnel);
   const user: User = computed(() => store.user);
