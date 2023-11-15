@@ -26,6 +26,7 @@ const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
 
 const router = useRouter();
+declare const window: Window;
 
 interface State {
   user: User;
@@ -846,10 +847,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorFinancial(, formData) {
+    saveGuarantorFinancial(formData) {
       return RegisterService.saveGuarantorFinancial(formData)
         .then(async (response) => {
-          await commit("loadUserCommit", response.data);
+          await this.loadUserCommit(response.data);
           const fd = this.getters.guarantorFinancialDocuments;
           if (fd === undefined) {
             return Promise.resolve(response.data);
@@ -858,9 +859,9 @@ const useTenantStore = defineStore('tenant', {
             const s = fd.find((f: any) => {
               return f.id.toString() === formData.get("id");
             });
-            await commit("selectGuarantorDocumentFinancial", s);
+            await this.selectGuarantorDocumentFinancial(s);
           } else {
-            await commit("selectGuarantorDocumentFinancial", fd[fd.length - 1]);
+            await this.selectGuarantorDocumentFinancial(fd[fd.length - 1]);
           }
           return Promise.resolve(response.data);
         })
@@ -868,10 +869,10 @@ const useTenantStore = defineStore('tenant', {
           return Promise.reject(error);
         });
     },
-    saveTenantTax(, formData) {
+    saveTenantTax(formData) {
       return RegisterService.saveTenantTax(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -879,10 +880,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorTax(, formData) {
+    saveGuarantorTax(formData) {
       return RegisterService.saveGuarantorTax(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
