@@ -15,8 +15,17 @@ import { AnalyticsService } from '@/services/AnalyticsService';
 import { UtilsService } from '@/services/UtilsService';
 import { ProfileService } from '@/services/ProfileService';
 
+import * as Sentry from "@sentry/vue";
+import moment from 'moment';
+import { MessageService } from '@/services/MessageService';
+import { ApartmentSharingLinkService } from '@/services/ApartmentSharingLinkService';
+import { useRouter } from 'vue-router';
+import { RegisterService } from '@/services/RegisterService';
+
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
+
+const router = useRouter();
 
 interface State {
   user: User;
@@ -40,8 +49,8 @@ function defaultState(): State {
   const tenantState: State = {
   user : new User(),
   selectedGuarantor : new Guarantor(),
-  status : { loggedIn: false },
-  isFunnel : false,
+  status: { loggedIn: false },
+  isFunnel: false,
   spouseAuthorize : false,
   coTenantAuthorize : false,
   coTenants : [],
@@ -320,7 +329,7 @@ const useTenantStore = defineStore('tenant', {
       u.lastName = "";
       this.user.apartmentSharing.tenants.push(u);
     },
-    updateMessages({ tenantId, messageList }) {
+    updateMessagesCommit(tenantId: number, messageList: any) {
       this.messageList[tenantId] = messageList;
 
       const unreadMessages = this.messageList
@@ -342,10 +351,10 @@ const useTenantStore = defineStore('tenant', {
     updateCoTenantAuthorize(authorize: boolean) {
       this.coTenantAuthorize = authorize;
     },
-    isFunnel(isFunnel: boolean) {
+    updateIsFunnel(isFunnel: boolean) {
       this.isFunnel = isFunnel;
     },
-    updateSkipLinks(skipLinks) {
+    updateSkipLinks(skipLinks: SkipLink[]) {
       this.skipLinks = skipLinks;
     },
     updateUserFirstname(firstname: string) {
@@ -372,23 +381,19 @@ const useTenantStore = defineStore('tenant', {
       this.editFinancialDocument = true;
     },
     selectGuarantorDocumentFinancial(d: FinancialDocument) {
-      Vue.set(state, "guarantorFinancialDocumentSelected", d);
-      Vue.set(state, "editGuarantorFinancialDocument", d !== undefined);
+      Object.assign(this.guarantorFinancialDocumentSelected, d);
+      Object.assign(this.editGuarantorFinancialDocument, d !== undefined);
     },
     createGuarantorDocumentFinancial() {
-      Vue.set(
-        state,
-        "guarantorFinancialDocumentSelected",
-        new FinancialDocument()
-      );
-      Vue.set(state, "editGuarantorFinancialDocument", true);
+      Object.assign(this.guarantorFinancialDocumentSelected, new FinancialDocument());
+      Object.assign(this.editGuarantorFinancialDocument, true);
     },
     setApartmentSharingLinks(links: ApartmentSharingLink[]) {
       const sortedLinks = links.sort(
         (a: ApartmentSharingLink, b: ApartmentSharingLink) =>
           (a.lastVisit || "") > (b.lastVisit || "") ? -1 : 1
       );
-      Vue.set(state, "apartmentSharingLinks", sortedLinks);
+      Object.assign(this.apartmentSharingLinks, sortedLinks);
     },
     logout(redirect: boolean = true) {
       const isFC = this.user.franceConnect;
@@ -407,14 +412,14 @@ const useTenantStore = defineStore('tenant', {
         })
         .catch(async () => {
           console.log("Fail to logout - logout keycloak - force redirect");
-          await (Vue as any).$keycloak.logout();
+          await keycloak.logout();
           await this.logout();
           await this.initState();
           window.location.replace(MAIN_URL);
         });
     },
     deleteAccount() {
-      const isFC = this.state.user.franceConnect;
+      const isFC = this.user.franceConnect;
       return AuthService.deleteAccount().then(
         (response) => {
           this.logout();
@@ -434,7 +439,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    register({ user, source, internalPartnerId }) {
+    register(user: User, source: string, internalPartnerId: string) {
       return AuthService.register(user, source, internalPartnerId).then(
         (response) => {
           this.registerSuccess();
@@ -446,7 +451,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    resetPassword(_, user) {
+    resetPassword(user: User) {
       return AuthService.resetPassword(user).then(
         (user) => {
           return Promise.resolve(user);
@@ -456,14 +461,14 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    unlinkFranceConnect(, user: User) {
+    unlinkFranceConnect(user: User) {
       if (!user.franceConnect) {
         return Promise.reject("Account is not a FranceConnect Account");
       }
       return ProfileService.unlinkFranceConnect().then(
         () => {
           // Force reload because some backend's GET endpoints retrieve and save user data by using JWT's information.
-          (Vue as any).$keycloak.updateToken(-1).catch((err: any) => {
+          keycloak.updateToken(-1).catch((err: any) => {
             console.error("Unlink FC Error" + err);
           });
           return this.unlinkFCSuccess();
@@ -506,51 +511,51 @@ const useTenantStore = defineStore('tenant', {
       }
       return ProfileService.saveNames(user).then(
         (response) => {
-          return commit("loadUserCommit", response.data);
+          return this.loadUserCommit(response.data);
         },
         (error) => {
           return Promise.reject(error);
         }
       );
     },
-    setRoommates(, data) {
+    setRoommates(data: any) {
       return ProfileService.saveRoommates(data).then(
         (response) => {
-          return commit("loadUserCommit", response.data);
+          return this.loadUserCommit(response.data);
         },
         (error) => {
           return Promise.reject(error);
         }
       );
     },
-    setCoTenants(, data) {
+    setCoTenants(data: any) {
       return ProfileService.saveCoTenants(data).then(
         (response) => {
-          return commit("loadUserCommit", response.data);
+          return this.loadUserCommit(response.data);
         },
         (error) => {
           return Promise.reject(error);
         }
       );
     },
-    setLang(_, lang) {
-      i18n.locale = lang;
-      i18n.fallbackLocale = "fr";
-      moment.locale(lang);
-      const html = document.documentElement;
-      html.setAttribute("lang", i18n.locale);
-      const aYearFromNow = new Date();
-      aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
-      Vue.$cookies.set(
-        "lang",
-        lang,
-        aYearFromNow,
-        "",
-        MAIN_URL.endsWith("dossierfacile.fr") ? "dossierfacile.fr" : "localhost"
-      );
+    setLang(lang: any) {
+      // TODO
+      // i18n.locale = lang;
+      // i18n.fallbackLocale = "fr";
+      // moment.locale(lang);
+      // const html = document.documentElement;
+      // html.setAttribute("lang", i18n.locale);
+      // const aYearFromNow = new Date();
+      // aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+      // Vue.$cookies.set(
+      //   "lang",
+      //   lang,
+      //   aYearFromNow,
+      //   "",
+      //   MAIN_URL.endsWith("dossierfacile.fr") ? "dossierfacile.fr" : "localhost"
+      // );
     },
     validateFile(
-      _,
       data: { honorDeclaration: boolean; clarification: string }
     ) {
       return ProfileService.validateFile(
@@ -573,15 +578,14 @@ const useTenantStore = defineStore('tenant', {
         typeGuarantor: "NATURAL_PERSON",
       }).then(
         (response) => {
-          commit("loadUserCommit", response.data);
-          if (this.state.user.guarantors === undefined) {
+          this.loadUserCommit(response.data);
+          if (this.user.guarantors === undefined) {
             return Promise.reject();
           }
-          this.dispatch("setGuarantorPage", {
-            guarantor:
-              this.state.user.guarantors[this.state.user.guarantors.length - 1],
-            substep: "0",
-          });
+          this.setGuarantorPage(
+              this.user.guarantors[this.user.guarantors.length - 1],
+            0
+          );
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -590,10 +594,10 @@ const useTenantStore = defineStore('tenant', {
       );
     },
     async deleteAllGuarantors() {
-      if (this.state.user.guarantors === undefined) {
+      if (this.user.guarantors === undefined) {
         return Promise.resolve();
       }
-      const promises = this.state.user.guarantors.map(async (g: Guarantor) => {
+      const promises = this.user.guarantors.map(async (g: Guarantor) => {
         await ProfileService.deleteGuarantor(g);
       });
       return Promise.all(promises).then(
@@ -605,7 +609,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    deleteGuarantor(_, g: Guarantor) {
+    deleteGuarantor(g: Guarantor) {
       return ProfileService.deleteGuarantor(g).then(
         async (response) => {
           await this.loadUser();
@@ -616,10 +620,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    setGuarantorType(, guarantorType: Guarantor) {
+    setGuarantorType(guarantorType: Guarantor) {
       return ProfileService.setGuarantorType(guarantorType).then(
         async (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -627,10 +631,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    changePassword(, user: User) {
+    changePassword(user: User) {
       return AuthService.changePassword(user).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(user);
         },
         (error) => {
@@ -638,10 +642,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    createPasswordCouple(, user: User) {
+    createPasswordCouple(user: User) {
       return AuthService.createPasswordCouple(user).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(user);
         },
         (error) => {
@@ -649,10 +653,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    createPasswordGroup(, user: User) {
+    createPasswordGroup(user: User) {
       return AuthService.createPasswordGroup(user).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(user);
         },
         (error) => {
@@ -660,7 +664,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    deleteDocument(_, docId: number) {
+    deleteDocument(docId: number) {
       return ProfileService.deleteDocument(docId).then(
         () => {
           return this.loadUser();
@@ -671,47 +675,46 @@ const useTenantStore = defineStore('tenant', {
       );
     },
     updateMessages() {
-      if (this.getters.isLoggedIn) {
+      if (keycloak.authenticated) {
         MessageService.updateMessages().then((data) => {
-          commit("updateMessages", {
-            tenantId: this.state.user.id,
-            messageList: data?.data || {},
-          });
+          this.updateMessagesCommit(
+            this.user.id,
+            data?.data || {}
+          );
         });
         const spouse = UtilsService.getSpouse();
         if (spouse) {
           MessageService.updateMessages(spouse.id).then((data) => {
-            commit("updateMessages", {
-              tenantId: spouse.id,
-              messageList: data?.data || {},
-            });
+            this.updateMessagesCommit(spouse.id,
+              data?.data || {},
+            );
           });
         }
       }
     },
-    sendMessage(_, { message, tenantId }) {
+    sendMessage( message: string, tenantId: number) {
       return MessageService.postMessage({
         tenantId: tenantId,
         messageBody: message,
       }).then(() => {
-        this.dispatch("updateMessages");
+        this.updateMessages();
       });
     },
-    deleteCoTenant(_, tenant: User) {
+    deleteCoTenant(tenant: User) {
       if (tenant.id && tenant.id > 0) {
         ProfileService.deleteCoTenant(tenant.id);
       }
-      this.commit("deleteRoommates", tenant.email);
+      this.deleteRoommates(tenant.email);
     },
-    async setTenantPage(_, { substep }) {
+    async setTenantPage(substep: string) {
       router.push({
         name: "TenantDocuments",
         params: { substep },
       });
     },
-    async setGuarantorPage(, { guarantor, substep, tenantId }) {
-      await commit("setSelectedGuarantor", guarantor);
-      if (tenantId && tenantId != this.state.user.id) {
+    async setGuarantorPage(guarantor: Guarantor, substep: number, tenantId: number | undefined = undefined ) {
+      await this.setSelectedGuarantor(guarantor);
+      if (tenantId && tenantId != this.user.id) {
         router.push({
           name: "TenantGuarantorDocuments",
           params: {
@@ -728,10 +731,10 @@ const useTenantStore = defineStore('tenant', {
         });
       }
     },
-    saveTenantIdentification(, formData) {
+    saveTenantIdentification(formData: any) {
       return RegisterService.saveTenantIdentification(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -739,10 +742,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveCoTenantIdentification(, formData) {
+    saveCoTenantIdentification(formData: any) {
       return RegisterService.saveCoTenantIdentification(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -750,10 +753,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorName(, formData) {
+    saveGuarantorName(formData: any) {
       return RegisterService.saveGuarantorName(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -761,10 +764,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorIdentification(, formData) {
+    saveGuarantorIdentification(formData: any) {
       return RegisterService.saveGuarantorIdentification(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -772,10 +775,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveTenantResidency(, formData) {
+    saveTenantResidency(formData: any) {
       return RegisterService.saveTenantResidency(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -783,10 +786,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorResidency(, formData) {
+    saveGuarantorResidency(formData: any) {
       return RegisterService.saveGuarantorResidency(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -794,10 +797,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveTenantProfessional(, formData) {
+    saveTenantProfessional(formData: any) {
       return RegisterService.saveTenantProfessional(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -805,10 +808,10 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorProfessional(, formData) {
+    saveGuarantorProfessional(formData: any) {
       return RegisterService.saveGuarantorProfessional(formData).then(
         (response) => {
-          commit("loadUserCommit", response.data);
+          this.loadUserCommit(response.data);
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -816,11 +819,11 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveTenantFinancial(, formData) {
+    saveTenantFinancial(formData: any) {
       return RegisterService.saveTenantFinancial(formData).then(
         async (response) => {
-          await commit("loadUserCommit", response.data);
-          const fd = await this.getters.tenantFinancialDocuments;
+          await this.loadUserCommit(response.data);
+          const fd = await this.state.getters.tenantFinancialDocuments();
           if (fd === undefined) {
             return Promise.resolve(response.data);
           }
@@ -829,12 +832,12 @@ const useTenantStore = defineStore('tenant', {
               return f.id.toString() === formData.get("id");
             });
             if (s !== undefined) {
-              await commit("selectDocumentFinancial", s);
+              await this.selectDocumentFinancial(s);
             } else {
-              await commit("selectDocumentFinancial", fd[fd.length - 1]);
+              await this.selectDocumentFinancial(fd[fd.length - 1]);
             }
           } else {
-            await commit("selectDocumentFinancial", fd[fd.length - 1]);
+            await this.selectDocumentFinancial(fd[fd.length - 1]);
           }
           return Promise.resolve(response.data);
         },
@@ -967,15 +970,15 @@ const useTenantStore = defineStore('tenant', {
       }
 
       if (guarantors && guarantors.length > 0) {
-        commit("setSelectedGuarantor", guarantors[guarantors.length - 1]);
+        this.setSelectedGuarantor(guarantors[guarantors.length - 1]);
         return;
       }
-      commit("setSelectedGuarantor", new Guarantor());
+      this.setSelectedGuarantor(new Guarantor());
     },
-    readMessages(, tenantId?: number) {
+    readMessages(tenantId?: number) {
       return MessageService.markMessagesAsRead(tenantId).then(
         (response) => {
-          commit("updateMessages", { tenantId, messageList: response.data });
+          this.updateMessagesCommit({ tenantId, messageList: response.data });
           return Promise.resolve(response.data);
         },
         (error) => {
@@ -986,8 +989,8 @@ const useTenantStore = defineStore('tenant', {
     loadApartmentSharingLinks() {
       return ApartmentSharingLinkService.getLinks().then(
         (response) => {
-          const links = response.data.links;
-          commit("setApartmentSharingLinks", links);
+          const links = response.data.links || [];
+          this.setApartmentSharingLinks(links);
           return Promise.resolve(links);
         },
         (error) => {
@@ -997,23 +1000,23 @@ const useTenantStore = defineStore('tenant', {
     },
     deleteApartmentSharingLink(linkToDelete: ApartmentSharingLink) {
       ApartmentSharingLinkService.deleteLink(linkToDelete).then((_) => {
-        const newLinks = store.state.apartmentSharingLinks.filter(
+        const newLinks = this.apartmentSharingLinks.filter(
           (link) => link.id !== linkToDelete.id
         );
-        commit("setApartmentSharingLinks", newLinks);
+        this.setApartmentSharingLinks(newLinks);
       });
     },
     async updateApartmentSharingLinkStatus(
       { link: linkToUpdate, enabled }
     ) {
       await ApartmentSharingLinkService.updateLinkStatus(linkToUpdate, enabled);
-      const updatedLinks = store.state.apartmentSharingLinks.map((link) => {
+      const updatedLinks = this.apartmentSharingLinks.map((link) => {
         if (link.id === linkToUpdate.id) {
           link.enabled = enabled;
         }
         return link;
       });
-      commit("setApartmentSharingLinks", updatedLinks);
+      this.setApartmentSharingLinks(updatedLinks);
     },
   },
 });
