@@ -1,38 +1,13 @@
-import useTenantStore from "@/stores/tenant-store";
 import axios from "axios";
 
-const store = useTenantStore();
-
 export const RegisterService = {
-  deleteFile(id: number | string, silent = false) {
-    // TODO
-    // const loader = Vue.$loading.show();
-    const url = `https://${process.env.VUE_APP_API_URL}/api/file/${id}`;
-    return axios
-      .delete(url)
-      .then(() => {
-        if (!silent) {
-    // TODO
-          // Vue.toasted.global.delete_success();
-        }
-      })
-      .catch(() => {
-    // TODO
-        // Vue.toasted.global.delete_failed();
-      })
-      .finally(() => {
-    // TODO
-        // loader.hide();
-        store.loadUser();
-      });
-  },
   deleteFileById(id: number) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/file/${id}`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios.delete(url);
   },
   saveTenantIdentification(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/documentIdentification`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/documentIdentification`,
       formData
     );
   },
@@ -40,7 +15,7 @@ export const RegisterService = {
   saveCoTenantIdentification(formData: FormData) {
     return axios.post(
       `https://${
-        process.env.VUE_APP_API_URL
+        import.meta.env.VITE_API_URL
       }/api/tenant/coTenant/${formData.get(
         "coTenantId"
       )}/documentIdentification`,
@@ -50,101 +25,101 @@ export const RegisterService = {
 
   saveGuarantorName(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/name`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/name`,
       formData
     );
   },
 
   saveGuarantorIdentification(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/documentIdentification/v2`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentIdentification/v2`,
       formData
     );
   },
 
   saveTenantResidency(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/documentResidency`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/documentResidency`,
       formData
     );
   },
 
   saveGuarantorResidency(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/documentResidency`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentResidency`,
       formData
     );
   },
 
   saveTenantProfessional(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/documentProfessional`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/documentProfessional`,
       formData
     );
   },
 
   saveGuarantorProfessional(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/documentProfessional`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentProfessional`,
       formData
     );
   },
 
   saveTenantFinancial(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/documentFinancial`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/documentFinancial`,
       formData
     );
   },
 
   saveGuarantorFinancial(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/documentFinancial`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentFinancial`,
       formData
     );
   },
 
   saveTenantTax(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/documentTax`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/documentTax`,
       formData
     );
   },
   saveGuarantorTax(formData: FormData) {
     return axios.post(
-      `https://${process.env.VUE_APP_API_URL}/api/register/guarantorNaturalPerson/documentTax`,
+      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentTax`,
       formData
     );
   },
 
   saveRepresentativeIdentification(formData: FormData) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/register/guarantorLegalPerson/documentRepresentantIdentification`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentRepresentantIdentification`;
     return axios.post(url, formData);
   },
 
   saveCorporationName(formData: FormData) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/register/guarantorLegalPerson/name`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/name`;
     return axios.post(url, formData);
   },
 
   saveLegalPersonRepresentantName(formData: FormData) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/register/guarantorLegalPerson/representing-name`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/representing-name`;
     return axios.post(url, formData);
   },
 
   saveCorporationIdentification(formData: FormData) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/register/guarantorLegalPerson/documentIdentification`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentIdentification`;
     return axios.post(url, formData);
   },
 
   saveOrganismIdentification(formData: FormData) {
-    const url = `https://${process.env.VUE_APP_API_URL}/api/register/guarantorOrganism/documentIdentification`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorOrganism/documentIdentification`;
     return axios.post(url, formData);
   },
   async getFranceConnectToken() {
     return axios
       .get(
-        `${process.env.VUE_APP_SSO_ENDPOINT}/realms/dossier-facile/broker/oidc/token`
+        `${import.meta.env.VITE_SSO_ENDPOINT}/realms/dossier-facile/broker/oidc/token`
       )
       .then((response: any) => {
         return Promise.resolve(response.data.access_token);

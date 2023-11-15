@@ -21,6 +21,7 @@ import { MessageService } from '@/services/MessageService';
 import { ApartmentSharingLinkService } from '@/services/ApartmentSharingLinkService';
 import { useRouter } from 'vue-router';
 import { RegisterService } from '@/services/RegisterService';
+import axios from 'axios';
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
@@ -73,25 +74,25 @@ const useTenantStore = defineStore('tenant', {
   state: (): State => ({ ...initialStore }),
   getters: {
     getUser: (state: State) => state.user,
-    getTenantDocuments(state): DfDocument[] {
+    getTenantDocuments(state: State): DfDocument[] {
       return state.user.documents || [];
     },
-    getTenantIdentificationDocument(state): DfDocument | undefined {
+    getTenantIdentificationDocument(state: State): DfDocument | undefined {
       return state.user.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       });
     },
-    getTenantResidencyDocument(state): DfDocument | undefined {
+    getTenantResidencyDocument(state: State): DfDocument | undefined {
       return state.user.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
     },
-    getTenantProfessionalDocument(state): DfDocument | undefined {
+    getTenantProfessionalDocument(state: State): DfDocument | undefined {
       return state.user.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
     },
-    getTenantTaxDocument(state): DfDocument | undefined {
+    getTenantTaxDocument(state: State): DfDocument | undefined {
       return state.user.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
@@ -103,41 +104,41 @@ const useTenantStore = defineStore('tenant', {
         return d.documentCategory === "IDENTIFICATION_LEGAL_PERSON";
       });
     },
-    getGuarantorIdentificationDocument(state): DfDocument | undefined {
+    getGuarantorIdentificationDocument(state: State): DfDocument | undefined {
       return state.selectedGuarantor?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       });
     },
-    getGuarantorResidencyDocument(state): DfDocument | undefined {
+    getGuarantorResidencyDocument(state: State): DfDocument | undefined {
       return state.selectedGuarantor?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
     },
-    getGuarantorProfessionalDocument(state): DfDocument | undefined {
+    getGuarantorProfessionalDocument(state: State): DfDocument | undefined {
       return state.selectedGuarantor?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
     },
-    getGuarantorTaxDocument(state): DfDocument | undefined {
+    getGuarantorTaxDocument(state: State): DfDocument | undefined {
       return state.selectedGuarantor?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
     },
 
-    getGuarantorDocuments(state): DfDocument[] {
+    getGuarantorDocuments(state: State): DfDocument[] {
       return state.selectedGuarantor.documents || [];
     },
-    guarantor(state): Guarantor {
+    guarantor(state: State): Guarantor {
       return state.selectedGuarantor;
     },
     isLoggedIn: () => keycloak.authenticated,
-    userToEdit(state): User | null {
+    userToEdit(state: State): User | null {
       return state.user;
     },
-    isFranceConnected(state): boolean {
+    isFranceConnected(state: State): boolean {
       return state.user.franceConnect || false;
     },
-    getRoommates(state): User[] {
+    getRoommates(state: State): User[] {
       if (state.user.apartmentSharing === undefined) {
         return [];
       }
@@ -147,22 +148,22 @@ const useTenantStore = defineStore('tenant', {
         })
         .map((u: User) => ({ ...u }));
     },
-    newMessage(state): number {
+    newMessage(state: State): number {
       return state.newMessage;
     },
-    spouseAuthorize(state): boolean {
+    spouseAuthorize(state: State): boolean {
       return state.spouseAuthorize;
     },
-    coTenantAuthorize(state): boolean {
+    coTenantAuthorize(state: State): boolean {
       return state.coTenantAuthorize;
     },
-    guarantors(state): Guarantor[] {
+    guarantors(state: State): Guarantor[] {
       return state.user.guarantors;
     },
-    getMessages(state): DfMessage[][] {
+    getMessages(state: State): DfMessage[][] {
       return state.messageList;
     },
-    tenantFinancialDocuments(state): FinancialDocument[] {
+    tenantFinancialDocuments(state: State): FinancialDocument[] {
       const financialDocuments: FinancialDocument[] = [];
       if (state.user.documents !== null) {
         const docs = state.user.documents?.filter((d: DfDocument) => {
@@ -197,7 +198,7 @@ const useTenantStore = defineStore('tenant', {
       }
       return financialDocuments;
     },
-    guarantorFinancialDocuments(state): FinancialDocument[] {
+    guarantorFinancialDocuments(state: State): FinancialDocument[] {
       const financialdocuments: FinancialDocument[] = [];
       const g: Guarantor = state.selectedGuarantor;
       const dfDocs: DfDocument[] = g.documents || [];
@@ -232,22 +233,22 @@ const useTenantStore = defineStore('tenant', {
       }
       return financialdocuments;
     },
-    financialDocumentSelected(state): FinancialDocument {
+    financialDocumentSelected(state: State): FinancialDocument {
       return state.financialDocumentSelected;
     },
-    editFinancialDocument(state): boolean {
+    editFinancialDocument(state: State): boolean {
       return state.editFinancialDocument;
     },
-    guarantorFinancialDocumentSelected(state): FinancialDocument {
+    guarantorFinancialDocumentSelected(state: State): FinancialDocument {
       return state.guarantorFinancialDocumentSelected;
     },
-    editGuarantorFinancialDocument(state): boolean {
+    editGuarantorFinancialDocument(state: State): boolean {
       return state.editGuarantorFinancialDocument;
     },
-    coTenants(state): User[] {
+    coTenants(state: State): User[] {
       return state.coTenants;
     },
-    getSpouse(state): any {
+    getSpouse(state: State): any {
       if (this.user.apartmentSharing.applicationType === "COUPLE") {
         return this.user.apartmentSharing.tenants.find((t: any) => {
           return t.id != this.user.id;
@@ -255,7 +256,7 @@ const useTenantStore = defineStore('tenant', {
       }
       return null;
     },
-    getTenant: (state) => (id: number): User => {
+    getTenant: (state: State) => (id: number): User => {
       if (id === state.user.id) {
         return state.user;
       }
@@ -263,7 +264,7 @@ const useTenantStore = defineStore('tenant', {
         return r.id === id;
       }) as User;
     },
-  allDocumentsFilled(state): boolean {
+  allDocumentsFilled(state: State): boolean {
     const user = state.user;
     const tenantDocumentsFilled = (tenant: User) =>
       this.documentsFilled(tenant) &&
@@ -281,7 +282,7 @@ const useTenantStore = defineStore('tenant', {
     }
     return tenantDocumentsFilled(user) || false;
   },
-  allNamesFilled(state): boolean {
+  allNamesFilled(state: State): boolean {
     const userNamesFilled = (u: User) => u.firstName && u.lastName;
     const guarantorNamesFilled = (g: Guarantor) =>
       !g ||
@@ -305,7 +306,7 @@ const useTenantStore = defineStore('tenant', {
     return (userNamesFilled(user) &&
       user.guarantors.every(guarantorNamesFilled)) as boolean;
   },
-  hasDoc: (state) => (docType: string, user?: User) => {
+  hasDoc: (state: State) => (docType: string, user?: User) => {
     const u = user ? user : state.user;
     const f = u.documents?.find((d: DfDocument) => {
       return (
@@ -315,7 +316,7 @@ const useTenantStore = defineStore('tenant', {
     })?.files;
     return f && f.length > 0;
   },
-  isTenantDocumentValid: (state) => (docType: string, user?: User) => {
+  isTenantDocumentValid: (state: State) => (docType: string, user?: User) => {
     const u = user ? user : state.user;
     const document = u.documents?.find((d: DfDocument) => {
       return d.documentCategory === docType;
@@ -758,7 +759,7 @@ const useTenantStore = defineStore('tenant', {
             data?.data || {}
           );
         });
-        const spouse = UtilsService.getSpouse();
+        const spouse = this.getSpouse();
         if (spouse) {
           MessageService.updateMessages(spouse.id).then((data) => {
             this.updateMessagesCommit(spouse.id,
@@ -982,23 +983,23 @@ const useTenantStore = defineStore('tenant', {
         router.push({ name: "TenantType" });
         return;
       }
-      if (!UtilsService.hasDoc("IDENTIFICATION")) {
+      if (!this.hasDoc("IDENTIFICATION")) {
         router.push({ name: "TenantDocuments", params: { substep: "1" } });
         return;
       }
-      if (!UtilsService.isTenantDocumentValid("RESIDENCY")) {
+      if (!this.isTenantDocumentValid("RESIDENCY")) {
         router.push({ name: "TenantDocuments", params: { substep: "2" } });
         return;
       }
-      if (!UtilsService.hasDoc("PROFESSIONAL")) {
+      if (!this.hasDoc("PROFESSIONAL")) {
         router.push({ name: "TenantDocuments", params: { substep: "3" } });
         return;
       }
-      if (!UtilsService.isTenantDocumentValid("FINANCIAL")) {
+      if (!this.isTenantDocumentValid("FINANCIAL")) {
         router.push({ name: "TenantDocuments", params: { substep: "4" } });
         return;
       }
-      if (!UtilsService.isTenantDocumentValid("TAX")) {
+      if (!this.isTenantDocumentValid("TAX")) {
         router.push({ name: "TenantDocuments", params: { substep: "5" } });
         return;
       }
@@ -1094,6 +1095,28 @@ const useTenantStore = defineStore('tenant', {
       });
       this.setApartmentSharingLinks(updatedLinks);
     },
+  deleteFile(id: number | string, silent = false) {
+    // TODO
+    // const loader = Vue.$loading.show();
+    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
+    axios
+      .delete(url)
+      .then(() => {
+        if (!silent) {
+    // TODO
+          // Vue.toasted.global.delete_success();
+        }
+      })
+      .catch(() => {
+    // TODO
+        // Vue.toasted.global.delete_failed();
+      })
+      .finally(() => {
+    // TODO
+        // loader.hide();
+          this.loadUser();
+      });
+  },
   },
 });
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DfMessage } from "df-shared/src/models/DfMessage";
 
-const MESSAGE_ENDPOINT = `https://${process.env.VUE_APP_API_URL}/api/message`;
+const MESSAGE_ENDPOINT = `https://${import.meta.env.VUE_APP_API_URL}/api/message`;
 
 export const MessageService = {
   updateMessages(tenantId?: number) {

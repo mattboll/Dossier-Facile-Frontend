@@ -3,14 +3,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import useTenantStore from '@/stores/tenant-store';
 import type { SkipLink } from 'df-shared-next/src/models/SkipLink';
 import keycloak from '../plugin/keycloak';
+import Home from '../views/Home.vue';
 
-const MAIN_URL = `//${process.env.VUE_APP_MAIN_URL}`;
-const TENANT_URL = process.env.VUE_APP_FULL_TENANT_URL;
+const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
+const TENANT_URL = import.meta.env.VITE_FULL_TENANT_URL;
 
 let updateTokenInterval: NodeJS.Timer;
-
-const store = useTenantStore();
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -374,6 +372,7 @@ const router = createRouter({
 })
 
 function keepGoing(to: RouteLocationNormalized, next: NavigationGuardNext) {
+  const store = useTenantStore();
   if (
     to.matched.some((record: { path: string }) => {
       return record.path === "/account";
@@ -398,6 +397,7 @@ function keepGoing(to: RouteLocationNormalized, next: NavigationGuardNext) {
 }
 
 function registerFunnel(to: RouteLocationNormalized) {
+  const store = useTenantStore();
   if (to.matched.some((record) => record.meta.hideFooter)) {
     store.updateIsFunnel(true);
   } else {
@@ -410,6 +410,7 @@ async function loadUserIfAuthenticated(next: NavigationGuardNext) {
     return;
   }
   await keycloak.loadUserProfile();
+  const store = useTenantStore();
   await store.loadUser().catch(() => {
     next({ name: "404" });
   });
@@ -422,6 +423,7 @@ function updateKeycloakTokenAndMessages() {
         console.error(err);
       });
     }, 45000);
+    const store = useTenantStore();
     store.updateMessages();
   }
 }
@@ -430,6 +432,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from, next: NavigationGuar
   registerFunnel(to);
 
   to.matched.some((record) => {
+    const store = useTenantStore();
     store.updateSkipLinks(record.meta.skipLinks as SkipLink[]);
   });
 

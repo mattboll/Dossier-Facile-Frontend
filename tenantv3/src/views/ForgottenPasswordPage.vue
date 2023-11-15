@@ -34,7 +34,7 @@ import Modal from "df-shared/src/components/Modal.vue";
 })
 export default class ForgottenPasswordPage extends Vue {
   isValidModalVisible = false;
-  MAIN_URL = `//${process.env.VUE_APP_MAIN_URL}`;
+  MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 
   onForgottenPassword(user: User) {
     if (user.email) {

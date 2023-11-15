@@ -77,7 +77,7 @@ import Modal from "df-shared/src/components/Modal.vue";
   },
 })
 export default class SignupPage extends Vue {
-  MAIN_URL = `//${process.env.VUE_APP_MAIN_URL}`;
+  MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
   isValidModalVisible = false;
 
   mounted() {

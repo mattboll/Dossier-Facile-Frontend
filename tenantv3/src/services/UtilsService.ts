@@ -80,7 +80,7 @@ export const UtilsService = {
   },
   useNewOtherResidencyCategory(): boolean {
     // TODO remove all code related to this method after 2024-01-29
-    const activationDate = process.env.VUE_APP_OTHER_RESIDENCY_ACTIVATION_DATE;
+    const activationDate = import.meta.env.VITE_OTHER_RESIDENCY_ACTIVATION_DATE;
     if (activationDate === undefined) {
       return true;
     }
