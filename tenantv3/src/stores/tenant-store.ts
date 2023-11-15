@@ -257,7 +257,7 @@ const useTenantStore = defineStore('tenant', {
       this.user = new User();
       AnalyticsService.loginFail();
     },
-    logout() {
+    logoutCommit() {
       this.status.loggedIn = false;
       this.user = new User();
     },
@@ -400,7 +400,7 @@ const useTenantStore = defineStore('tenant', {
       const isFC = this.user.franceConnect;
       return AuthService.logout()
         .then(async () => {
-          await this.logout();
+          await this.logoutCommit();
           await this.initState();
           if (isFC) {
             window.location.replace(FC_LOGOUT_URL);
@@ -414,7 +414,7 @@ const useTenantStore = defineStore('tenant', {
         .catch(async () => {
           console.log("Fail to logout - logout keycloak - force redirect");
           await keycloak.logout();
-          await this.logout();
+          await this.logoutCommit();
           await this.initState();
           window.location.replace(MAIN_URL);
         });
@@ -423,7 +423,7 @@ const useTenantStore = defineStore('tenant', {
       const isFC = this.user.franceConnect;
       return AuthService.deleteAccount().then(
         (response) => {
-          this.logout();
+          this.logoutCommit();
           this.initState();
           if (isFC) {
             window.location.replace(
@@ -959,7 +959,7 @@ const useTenantStore = defineStore('tenant', {
 
       router.push({ name: "TenantName" });
     },
-    updateSelectedGuarantor(, tenantId: number) {
+    updateSelectedGuarantor(tenantId: number) {
       let guarantors;
       if (this.state.user.id === tenantId) {
         guarantors = this.state.user.guarantors;

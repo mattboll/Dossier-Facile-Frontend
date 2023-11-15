@@ -1,24 +1,24 @@
 import { User } from "df-shared/src/models/User";
 import { DfDocument } from "../../../df-shared/src/models/DfDocument";
 import { Guarantor } from "../../../df-shared/src/models/Guarantor";
-import store from "../store";
-import moment from "moment";
-import { Vue } from "vue-property-decorator";
+import * as moment from "moment";
+import useTenantStore from "@/stores/tenant-store";
+const store = useTenantStore();
 
 export const UtilsService = {
   getSpouse() {
-    if (store.state.user.apartmentSharing.applicationType === "COUPLE") {
-      return store.state.user.apartmentSharing.tenants.find((t: any) => {
-        return t.id != store.state.user.id;
+    if (store.user.apartmentSharing.applicationType === "COUPLE") {
+      return store.user.apartmentSharing.tenants.find((t: any) => {
+        return t.id != store.user.id;
       });
     }
     return null;
   },
   getTenant(id: number) {
-    if (id === store.state.user.id) {
-      return store.state.user;
+    if (id === store.user.id) {
+      return store.user;
     }
-    return store.state.user.apartmentSharing.tenants.find((r: User) => {
+    return store.user.apartmentSharing.tenants.find((r: User) => {
       return r.id === id;
     }) as User;
   },
@@ -29,7 +29,7 @@ export const UtilsService = {
     throw Error("guarantor is not found");
   },
   allDocumentsFilled(): boolean {
-    const user = store.state.user;
+    const user = store.user;
     const tenantDocumentsFilled = (tenant: User) =>
       this.documentsFilled(tenant) &&
       tenant.guarantors?.every((g) => !!this.guarantorDocumentsFilled(g));
@@ -54,7 +54,7 @@ export const UtilsService = {
       (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
       g.typeGuarantor === "ORGANISM";
 
-    const user = store.state.user;
+    const user = store.user;
     if (user.applicationType === "COUPLE") {
       const couple = user.apartmentSharing?.tenants.find(
         (cotenant: User) => user.id !== cotenant.id
@@ -95,7 +95,7 @@ export const UtilsService = {
     );
   },
   hasDoc(docType: string, user?: User) {
-    const u = user ? user : store.state.user;
+    const u = user ? user : store.user;
     const f = u.documents?.find((d: DfDocument) => {
       return (
         d.documentCategory === docType &&
@@ -105,7 +105,7 @@ export const UtilsService = {
     return f && f.length > 0;
   },
   isTenantDocumentValid(docType: string, user?: User) {
-    const u = user ? user : store.state.user;
+    const u = user ? user : store.user;
     const document = u.documents?.find((d: DfDocument) => {
       return d.documentCategory === docType;
     });
@@ -168,9 +168,11 @@ export const UtilsService = {
       return;
     }
     if (err.response.data.message.includes("NumberOfPages")) {
-      Vue.toasted.global.save_failed_num_pages();
+      // TODO
+      // Vue.toasted.global.save_failed_num_pages();
     } else {
-      Vue.toasted.global.save_failed();
+      // TODO
+      // Vue.toasted.global.save_failed();
     }
   },
 };
