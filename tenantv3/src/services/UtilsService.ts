@@ -2,73 +2,13 @@ import { User } from "df-shared/src/models/User";
 import { DfDocument } from "../../../df-shared/src/models/DfDocument";
 import { Guarantor } from "../../../df-shared/src/models/Guarantor";
 import * as moment from "moment";
-import useTenantStore from "@/stores/tenant-store";
-const store = useTenantStore();
 
 export const UtilsService = {
-  getSpouse() {
-    if (store.user.apartmentSharing.applicationType === "COUPLE") {
-      return store.user.apartmentSharing.tenants.find((t: any) => {
-        return t.id != store.user.id;
-      });
-    }
-    return null;
-  },
-  getTenant(id: number) {
-    if (id === store.user.id) {
-      return store.user;
-    }
-    return store.user.apartmentSharing.tenants.find((r: User) => {
-      return r.id === id;
-    }) as User;
-  },
   getLastAddedGuarantor(user: User) {
     if (user.guarantors?.length && user.guarantors?.length > 0) {
       return user.guarantors[user.guarantors.length - 1];
     }
     throw Error("guarantor is not found");
-  },
-  allDocumentsFilled(): boolean {
-    const user = store.user;
-    const tenantDocumentsFilled = (tenant: User) =>
-      this.documentsFilled(tenant) &&
-      tenant.guarantors?.every((g) => !!this.guarantorDocumentsFilled(g));
-
-    if (user.applicationType === "COUPLE") {
-      const cotenants = user.apartmentSharing?.tenants.filter(
-        (cotenant: User) => user.id !== cotenant.id
-      );
-      return (
-        (tenantDocumentsFilled(user) &&
-          cotenants.every(tenantDocumentsFilled)) ||
-        false
-      );
-    }
-    return tenantDocumentsFilled(user) || false;
-  },
-  allNamesFilled(): boolean {
-    const userNamesFilled = (u: User) => u.firstName && u.lastName;
-    const guarantorNamesFilled = (g: Guarantor) =>
-      !g ||
-      (g.typeGuarantor === "NATURAL_PERSON" && g.firstName && g.lastName) ||
-      (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
-      g.typeGuarantor === "ORGANISM";
-
-    const user = store.user;
-    if (user.applicationType === "COUPLE") {
-      const couple = user.apartmentSharing?.tenants.find(
-        (cotenant: User) => user.id !== cotenant.id
-      ) as User;
-
-      if (
-        !userNamesFilled(couple) ||
-        !couple.guarantors.every(guarantorNamesFilled)
-      ) {
-        return false;
-      }
-    }
-    return (userNamesFilled(user) &&
-      user.guarantors.every(guarantorNamesFilled)) as boolean;
   },
   documentsFilled(user?: User) {
     return (
@@ -93,23 +33,6 @@ export const UtilsService = {
       (g.typeGuarantor === "ORGANISM" &&
         this.guarantorHasDoc("IDENTIFICATION", g))
     );
-  },
-  hasDoc(docType: string, user?: User) {
-    const u = user ? user : store.user;
-    const f = u.documents?.find((d: DfDocument) => {
-      return (
-        d.documentCategory === docType &&
-        (d.documentStatus === "TO_PROCESS" || d.documentStatus === "VALIDATED")
-      );
-    })?.files;
-    return f && f.length > 0;
-  },
-  isTenantDocumentValid(docType: string, user?: User) {
-    const u = user ? user : store.user;
-    const document = u.documents?.find((d: DfDocument) => {
-      return d.documentCategory === docType;
-    });
-    return this.isDocumentValid(document);
   },
   guarantorHasDoc(docType: string, g: Guarantor | User) {
     const f = g.documents?.find((d: DfDocument) => {

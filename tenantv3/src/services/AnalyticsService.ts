@@ -1,15 +1,13 @@
-import useTenantStore from "../stores/tenant-store";
-
-const tenantStore = useTenantStore();
 
 export const AnalyticsService = {
   sendEvent(name: string, data: any) {
     if (!process.env.VUE_APP_MATOMO_ENABLE) {
       return;
     }
-    if (tenantStore.getUser.id !== undefined) {
-      data.event_label = tenantStore.user.id;
-    }
+    // TODO : always use store before analyticsService and send user id
+    // if (tenantStore.getUser.id !== undefined) {
+    //   data.event_label = tenantStore.user.id;
+    // }
     // Matomo already manage consent
     window._paq.push([
       "trackEvent",

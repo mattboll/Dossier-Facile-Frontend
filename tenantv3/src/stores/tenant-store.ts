@@ -247,6 +247,81 @@ const useTenantStore = defineStore('tenant', {
     coTenants(state): User[] {
       return state.coTenants;
     },
+    getSpouse(state): any {
+      if (this.user.apartmentSharing.applicationType === "COUPLE") {
+        return this.user.apartmentSharing.tenants.find((t: any) => {
+          return t.id != this.user.id;
+        });
+      }
+      return null;
+    },
+    getTenant: (state) => (id: number): User => {
+      if (id === state.user.id) {
+        return state.user;
+      }
+      return state.user.apartmentSharing.tenants.find((r: User) => {
+        return r.id === id;
+      }) as User;
+    },
+  allDocumentsFilled(state): boolean {
+    const user = state.user;
+    const tenantDocumentsFilled = (tenant: User) =>
+      this.documentsFilled(tenant) &&
+      tenant.guarantors?.every((g) => !!this.guarantorDocumentsFilled(g));
+
+    if (user.applicationType === "COUPLE") {
+      const cotenants = user.apartmentSharing?.tenants.filter(
+        (cotenant: User) => user.id !== cotenant.id
+      );
+      return (
+        (tenantDocumentsFilled(user) &&
+          cotenants.every(tenantDocumentsFilled)) ||
+        false
+      );
+    }
+    return tenantDocumentsFilled(user) || false;
+  },
+  allNamesFilled(state): boolean {
+    const userNamesFilled = (u: User) => u.firstName && u.lastName;
+    const guarantorNamesFilled = (g: Guarantor) =>
+      !g ||
+      (g.typeGuarantor === "NATURAL_PERSON" && g.firstName && g.lastName) ||
+      (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
+      g.typeGuarantor === "ORGANISM";
+
+    const user = state.user;
+    if (user.applicationType === "COUPLE") {
+      const couple = user.apartmentSharing?.tenants.find(
+        (cotenant: User) => user.id !== cotenant.id
+      ) as User;
+
+      if (
+        !userNamesFilled(couple) ||
+        !couple.guarantors.every(guarantorNamesFilled)
+      ) {
+        return false;
+      }
+    }
+    return (userNamesFilled(user) &&
+      user.guarantors.every(guarantorNamesFilled)) as boolean;
+  },
+  hasDoc: (state) => (docType: string, user?: User) => {
+    const u = user ? user : state.user;
+    const f = u.documents?.find((d: DfDocument) => {
+      return (
+        d.documentCategory === docType &&
+        (d.documentStatus === "TO_PROCESS" || d.documentStatus === "VALIDATED")
+      );
+    })?.files;
+    return f && f.length > 0;
+  },
+  isTenantDocumentValid: (state) => (docType: string, user?: User) => {
+    const u = user ? user : state.user;
+    const document = u.documents?.find((d: DfDocument) => {
+      return d.documentCategory === docType;
+    });
+    return UtilsService.isDocumentValid(document);
+  },
   },
   actions: {
     initState() {
