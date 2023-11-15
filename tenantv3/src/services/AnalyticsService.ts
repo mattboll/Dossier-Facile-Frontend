@@ -8,7 +8,7 @@ export const AnalyticsService = {
       return;
     }
     if (tenantStore.getUser.id !== undefined) {
-      data.event_label = tenantStore.state.user.id;
+      data.event_label = tenantStore.user.id;
     }
     // Matomo already manage consent
     window._paq.push([

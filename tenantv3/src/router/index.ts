@@ -1,6 +1,7 @@
-import { NavigationGuardNext, RouteLocationNormalized, createRouter, createWebHistory } from 'vue-router'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import useTenantStore from '@/stores/tenant-store';
-import { CONTENT, SkipLink } from 'df-shared-next/src/models/SkipLink';
+import type { SkipLink } from 'df-shared-next/src/models/SkipLink';
 import keycloak from '../plugin/keycloak';
 
 const MAIN_URL = `//${process.env.VUE_APP_MAIN_URL}`;
