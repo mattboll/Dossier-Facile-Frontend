@@ -1,33 +1,32 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import useTenantStore from './stores/tenant-store';
-import { User } from '@sentry/vue';
 import { computed } from 'vue';
 import TenantSkipLinks from './components/TenantSkipLinks.vue';
 import Menu from './components/Menu.vue';
 import MyHeader from "df-shared-next/src/Header/Header.vue";
 import Footer from "df-shared-next/src/Footer/Footer.vue";
+import DeleteAccount from './components/DeleteAccount.vue';
+import Announcement from 'df-shared-next/src/components/Announcement.vue';
 
 const store = useTenantStore();
 
   const isFunnel = computed(() => store.isFunnel);
-  const user: User = computed(() => store.user);
   const isLoggedIn = computed(() => store.isLoggedIn);
 
   const OWNER_URL = `//${import.meta.env.VITE_OWNER_URL}`;
-  const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
-  const TENANT_URL = `//${import.meta.env.VITE_TENANT_URL}`;
 
   function onLogout() {
-    this.$store.dispatch("logout", this.MAIN_URL);
+    store.logout(true);
   }
 
   function onLoginTenant() {
-    this.$router.push("/login");
+    // TODO
+    // this.$router.push("/login");
   }
 
   function onCreateOwner() {
-    window.location.href = this.OWNER_URL;
+    window.location.href = OWNER_URL;
   }
 </script>
 
