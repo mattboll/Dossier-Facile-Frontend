@@ -99,30 +99,32 @@
 <script setup lang="ts">
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import LanguageSelector from "df-shared-next/src/Header/LanguageSelector.vue";
-import { User } from "df-shared-next/src/models/User";
-import { DfMessage } from "df-shared-next/src/models/DfMessage";
 
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
   const { t } = useI18n();
-  const user: User = computed(() => store.user);
-  const isLoggedIn: boolean = computed(() => store.isLoggedIn);
-  const newMessage: number = computed(() => store.newMessage);
-  const messageList: DfMessage[][] = computed(() => store.getMessages);
-  const isDeleteModalVisible = false;
+  const store = useTenantStore();
+  const user = computed(() => store.user);
+  const isLoggedIn = computed(() => store.isLoggedIn);
+  const newMessage = computed(() => store.newMessage);
+  const messageList = computed(() => store.getMessages);
 
-  const MAIN_URL = `//${process.env.VUE_APP_MAIN_URL}`;
-  const DOCS_URL = `//${process.env.VUE_APP_DOCS_URL}`;
+  const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
+  const DOCS_URL = `//${import.meta.env.VITE_DOCS_URL}`;
 
   function currentPage() {
-    return this.$route.name;
+    // TODO
+    // return this.$route.name;
+    return ""
   }
 
   function showMessaging() {
     return (
-      (this.isLoggedIn === true && this.user.status !== "INCOMPLETE") ||
-      (this.messageList[this.user.id] !== undefined &&
-        this.messageList[this.user.id].length > 0)
+      (isLoggedIn.value === true && user.value.status !== "INCOMPLETE") ||
+      (messageList.value[user.value.id] !== undefined &&
+        messageList.value[user.value.id].length > 0)
     );
   }
 </script>
