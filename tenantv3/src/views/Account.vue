@@ -149,7 +149,7 @@
                     rel="noreferrer"
                   >
                     <img
-                      :src="require('../assets/button-je-donne-mon-avis.svg')"
+                      src="../assets/button-je-donne-mon-avis.svg"
                       alt="Je donne mon avis"
                       title="Je donne mon avis sur cette démarche"
                       class="align--center"
@@ -158,7 +158,7 @@
                 </div>
                 <p
                   class="fr-mt-3w"
-                  v-html="$tc('account.opinion-bloc.warning')"
+                  v-html="$t('account.opinion-bloc.warning')"
                 ></p>
               </div>
             </div>

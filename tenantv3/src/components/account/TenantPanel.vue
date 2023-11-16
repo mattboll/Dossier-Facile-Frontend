@@ -5,7 +5,7 @@
       <ul class="fr-p-0">
         <RowListItem
           v-if="!isCotenant"
-          :label="$tc('tenantpanel.clarification-title')"
+          :label="$t('tenantpanel.clarification-title')"
           :subLabel="props.tenant.clarification"
           @click-edit="goToValidationPage()"
         />
@@ -14,18 +14,18 @@
           @click-edit="gotoTenantName()"
         />
         <FileRowListItem
-          :label="$tc('tenantpanel.identification')"
+          :label="$t('tenantpanel.identification')"
           :document="document(props.tenant, 'IDENTIFICATION')"
           enableDownload="force"
           @click-edit="setTenantStep(1)"
         />
         <FileRowListItem
-          :label="$tc('tenantpanel.residency')"
+          :label="$t('tenantpanel.residency')"
           :document="document(props.tenant, 'RESIDENCY')"
           @click-edit="setTenantStep(2)"
         />
         <FileRowListItem
-          :label="$tc('tenantpanel.professional')"
+          :label="$t('tenantpanel.professional')"
           :sub-label="getProfessionalSubCategory(props.tenant)"
           :document="document(props.tenant, 'PROFESSIONAL')"
           @click-edit="setTenantStep(3)"
@@ -34,20 +34,20 @@
           <FileRowListItem
             v-for="doc in documents(props.tenant, 'FINANCIAL')"
             v-bind:key="doc.id"
-            :label="$tc('tenantpanel.financial')"
-            :sub-label="$tc(`documents.subcategory.${doc.subCategory}`)"
+            :label="$t('tenantpanel.financial')"
+            :sub-label="$t(`documents.subcategory.${doc.subCategory}`)"
             :document="doc"
             @click-edit="setTenantStep(4)"
           />
         </span>
         <FileRowListItem
           v-else
-          :label="$tc('tenantpanel.financial')"
+          :label="$t('tenantpanel.financial')"
           :document="document(props.tenant, 'FINANCIAL')"
           @click-edit="setTenantStep(4)"
         />
         <FileRowListItem
-          :label="$tc('tenantpanel.tax')"
+          :label="$t('tenantpanel.tax')"
           :document="document(props.tenant, 'TAX')"
           @click-edit="setTenantStep(5)"
         />
