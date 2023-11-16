@@ -8,6 +8,7 @@ import MyHeader from "./components/Header.vue";
 import Footer from "df-shared-next/src/Footer/Footer.vue";
 import DeleteAccount from './components/DeleteAccount.vue';
 import Announcement from 'df-shared-next/src/components/Announcement.vue';
+import FollowSocials from 'df-shared-next/src/Footer/FollowSocials.vue';
 
 const store = useTenantStore();
 
@@ -55,8 +56,6 @@ const store = useTenantStore();
 </template>
 
 <style>
-@import '../node_modules/@gouvfr/dsfr/dist/dsfr/dsfr.min.css';
-
 #app {
   min-height: 100vh;
   display: flex;
