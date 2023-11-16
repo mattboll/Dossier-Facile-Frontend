@@ -1,4 +1,9 @@
 {
+  "logout": "Logout",
+  "signin": "Sign in",
+  "owner-header": "Owner area",
+  "partner": "Become partner",
+  "partner-link-title": "Become partner (New Window)",
   "identity-card": "Identity Card",
   "passport": "Passport",
   "permit": "French Residence Permit",

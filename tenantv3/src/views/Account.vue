@@ -169,73 +169,47 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { mapState } from "vuex";
+<script setup lang="ts">
 import { User } from "df-shared/src/models/User";
-import { DfDocument } from "df-shared/src/models/DfDocument";
 import DfButton from "df-shared/src/Button/Button.vue";
 import ColoredTag from "df-shared/src/components/ColoredTag.vue";
 import { Guarantor } from "df-shared/src/models/Guarantor";
-import { AnalyticsService } from "../services/AnalyticsService";
-import DeleteAccount from "../components/DeleteAccount.vue";
 import FakeAnnouncement from "../components/FakeAnnouncement.vue";
 import PartnersSection from "@/components/account/PartnersSection.vue";
 import { UtilsService } from "@/services/UtilsService";
 import TenantPanel from "@/components/account/TenantPanel.vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+// import { useRouter } from "vue-router";
 
-@Component({
-  components: {
-    FakeAnnouncement,
-    PartnersSection,
-    ValidationProvider,
-    ValidationObserver,
-    DfButton,
-    ColoredTag,
-    DeleteAccount,
-    TenantPanel,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class Account extends Vue {
-  TENANT_URL = `https://${import.meta.env.VITE_TENANT_URL}`;
-  MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
-  FORCE_FAKE_ANNOUNCEMENT_VISIBILITY =
-    import.meta.env.VITE_FORCE_ANNOUNCEMENT_VISIBILITY || false;
+  const FORCE_FAKE_ANNOUNCEMENT_VISIBILITY = import.meta.env.VITE_FORCE_ANNOUNCEMENT_VISIBILITY || false;
+  const isAnnouncementVisible = ref(false);
+  const store = useTenantStore();
+  const user = computed(() => store.user);
+  const tabIndex = ref(0);
+  // const router = useRouter();
 
-  isAnnouncementVisible = false;
-
-  user!: User;
-  isDeleteModalVisible = false;
-
-  tabIndex = 0;
-
-  mounted() {
+  onMounted(() => {
     window.Beacon("init", "d949ac15-a9eb-4316-b0c5-f92cecc7118f");
     const today = new Date();
     if (
       (today.getMonth() >= 5 && today.getMonth() <= 8) ||
-      this.FORCE_FAKE_ANNOUNCEMENT_VISIBILITY === "true"
+      FORCE_FAKE_ANNOUNCEMENT_VISIBILITY === "true"
     ) {
-      this.isAnnouncementVisible = true;
+      isAnnouncementVisible.value = true;
     }
-  }
+  })
 
-  beforeDestroy() {
+  onBeforeUnmount(() => {
     window.Beacon("destroy");
-  }
+  })
 
-  getTenants() {
+  function getTenants() {
     const tenants: User[] = [];
-    tenants.push(this.user);
+    tenants.push(user.value);
 
-    this.user?.apartmentSharing?.tenants?.forEach((t) => {
-      if (t.id != this.user.id) {
+    user.value?.apartmentSharing?.tenants?.forEach((t) => {
+      if (t.id != user.value.id) {
         tenants.push(t);
       }
     });
@@ -243,132 +217,25 @@ export default class Account extends Vue {
     return tenants;
   }
 
-  getStatus(docType: string) {
-    if (docType === "FINANCIAL") {
-      const docs = this.user.documents?.filter((d) => {
-        return d.documentCategory === "FINANCIAL";
-      });
-      return this.isFinancialValid(docs || []);
-    }
-    const doc = this.user.documents?.find((d: DfDocument) => {
-      return d.documentCategory === docType;
-    });
-    return doc?.documentStatus || "EMPTY";
+  function goToMessaging() {
+    // TODO
+    // router.push("/messaging");
   }
 
-  isFinancialValid(docs: DfDocument[]) {
-    if (!docs || docs.length === 0) {
-      return "INCOMPLETE";
-    }
-
-    for (const doc of docs) {
-      if (!doc.noDocument && (doc.files?.length || 0) <= 0) {
-        return "INCOMPLETE";
-      }
-    }
-
-    for (const doc of docs) {
-      if (doc.documentStatus === "DECLINED") {
-        return "DECLINED";
-      }
-    }
-
-    for (const doc of docs) {
-      if (doc.documentStatus === "TO_PROCESS") {
-        return "TO_PROCESS";
-      }
-    }
-
-    return "VALIDATED";
+  function getFirstName() {
+    return UtilsService.capitalize(user.value.firstName || "");
   }
 
-  goToMessaging() {
-    this.$router.push("/messaging");
+  function canCopyLink() {
+    return UtilsService.canShareFile(user.value);
   }
 
-  openDeleteModal() {
-    this.isDeleteModalVisible = true;
-  }
-
-  undoSelect() {
-    this.isDeleteModalVisible = false;
-    return false;
-  }
-
-  getPersonnalStatus() {
-    if (
-      this.user?.apartmentSharing?.tenants !== undefined &&
-      this.user.applicationType === "ALONE"
-    ) {
-      return this.$i18n.t("account.ALONE");
-    }
-    if (this.user.applicationType === "COUPLE") {
-      const spouse = this.user?.apartmentSharing?.tenants?.find((t: User) => {
-        return t.id !== this.user?.id;
-      });
-      if (spouse?.lastName !== undefined && spouse?.lastName !== "") {
-        return this.$i18n
-          .t("account.couple-with", [
-            `${spouse?.firstName} ${spouse?.lastName}`,
-          ])
-          .toString();
-      }
-      return this.$i18n
-        .t("account.couple-with", [this.$i18n.t("account.someone")])
-        .toString();
-    }
-
-    const roommates = this.user?.apartmentSharing?.tenants
-      .filter((t: User) => {
-        return t.id !== this.user?.id;
-      })
-      .map((u: User) => {
-        return `${u.firstName} ${u.lastName}`;
-      });
-
-    const listNames = roommates?.join(", ");
-    if (!listNames.trim() || listNames.includes("undefined")) {
-      return this.$i18n.t("account.group-with-someone").toString();
-    }
-    return this.$i18n.t("account.group-with", [listNames]).toString();
-  }
-
-  getProfession() {
-    const doc = this.user.documents?.find((d: DfDocument) => {
-      return d.documentCategory === "PROFESSIONAL";
-    });
-    if (doc?.subCategory === "OTHER") {
-      return "";
-    }
-    return this.$i18n.t(`account.${doc?.subCategory || "none"}`);
-  }
-
-  getIncome() {
-    const sum = this.user.documents
-      ?.filter((d: DfDocument) => {
-        return d.documentCategory === "FINANCIAL";
-      })
-      .reduce((sum, current) => sum + (current.monthlySum || 0), 0);
-    if (sum === 0) {
-      return this.$i18n.t("account.no-income");
-    }
-    return this.$i18n.t("account.income", [sum]);
-  }
-
-  getFirstName() {
-    return UtilsService.capitalize(this.user.firstName || "");
-  }
-
-  canCopyLink() {
-    return UtilsService.canShareFile(this.user);
-  }
-
-  isDenied() {
+  function isDenied() {
     return (
-      this.user.documents?.find((d) => {
+      user.value.documents?.find((d) => {
         return d.documentStatus === "DECLINED";
       }) !== undefined ||
-      this.user.guarantors?.find((g: Guarantor) => {
+      user.value.guarantors?.find((g: Guarantor) => {
         return (
           g.documents?.find((d) => {
             return d.documentStatus === "DECLINED";
@@ -378,24 +245,12 @@ export default class Account extends Vue {
     );
   }
 
-  gotoTenantName() {
-    this.$router.push({ name: "TenantName" });
+  function getGlobalStatus(): string {
+    return user.value.apartmentSharing?.status as string | "INCOMPLETE";
   }
 
-  setTenantStep(n: number) {
-    AnalyticsService.editFromAccount(n);
-    this.$router.push({
-      name: "TenantDocuments",
-      params: { substep: n.toString() },
-    });
-  }
-
-  getGlobalStatus(): string {
-    return this.user.apartmentSharing?.status as string | "INCOMPLETE";
-  }
-
-  getApplicationType() {
-    switch (this.user.applicationType) {
+  function getApplicationType() {
+    switch (user.value.applicationType) {
       case "COUPLE":
         return "couple";
       case "GROUP":
@@ -403,7 +258,6 @@ export default class Account extends Vue {
     }
     return "alone";
   }
-}
 </script>
 
 <style scoped lang="scss">

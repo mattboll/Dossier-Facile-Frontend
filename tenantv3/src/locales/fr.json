@@ -1,4 +1,9 @@
 {
+  "logout": "Se déconnecter",
+  "signin": "Se connecter",
+  "owner-header": "Espace propriétaire",
+  "partner": "Devenir partenaire",
+  "partner-link-title": "Devenir partenaire (Nouvelle fenêtre)",
   "identity-card": "Carte d’identité",
   "passport": "Passeport",
   "permit": "Titre de séjour français",

@@ -240,16 +240,16 @@ const router = createRouter({
   //   },
   //   component: () => import(/* webpackChunkName: "file" */ "../views/File.vue"),
   // },
-  // {
-  //   path: "/account",
-  //   name: "Account",
-  //   meta: {
-  //     title: "Mon dossier - DossierFacile",
-  //     requiresAuth: true,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "account" */ "../views/Account.vue"),
-  // },
+  {
+    path: "/account",
+    name: "Account",
+    meta: {
+      title: "Mon dossier - DossierFacile",
+      requiresAuth: true,
+    },
+    component: () =>
+      import(/* webpackChunkName: "account" */ "../views/Account.vue"),
+  },
   // {
   //   path: "/applications",
   //   name: "SharingPage",

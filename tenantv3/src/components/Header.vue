@@ -49,7 +49,7 @@
                 </li>
                 <li v-if="!props.loggedIn">
                   <DfButton
-                    primary="true"
+                    :primary="true"
                     size="small"
                     @on-click="onLoginTenant"
                   >
@@ -60,7 +60,7 @@
                 <li v-if="!props.loggedIn">
                   <DfButton size="small" @on-click="onCreateOwner">
                     <i class="ri-community-line" aria-hidden="true"></i>
-                    {{ $t("owner") }}
+                    {{ $t("owner-header") }}
                   </DfButton>
                 </li>
                 <li v-if="!props.loggedIn">
@@ -213,22 +213,3 @@ header i {
   }
 }
 </style>
-
-<i18n>
-{
-  "en": {
-    "logout": "Logout",
-    "signin": "Sign in",
-    "owner": "Owner area",
-    "partner": "Become partner",
-    "partner-link-title": "Become partner (New Window)"
-  },
-  "fr": {
-    "logout": "Se déconnecter",
-    "signin": "Se connecter",
-    "owner": "Espace propriétaire",
-    "partner": "Devenir partenaire",
-    "partner-link-title": "Devenir partenaire (Nouvelle fenêtre)"
-  }
-}
-</i18n>
