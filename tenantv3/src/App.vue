@@ -3,6 +3,10 @@ import { RouterView } from 'vue-router'
 import useTenantStore from './stores/tenant-store';
 import { User } from '@sentry/vue';
 import { computed } from 'vue';
+import TenantSkipLinks from './components/TenantSkipLinks.vue';
+import Menu from './components/Menu.vue';
+import MyHeader from "df-shared-next/src/Header/Header.vue";
+import Footer from "df-shared-next/src/Footer/Footer.vue";
 
 const store = useTenantStore();
 
