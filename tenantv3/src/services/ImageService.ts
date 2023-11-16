@@ -1,4 +1,4 @@
-import { DfFile } from "df-shared/src/models/DfFile";
+import { DfFile } from "df-shared-next/src/models/DfFile";
 
 export const ImageService = {
   isImage(file: DfFile) {

@@ -42,17 +42,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
-import DfButton from "df-shared/src/Button/Button.vue";
-import { Component, Vue } from "vue-property-decorator";
-@Component({
-  components: {
-    DfButton,
-  },
-})
-export default class FakeAnnouncement extends Vue {
-  signal() {
+import DfButton from "df-shared-next/src/Button/Button.vue";
+  function signal() {
     AnalyticsService.openMaSecurite();
     window.open(
       "https://www.service-public.fr/particuliers/vosdroits/N31138#2",
@@ -60,7 +53,6 @@ export default class FakeAnnouncement extends Vue {
       "noopener"
     );
   }
-}
 </script>
 
 <style scoped lang="scss">

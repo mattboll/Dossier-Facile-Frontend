@@ -9,7 +9,7 @@ import { Component, Vue } from "vue-property-decorator";
 import GuarantorDocuments from "../components/GuarantorDocuments.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
 import { mapGetters } from "vuex";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 
 @Component({
   components: {

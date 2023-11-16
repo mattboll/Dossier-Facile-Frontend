@@ -1,6 +1,6 @@
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import axios from "axios";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 
 export const ProfileService = {
   unlinkFranceConnect(): Promise<boolean> {
@@ -56,7 +56,7 @@ export const ProfileService = {
       { honorDeclaration, clarification }
     );
   },
-  setGuarantorType(typeGuarantorData: Guarantor) {
+  setGuarantorType(typeGuarantorData: any) {
     return axios.post(
       `https://${import.meta.env.VITE_API_URL}/api/register/guarantorType`,
       typeGuarantorData

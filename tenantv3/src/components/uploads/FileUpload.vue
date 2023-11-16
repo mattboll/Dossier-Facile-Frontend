@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { UploadStatus } from "df-shared/src/models/UploadStatus";
+import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 
 const { STATUS_INITIAL, STATUS_SUCCESS, STATUS_SAVING, STATUS_FAILED } =
   UploadStatus;

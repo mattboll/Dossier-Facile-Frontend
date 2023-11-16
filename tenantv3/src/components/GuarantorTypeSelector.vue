@@ -18,11 +18,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import RichRadioButtons from "df-shared/src/Button/RichRadioButtons.vue";
+import RichRadioButtons from "df-shared-next/src/Button/RichRadioButtons.vue";
 import { mapGetters, mapState } from "vuex";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
-import { User } from "df-shared/src/models/User";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import { User } from "df-shared-next/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 
 @Component({
   computed: {

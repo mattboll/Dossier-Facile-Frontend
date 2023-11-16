@@ -109,14 +109,14 @@
 import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider, ValidationObserver } from "vee-validate";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import { UtilsService } from "../services/UtilsService";
 import { extend } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
 import FileErrors from "./FileErrors.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { RegisterService } from "@/services/RegisterService";
 
 extend("isvalid", {

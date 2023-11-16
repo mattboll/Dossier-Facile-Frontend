@@ -1,6 +1,6 @@
-import { User } from "df-shared/src/models/User";
-import { DfDocument } from "../../../df-shared/src/models/DfDocument";
-import { Guarantor } from "../../../df-shared/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import { DfDocument } from "../../../df-shared-next/src/models/DfDocument";
+import { Guarantor } from "../../../df-shared-next/src/models/Guarantor";
 import * as moment from "moment";
 
 export const UtilsService = {

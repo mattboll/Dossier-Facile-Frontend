@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import Artwork from "df-shared/src/components/Artwork.vue";
+import Artwork from "df-shared-next/src/components/Artwork.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({

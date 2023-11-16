@@ -153,12 +153,12 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import { mapGetters, mapState } from "vuex";
-import VGouvFrButton from "df-shared/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import RoommatesInformationHelp from "./helps/RoommatesInformationHelp.vue";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { UtilsService } from "../services/UtilsService";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
@@ -244,7 +244,7 @@ export default class RoommatesInformation extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 .overflow--hidden {
   overflow: hidden;

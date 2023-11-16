@@ -923,7 +923,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorFinancial(formData) {
+    saveGuarantorFinancial(formData: any) {
       return RegisterService.saveGuarantorFinancial(formData)
         .then(async (response) => {
           await this.loadUserCommit(response.data);
@@ -945,7 +945,7 @@ const useTenantStore = defineStore('tenant', {
           return Promise.reject(error);
         });
     },
-    saveTenantTax(formData) {
+    saveTenantTax(formData: any) {
       return RegisterService.saveTenantTax(formData).then(
         (response) => {
           this.loadUserCommit(response.data);
@@ -956,7 +956,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    saveGuarantorTax(formData) {
+    saveGuarantorTax(formData: any) {
       return RegisterService.saveGuarantorTax(formData).then(
         (response) => {
           this.loadUserCommit(response.data);
@@ -1053,9 +1053,12 @@ const useTenantStore = defineStore('tenant', {
       this.setSelectedGuarantor(new Guarantor());
     },
     readMessages(tenantId?: number) {
+      if (tenantId === undefined) {
+        return;
+      }
       return MessageService.markMessagesAsRead(tenantId).then(
         (response) => {
-          this.updateMessagesCommit({ tenantId, messageList: response.data });
+          this.updateMessagesCommit(tenantId, response.data);
           return Promise.resolve(response.data);
         },
         (error) => {

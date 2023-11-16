@@ -69,16 +69,16 @@ import GuarantorProfessional from "./documents/naturalGuarantor/GuarantorProfess
 import GuarantorFinancial from "./documents/naturalGuarantor/GuarantorFinancial.vue";
 import GuarantorTax from "./documents/naturalGuarantor/GuarantorTax.vue";
 import { mapGetters, mapState } from "vuex";
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { User } from "df-shared/src/models/User";
-import DfButton from "df-shared/src/Button/Button.vue";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
-import VGouvFrButton from "df-shared/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import DfButton from "df-shared-next/src/Button/Button.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ProfileContainer from "./ProfileContainer.vue";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
@@ -190,7 +190,7 @@ export default class GuarantorDocuments extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 .remark {
   background-color: #e5e5f4;

@@ -92,11 +92,11 @@
 <script lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { OwnerService } from "../../services/OwnerService";
-import DfButton from "df-shared/src/Button/Button.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider } from "vee-validate";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 
 @Component({
   components: {

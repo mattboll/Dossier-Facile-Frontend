@@ -80,7 +80,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 
 @Component({
   components: {
@@ -97,7 +97,7 @@ export default class FileReinsurance extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 .text-green {
   color: green;

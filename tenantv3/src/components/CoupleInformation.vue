@@ -155,12 +155,12 @@ import { Component, Vue } from "vue-property-decorator";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
 import { mapGetters, mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
-import VGouvFrButton from "df-shared/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import { User } from "df-shared-next/src/models/User";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import CoupleInformationHelp from "./helps/CoupleInformationHelp.vue";
-import FieldLabel from "df-shared/src/components/form/FieldLabel.vue";
+import FieldLabel from "df-shared-next/src/components/form/FieldLabel.vue";
 
 extend("is", {
   ...is,

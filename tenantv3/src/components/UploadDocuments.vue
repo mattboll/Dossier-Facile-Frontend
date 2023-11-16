@@ -53,11 +53,11 @@ import Professional from "./documents/tenant/Professional.vue";
 import Financial from "./documents/tenant/Financial.vue";
 import Tax from "./documents/tenant/Tax.vue";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import { AnalyticsService } from "../services/AnalyticsService";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import { DocumentService } from "@/services/DocumentService";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 
 @Component({
   components: {
@@ -162,7 +162,7 @@ export default class UploadDocuments extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 h2 {
   font-size: 1rem;

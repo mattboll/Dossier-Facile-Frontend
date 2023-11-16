@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import { DocumentType, DocumentTypeTranslations } from "./DocumentType";
 
 @Component({

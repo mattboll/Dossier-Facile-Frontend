@@ -335,18 +335,18 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
-import FileStatusIcon from "df-shared/src/components/FileStatusIcon.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import FileStatusIcon from "df-shared-next/src/components/FileStatusIcon.vue";
 import { DocumentService } from "../services/DocumentService";
-import { DfFile } from "df-shared/src/models/DfFile";
-import { DfMessage } from "df-shared/src/models/DfMessage";
-import Modal from "df-shared/src/components/Modal.vue";
+import { DfFile } from "df-shared-next/src/models/DfFile";
+import { DfMessage } from "df-shared-next/src/models/DfMessage";
+import Modal from "df-shared-next/src/components/Modal.vue";
 import PdfViewer from "../components/PdfViewer.vue";
 import ShowDoc from "../components/documents/share/ShowDoc.vue";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { DfDocument } from "df-shared/src/models/DfDocument";
+import { User } from "df-shared-next/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ViewEditBtn from "../components/ViewEditBtn.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 

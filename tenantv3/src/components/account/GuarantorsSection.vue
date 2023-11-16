@@ -141,52 +141,51 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+<script setup lang="ts">
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { AnalyticsService } from "@/services/AnalyticsService";
-import { DfDocument } from "df-shared/src/models/DfDocument";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
-import { User } from "df-shared/src/models/User";
-import { mapState } from "vuex";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import { User } from "df-shared-next/src/models/User";
 import { UtilsService } from "@/services/UtilsService";
-import FileRowListItem from "@/components/documents/FileRowListItem.vue";
+import FileRowListItem from "../documents/FileRowListItem.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
-@Component({
-  components: { ColoredTag, ConfirmModal, FileRowListItem },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class GuarantorsSection extends Vue {
-  @Prop() tenant!: User;
-  user!: User;
-  guarantors!: Guarantor[];
-  showConfirmModal = false;
-  selectedGuarantor: Guarantor | undefined;
+const store = useTenantStore();
+const router = useRouter();
 
-  beforeMount() {
-    this.guarantors = this.tenant.guarantors as Guarantor[];
-  }
+  const props = defineProps<{tenant?: User;}>();
+  const user = computed(() => store.user);
+  const guarantors = ref([] as Guarantor[]);
+  const showConfirmModal = ref(false);
+  var selectedGuarantor: Guarantor | undefined;
 
-  guarantorTitle(g: Guarantor) {
+  const { t } = useI18n();
+
+  onBeforeMount(() => {
+    if (props.tenant?.guarantors !== undefined) {
+      guarantors.value = props.tenant.guarantors as Guarantor[];
+    }
+  })
+
+  function guarantorTitle(g: Guarantor) {
     if (g.typeGuarantor === "NATURAL_PERSON")
       return (
-        this.$t("guarantorssection.my-guarantor") +
+        t("guarantorssection.my-guarantor") +
         (g.firstName || g.lastName ? " " + g.firstName + " " + g.lastName : "")
       );
     else if (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) {
       return (
-        this.$t("guarantorssection.my-guarantor") + " " + g.legalPersonName
+        t("guarantorssection.my-guarantor") + " " + g.legalPersonName
       );
     }
-    return this.$t("guarantorssection.guarantors-information");
+    return t("guarantorssection.guarantors-information");
   }
 
-  isFinancialValid(docs: DfDocument[]) {
+  function isFinancialValid(docs: DfDocument[]) {
     if (!docs || docs.length === 0) {
       return "INCOMPLETE";
     }
@@ -211,23 +210,23 @@ export default class GuarantorsSection extends Vue {
 
     return "VALIDATED";
   }
-  document(g: Guarantor, s: string) {
+  function document(g: Guarantor, s: string) {
     return g.documents?.find((d) => {
       return d.documentCategory === s;
     });
   }
 
-  documents(g: Guarantor, docType: string): DfDocument[] {
+  function documents(g: Guarantor, docType: string): DfDocument[] {
     return g.documents?.filter((d: DfDocument) => {
       return d.documentCategory === docType;
     }) as DfDocument[];
   }
-  getGuarantorStatus(g: Guarantor, docType: string) {
+  function getGuarantorStatus(g: Guarantor, docType: string) {
     if (docType === "FINANCIAL") {
       const docs = g.documents?.filter((d) => {
         return d.documentCategory === "FINANCIAL";
       });
-      return this.isFinancialValid(docs || []);
+      return isFinancialValid(docs || []);
     }
     const doc = g.documents?.find((d: DfDocument) => {
       return d.documentCategory === docType;
@@ -235,35 +234,31 @@ export default class GuarantorsSection extends Vue {
     return doc?.documentStatus || "EMPTY";
   }
 
-  setGuarantorSubStep(n: number, g: Guarantor) {
+  function setGuarantorSubStep(n: number, g: Guarantor) {
     AnalyticsService.editFromAccount(n);
-    this.$store.dispatch("setGuarantorPage", {
-      guarantor: g,
-      substep: n,
-      tenantId: this.tenant.id,
-    });
+    store.setGuarantorPage( g, n, props.tenant?.id,);
   }
 
-  setAddGuarantorStep() {
+  function setAddGuarantorStep() {
     AnalyticsService.editAccount("guarantor");
 
-    if (this.user.id === this.tenant.id) {
-      if (this.guarantors.length > 0) {
-        this.$store.dispatch("addNaturalGuarantor");
+    if (user.value.id === props.tenant?.id) {
+      if (guarantors.value.length > 0) {
+        store.addNaturalGuarantor();
       } else {
-        this.$router.push({ name: "GuarantorChoice" });
+        router.push({ name: "GuarantorChoice" });
       }
     } else {
-      if (this.guarantors.length > 0) {
-        this.$store
-          .dispatch("setGuarantorType", {
-            tenantId: this.tenant.id,
+      if (guarantors.value.length > 0) {
+        store
+          .setGuarantorType({
+            tenantId: props.tenant?.id,
             typeGuarantor: "NATURAL_PERSON",
           })
           .then(() => {
             this.guarantors = UtilsService.getTenant(this.tenant.id).guarantors;
             const g = this.guarantors[this.guarantors.length - 1];
-            this.$router.push({
+            router.push({
               name: "TenantGuarantorDocuments",
               params: {
                 step: "5",
@@ -274,7 +269,7 @@ export default class GuarantorsSection extends Vue {
             });
           });
       } else {
-        this.$router.push({
+        router.push({
           name: "TenantGuarantors",
           params: {
             tenantId: this.tenant.id.toString(),
@@ -285,31 +280,35 @@ export default class GuarantorsSection extends Vue {
     }
   }
 
-  openConfirmModal(g: Guarantor) {
-    this.showConfirmModal = true;
-    this.selectedGuarantor = g;
+  function openConfirmModal(g: Guarantor) {
+    showConfirmModal.value = true;
+    selectedGuarantor = g;
   }
-  closeConfirmModal() {
-    this.showConfirmModal = false;
-    this.selectedGuarantor = undefined;
+  function closeConfirmModal() {
+    showConfirmModal.value = false;
+    selectedGuarantor = undefined;
   }
 
-  removeSelectedGuarantor() {
-    this.$store.dispatch("deleteGuarantor", this.selectedGuarantor).then(
+  function removeSelectedGuarantor() {
+    if (selectedGuarantor === undefined) {
+      return;
+    }
+    store.deleteGuarantor(selectedGuarantor).then(
       () => {
-        Vue.toasted.global.delete_success();
-        this.guarantors = this.guarantors.filter(
-          (g) => g.id != this.selectedGuarantor?.id
+        // TODO
+        // Vue.toasted.global.delete_success();
+        guarantors.value = guarantors.value.filter(
+          (g) => g.id != selectedGuarantor?.id
         );
-        this.closeConfirmModal();
+        closeConfirmModal();
       },
       () => {
-        Vue.toasted.global.delete_failed();
-        this.closeConfirmModal();
+        // TODO
+        // Vue.toasted.global.delete_failed();
+        closeConfirmModal();
       }
     );
   }
-}
 </script>
 
 <style lang="scss" scoped>

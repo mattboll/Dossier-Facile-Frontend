@@ -72,13 +72,13 @@ import { Component, Vue } from "vue-property-decorator";
 import { is } from "vee-validate/dist/rules";
 import { extend } from "vee-validate";
 import { mapGetters, mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import { Owner } from "df-shared/src/models/Owner";
+import { User } from "df-shared-next/src/models/User";
+import { Owner } from "df-shared-next/src/models/Owner";
 import { ValidationProvider, ValidationObserver } from "vee-validate";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import DfButton from "df-shared/src/Button/Button.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 import { OwnerService } from "../services/OwnerService";
-import VGouvFrButton from "df-shared/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 
 extend("is", {
   ...is,

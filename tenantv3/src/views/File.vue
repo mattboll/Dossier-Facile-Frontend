@@ -221,18 +221,18 @@
 </template>
 
 <script lang="ts">
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { User } from "df-shared/src/models/User";
-import { FileUser } from "df-shared/src/models/FileUser";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import { FileUser } from "df-shared-next/src/models/FileUser";
 import { Component, Vue } from "vue-property-decorator";
-import DfButton from "df-shared/src/Button/Button.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 import { ProfileService } from "../services/ProfileService";
-import { DfDocument } from "df-shared/src/models/DfDocument";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import FileReinsurance from "../components/FileReinsurance.vue";
 import ProgressIndicator from "@/components/ProgressIndicator.vue";
 import FileRowListItem from "../components/documents/FileRowListItem.vue";
 import OwnerBanner from "../components/OwnerBanner.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FileHeader from "../components/FileHeader.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileNotFound from "@/views/FileNotFound.vue";

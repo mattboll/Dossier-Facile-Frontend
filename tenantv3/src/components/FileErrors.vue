@@ -418,13 +418,13 @@
 </template>
 
 <script lang="ts">
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { User } from "df-shared/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
 import { Component, Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
 import { UtilsService } from "../services/UtilsService";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
-import DfButton from "df-shared/src/Button/Button.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 @Component({
   components: { NakedCard, DfButton },
   computed: {

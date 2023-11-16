@@ -15,12 +15,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import DocumentLink from "./DocumentLink.vue";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DocumentService } from "@/services/DocumentService";
 import { DocumentType } from "./DocumentType";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 
 @Component({
   components: { ColoredTag, DocumentLink },

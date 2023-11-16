@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
-import DfButton from "df-shared/src/Button/Button.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 import { Component, Vue } from "vue-property-decorator";
 @Component({
   components: {

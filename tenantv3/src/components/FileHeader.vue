@@ -20,15 +20,15 @@
 </template>
 
 <script lang="ts">
-import { FileUser } from "df-shared/src/models/FileUser";
+import { FileUser } from "df-shared-next/src/models/FileUser";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import DfButton from "df-shared/src/Button/Button.vue";
-import { DfDocument } from "df-shared/src/models/DfDocument";
+import DfButton from "df-shared-next/src/Button/Button.vue";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import FileReinsurance from "../components/FileReinsurance.vue";
 import ProgressIndicator from "@/components/ProgressIndicator.vue";
 import FileRowListItem from "../components/documents/FileRowListItem.vue";
 import OwnerBanner from "../components/OwnerBanner.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import moment from "moment";
 
 @Component({

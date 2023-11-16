@@ -41,7 +41,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { mapGetters, mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 
 import MessagesPanel from "../components/MessagesPanel.vue";
 

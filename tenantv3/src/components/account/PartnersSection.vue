@@ -113,13 +113,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
-import { Component, Vue } from "vue-property-decorator";
 
-@Component
-export default class PartnersSection extends Vue {
-  signal() {
+  function signal() {
     AnalyticsService.openMaSecurite();
     window.open(
       "https://www.service-public.fr/particuliers/vosdroits/N31138#2",
@@ -127,7 +124,6 @@ export default class PartnersSection extends Vue {
       "noopener"
     );
   }
-}
 </script>
 
 <style lang="scss" scoped>

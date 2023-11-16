@@ -65,9 +65,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import DfButton from "df-shared/src/Button/Button.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
@@ -148,7 +148,7 @@ export default class TenantGuarantorChoice extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 .remark {
   background-color: #e5e5f4;

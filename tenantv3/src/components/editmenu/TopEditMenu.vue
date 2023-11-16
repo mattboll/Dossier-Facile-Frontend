@@ -286,12 +286,12 @@
 </template>
 
 <script lang="ts">
-import StepNumber from "df-shared/src/components/StepNumber.vue";
+import StepNumber from "df-shared-next/src/components/StepNumber.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import { mapState } from "vuex";
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { User } from "df-shared/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
 import TenantDocumentLink from "./documents/TenantDocumentLink.vue";
 import GuarantorDocumentLink from "./documents/GuarantorDocumentLink.vue";
 import CoTenantDocumentLink from "./documents/CoTenantDocumentLink.vue";
@@ -440,7 +440,7 @@ export default class TopEditMenu extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 h1 {
   font-size: 0.9rem;

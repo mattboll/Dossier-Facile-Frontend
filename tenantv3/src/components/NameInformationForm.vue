@@ -101,18 +101,18 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import SubmitButton from "df-shared/src/Button/SubmitButton.vue";
-import RequiredFieldsInstruction from "df-shared/src/components/form/RequiredFieldsInstruction.vue";
+import SubmitButton from "df-shared-next/src/Button/SubmitButton.vue";
+import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import NameInformationHelp from "./helps/NameInformationHelp.vue";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import { mapGetters } from "vuex";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "@/services/UtilsService";
-import TextField from "df-shared/src/components/form/TextField.vue";
+import TextField from "df-shared-next/src/components/form/TextField.vue";
 
 extend("zipcode", {
   validate: (field) => new RegExp(/^[0-9]{5}$/).test(field),

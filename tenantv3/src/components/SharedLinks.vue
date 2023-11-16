@@ -122,14 +122,14 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
-import Toggle from "df-shared/src/components/Toggle.vue";
-import { ApartmentSharingLink } from "df-shared/src/models/ApartmentSharingLink";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import Toggle from "df-shared-next/src/components/Toggle.vue";
+import { ApartmentSharingLink } from "df-shared-next/src/models/ApartmentSharingLink";
 import Button from "df-shared-next/src/Button/Button.vue";
 import moment from "moment";
 import { mapState } from "vuex";
 import store from "@/store";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 
 @Component({
   components: { NakedCard, Button, ColoredTag, Toggle },

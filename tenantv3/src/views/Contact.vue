@@ -5,8 +5,8 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import ContactForm from "df-shared/src/components/ContactForm.vue";
+import { User } from "df-shared-next/src/models/User";
+import ContactForm from "df-shared-next/src/components/ContactForm.vue";
 
 @Component({
   components: {

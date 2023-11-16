@@ -400,12 +400,12 @@
 </template>
 
 <script lang="ts">
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapState } from "vuex";
-import StatusIcon from "df-shared/src/components/StatusIcon.vue";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
-import { User } from "df-shared/src/models/User";
+import StatusIcon from "df-shared-next/src/components/StatusIcon.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+import { User } from "df-shared-next/src/models/User";
 import DocumentLink from "./documents/DocumentLink.vue";
 import GuarantorDocumentLink from "./documents/GuarantorDocumentLink.vue";
 import TenantDocumentLink from "./documents/TenantDocumentLink.vue";
@@ -526,7 +526,7 @@ export default class LeftEditMenu extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 .left-edit-menu {
   background-color: var(--background-default-grey);

@@ -1,38 +1,38 @@
 <template>
   <div>
     <div class="main-information">
-      <h3 class="fr-h4">{{ $t("tenantpanel.my-files") + tenant.firstName }}</h3>
+      <h3 class="fr-h4">{{ $t("tenantpanel.my-files") + props.tenant.firstName }}</h3>
       <ul class="fr-p-0">
         <RowListItem
           v-if="!isCotenant"
           :label="$tc('tenantpanel.clarification-title')"
-          :subLabel="tenant.clarification"
+          :subLabel="props.tenant.clarification"
           @click-edit="goToValidationPage()"
         />
         <RowListItem
-          :label="tenant | fullName"
+          :label="props.tenant | fullName"
           @click-edit="gotoTenantName()"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.identification')"
-          :document="document(tenant, 'IDENTIFICATION')"
+          :document="document(props.tenant, 'IDENTIFICATION')"
           enableDownload="force"
           @click-edit="setTenantStep(1)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.residency')"
-          :document="document(tenant, 'RESIDENCY')"
+          :document="document(props.tenant, 'RESIDENCY')"
           @click-edit="setTenantStep(2)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.professional')"
-          :sub-label="getProfessionalSubCategory(tenant)"
-          :document="document(tenant, 'PROFESSIONAL')"
+          :sub-label="getProfessionalSubCategory(props.tenant)"
+          :document="document(props.tenant, 'PROFESSIONAL')"
           @click-edit="setTenantStep(3)"
         />
-        <span v-if="documents(tenant, 'FINANCIAL').length > 1">
+        <span v-if="documents(props.tenant, 'FINANCIAL').length > 1">
           <FileRowListItem
-            v-for="doc in documents(tenant, 'FINANCIAL')"
+            v-for="doc in documents(props.tenant, 'FINANCIAL')"
             v-bind:key="doc.id"
             :label="$tc('tenantpanel.financial')"
             :sub-label="$tc(`documents.subcategory.${doc.subCategory}`)"
@@ -43,137 +43,90 @@
         <FileRowListItem
           v-else
           :label="$tc('tenantpanel.financial')"
-          :document="document(tenant, 'FINANCIAL')"
+          :document="document(props.tenant, 'FINANCIAL')"
           @click-edit="setTenantStep(4)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.tax')"
-          :document="document(tenant, 'TAX')"
+          :document="document(props.tenant, 'TAX')"
           @click-edit="setTenantStep(5)"
         />
       </ul>
     </div>
 
-    <GuarantorsSection :tenant="tenant" />
+    <GuarantorsSection :tenant="props.tenant" />
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { User } from "df-shared/src/models/User";
-import { DfDocument } from "df-shared/src/models/DfDocument";
-import DfButton from "df-shared/src/Button/Button.vue";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
+<script setup lang="ts">
+import { User } from "df-shared-next/src/models/User";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { AnalyticsService } from "@/services/AnalyticsService";
-import DeleteAccount from "@/components/DeleteAccount.vue";
 import GuarantorsSection from "@/components/account/GuarantorsSection.vue";
-import PartnersSection from "@/components/account/PartnersSection.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileRowListItem from "@/components/documents/FileRowListItem.vue";
 import { DocumentTypeConstants } from "@/components/documents/share/DocumentTypeConstants";
+import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    PartnersSection,
-    GuarantorsSection,
-    ValidationProvider,
-    ValidationObserver,
-    DfButton,
-    ColoredTag,
-    DeleteAccount,
-    RowListItem,
-    FileRowListItem,
-  },
-})
-export default class TenantPanel extends Vue {
-  @Prop() tenant!: User;
-  @Prop({ default: false }) isCotenant!: boolean;
-
-  getStatus(docType: string) {
-    if (docType === "FINANCIAL") {
-      const docs = this.tenant.documents?.filter((d) => {
-        return d.documentCategory === "FINANCIAL";
-      });
-      return this.isFinancialValid(docs || []);
-    }
-    const doc = this.tenant.documents?.find((d: DfDocument) => {
-      return d.documentCategory === docType;
-    });
-    return doc?.documentStatus || "EMPTY";
+const props = withDefaults(
+  defineProps<{
+    tenant: User;
+    isCotenant: boolean;
+  }>(),
+  {
+    isCotenant: false
   }
+);
 
-  isFinancialValid(docs: DfDocument[]) {
-    if (!docs || docs.length === 0) {
-      return "INCOMPLETE";
-    }
+const router = useRouter();
+const { t } = useI18n();
 
-    for (const doc of docs) {
-      if (!doc.noDocument && (doc.files?.length || 0) <= 0) {
-        return "INCOMPLETE";
-      }
-    }
-
-    for (const doc of docs) {
-      if (doc.documentStatus === "DECLINED") {
-        return "DECLINED";
-      }
-    }
-
-    for (const doc of docs) {
-      if (doc.documentStatus === "TO_PROCESS") {
-        return "TO_PROCESS";
-      }
-    }
-
-    return "VALIDATED";
-  }
-
-  gotoTenantName() {
-    if (this.isCotenant) {
-      this.$router.push({
+  function gotoTenantName() {
+    if (props.isCotenant) {
+      router.push({
         name: "CoTenantDocuments",
         params: {
-          tenantId: this.tenant?.id.toString(),
+          tenantId: props.tenant?.id.toString(),
           step: "4",
           substep: "0",
         },
       });
     } else {
-      this.$router.push({ name: "TenantName" });
+      router.push({ name: "TenantName" });
     }
   }
 
-  goToValidationPage() {
-    this.$router.push({ name: "ValidateFile" });
+  function goToValidationPage() {
+    router.push({ name: "ValidateFile" });
   }
 
-  setTenantStep(n: number) {
+  function setTenantStep(n: number) {
     AnalyticsService.editFromAccount(n);
-    if (this.isCotenant) {
-      this.$router.push({
+    if (props.isCotenant) {
+      router.push({
         name: "CoTenantDocuments",
         params: {
-          tenantId: this.tenant?.id.toString(),
+          tenantId: props.tenant?.id.toString(),
           step: "4",
           substep: n.toString(),
         },
       });
     } else {
-      this.$router.push({
+      router.push({
         name: "TenantDocuments",
         params: { substep: n.toString() },
       });
     }
   }
 
-  document(u: User, s: string) {
+  function document(u: User, s: string) {
     return u.documents?.find((d) => {
       return d.documentCategory === s;
     });
   }
 
-  documents(g: User, docType: string): DfDocument[] {
+  function documents(g: User, docType: string): DfDocument[] {
     return (
       (g.documents?.filter((d: DfDocument) => {
         return d.documentCategory === docType;
@@ -181,14 +134,13 @@ export default class TenantPanel extends Vue {
     );
   }
 
-  getProfessionalSubCategory(u: User): string {
-    const professionalDocument = this.document(u, "PROFESSIONAL");
+  function getProfessionalSubCategory(u: User): string {
+    const professionalDocument = document(u, "PROFESSIONAL");
     const translationKey = DocumentTypeConstants.PROFESSIONAL_DOCS.find(
       (doc) => doc.value === professionalDocument?.subCategory
     )?.key;
-    return this.$tc(translationKey || "");
+    return t(translationKey || "");
   }
-}
 </script>
 
 <style scoped lang="scss">

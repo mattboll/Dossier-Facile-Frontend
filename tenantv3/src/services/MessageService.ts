@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DfMessage } from "df-shared/src/models/DfMessage";
+import { DfMessage } from "df-shared-next/src/models/DfMessage";
 
 const MESSAGE_ENDPOINT = `https://${import.meta.env.VUE_APP_API_URL}/api/message`;
 

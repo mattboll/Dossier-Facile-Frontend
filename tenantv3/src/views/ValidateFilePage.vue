@@ -9,7 +9,7 @@ import { Component, Vue } from "vue-property-decorator";
 import ValidateFile from "../components/ValidateFile.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 
 @Component({
   components: {

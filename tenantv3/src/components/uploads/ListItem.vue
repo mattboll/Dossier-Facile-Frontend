@@ -46,14 +46,14 @@
 </template>
 
 <script lang="ts">
-import { DfFile } from "df-shared/src/models/DfFile";
+import { DfFile } from "df-shared-next/src/models/DfFile";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Progress from "./Progress.vue";
 import ShowDoc from "../documents/share/ShowDoc.vue";
-import Modal from "df-shared/src/components/Modal.vue";
+import Modal from "df-shared-next/src/components/Modal.vue";
 import { AnalyticsService } from "../../services/AnalyticsService";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
-import DfButton from "df-shared/src/Button/Button.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import DfButton from "df-shared-next/src/Button/Button.vue";
 
 @Component({
   components: {

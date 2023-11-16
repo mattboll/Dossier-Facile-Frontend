@@ -11,11 +11,11 @@
 </template>
 
 <script lang="ts">
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import { Component, Vue } from "vue-property-decorator";
-import InitPassword from "df-shared/src/Authentification/InitPassword.vue";
+import InitPassword from "df-shared-next/src/Authentification/InitPassword.vue";
 import { mapGetters } from "vuex";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 
 @Component({
   components: {

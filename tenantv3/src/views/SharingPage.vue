@@ -26,12 +26,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ShareFile from "@/components/account/ShareFile.vue";
 import SharedLinks from "@/components/SharedLinks.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 
 @Component({
   components: {

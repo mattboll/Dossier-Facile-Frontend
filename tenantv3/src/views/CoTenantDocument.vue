@@ -84,7 +84,7 @@ import CoTenantFinancialList from "../components/documents/cotenant/CoTenantFina
 import CoTenantTax from "../components/documents/cotenant/CoTenantTax.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { UtilsService } from "@/services/UtilsService";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { AnalyticsService } from "@/services/AnalyticsService";
 
 @Component({

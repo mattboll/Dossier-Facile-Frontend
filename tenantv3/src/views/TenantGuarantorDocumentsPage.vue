@@ -14,8 +14,8 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import TenantGuarantorDocuments from "../components/TenantGuarantorDocuments.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 
 @Component({
   components: {

@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts">
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import { Component, Vue } from "vue-property-decorator";
-import ChangePassword from "df-shared/src/Authentification/ChangePassword.vue";
+import ChangePassword from "df-shared-next/src/Authentification/ChangePassword.vue";
 
 @Component({
   components: {

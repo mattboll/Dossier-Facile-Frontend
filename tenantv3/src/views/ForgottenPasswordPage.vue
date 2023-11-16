@@ -22,9 +22,9 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { User } from "df-shared/src/models/User";
-import ForgottenPassword from "df-shared/src/Authentification/ForgottenPassword.vue";
-import Modal from "df-shared/src/components/Modal.vue";
+import { User } from "df-shared-next/src/models/User";
+import ForgottenPassword from "df-shared-next/src/Authentification/ForgottenPassword.vue";
+import Modal from "df-shared-next/src/components/Modal.vue";
 
 @Component({
   components: {

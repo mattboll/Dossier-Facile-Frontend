@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Card from "df-shared/src/components/Card.vue";
+import Card from "df-shared-next/src/components/Card.vue";
 
 @Component({
   components: { Card },

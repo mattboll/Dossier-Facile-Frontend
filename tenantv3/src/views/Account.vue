@@ -170,10 +170,10 @@
 </template>
 
 <script setup lang="ts">
-import { User } from "df-shared/src/models/User";
-import DfButton from "df-shared/src/Button/Button.vue";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
-import { Guarantor } from "df-shared/src/models/Guarantor";
+import { User } from "df-shared-next/src/models/User";
+import DfButton from "df-shared-next/src/Button/Button.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import FakeAnnouncement from "../components/FakeAnnouncement.vue";
 import PartnersSection from "@/components/account/PartnersSection.vue";
 import { UtilsService } from "@/services/UtilsService";

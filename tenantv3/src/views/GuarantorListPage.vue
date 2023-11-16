@@ -41,17 +41,17 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
-import { User } from "df-shared/src/models/User";
+import { User } from "df-shared-next/src/models/User";
 import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "../components/helps/GuarantorChoiceHelp.vue";
-import NakedCard from "df-shared/src/components/NakedCard.vue";
-import ColoredTag from "df-shared/src/components/ColoredTag.vue";
-import CardRow from "df-shared/src/components/CardRow.vue";
+import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+import CardRow from "df-shared-next/src/components/CardRow.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
-import VGouvFrModal from "df-shared/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import { Guarantor } from "df-shared/src/models/Guarantor";
-import { DfDocument } from "df-shared/src/models/DfDocument";
-import ConfirmModal from "df-shared/src/components/ConfirmModal.vue";
+import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { DfDocument } from "df-shared-next/src/models/DfDocument";
+import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
 @Component({
@@ -189,7 +189,7 @@ export default class GuarantorListPage extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "df-shared/src/scss/_variables.scss";
+@import "df-shared-next/src/scss/_variables.scss";
 
 h2 {
   font-size: 1rem;
