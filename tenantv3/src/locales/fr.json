@@ -336,7 +336,7 @@
     "opinion-bloc": {
       "title": "Racontez-nous votre expérience DossierFacile",
       "content": "Nous cherchons constamment à améliorer la qualité de notre service. Dans le cadre de cette démarche d’amélioration, nous cherchons à obtenir votre retour d’expérience. En cliquant sur le bouton ci-dessous, vous pourrez évaluer DossierFacile. Vos commentaires nous sont précieux ! Merci.",
-      "warning": "Attention : ce formulaire ne nous permet pas de vous répondre. Si vous rencontrez un problème avec votre dossier, contactez plutôt notre équipe de support à cette adresse : <a href=\"mailto:contact@dossierfacile.logement.gouv.fr\">contact@dossierfacile.logement.gouv.fr</a> ou en utilisant <a href=\"/contact\">ce formulaire de contact</a>."
+      "warning": "Attention : ce formulaire ne nous permet pas de vous répondre. Si vous rencontrez un problème avec votre dossier, contactez plutôt notre équipe de support à cette adresse : <a href=\"mailto:contact{'@'}dossierfacile.logement.gouv.fr\">contact{'@'}dossierfacile.logement.gouv.fr</a> ou en utilisant <a href=\"/contact\">ce formulaire de contact</a>."
     },
     "share-file": "Partager mon dossier",
     "share-file-description": "Copiez votre lien-dossier pour le partager ! À vous de l'envoyer aux propriétaires ou bailleurs de votre choix (par mail, SMS, etc.)",
@@ -569,7 +569,7 @@
   },
   "documenthelp": {
     "title": "Aide",
-    "paragraph1": "Si votre pièce est trop lourde, nous vous conseillons de scanner votre pièce (avec une application gratuite pour smartphone par exemple).<br> Si cela ne suffit pas, contactez-nous par mail à l’adresse <a href='mailto:contact@dossierfacile.logement.gouv.fr'>contact@dossierfacile.logement.gouv.fr</a>, nous nous efforcerons de répondre au plus vite !"
+    "paragraph1": "Si votre pièce est trop lourde, nous vous conseillons de scanner votre pièce (avec une application gratuite pour smartphone par exemple).<br> Si cela ne suffit pas, contactez-nous par mail à l’adresse <a href='mailto:contact{'@'}dossierfacile.logement.gouv.fr'>contact{'@'}dossierfacile.logement.gouv.fr</a>, nous nous efforcerons de répondre au plus vite !"
   },
   "documentinsert": {},
   "fileerrors": {
@@ -1114,7 +1114,7 @@
     "by-mail": "Par mail",
     "by-link": "Par lien",
     "email-label": "Email du bailleur :",
-    "email-placeholder": "bailleur@exemple.com",
+    "email-placeholder": "bailleur{'@'}exemple.com",
     "sent-success": "Votre dossier a bien été partagé"
   },
   "showdoc": {
@@ -1140,7 +1140,7 @@
   "taxhelp": {
     "title": "Aide",
     "paragraph1": "Vous pouvez désormais <b>télécharger un avis d’imposition sur <a target='_blank' href='https://www.impots.gouv.fr'>www.impots.gouv.fr</a></b>",
-    "paragraph2": "Si votre pièce est trop lourde, nous vous conseillons de scanner votre pièce (avec une application gratuite pour smartphone par exemple).<br> Si cela ne suffit pas, contactez-nous par mail à l’adresse <a href='mailto:contact@dossierfacile.logement.gouv.fr'>contact@dossierfacile.logement.gouv.fr</a>, nous nous efforcerons de répondre au plus vite !"
+    "paragraph2": "Si votre pièce est trop lourde, nous vous conseillons de scanner votre pièce (avec une application gratuite pour smartphone par exemple).<br> Si cela ne suffit pas, contactez-nous par mail à l’adresse <a href='mailto:contact{'@'}dossierfacile.logement.gouv.fr'>contact{'@'}dossierfacile.logement.gouv.fr</a>, nous nous efforcerons de répondre au plus vite !"
   },
   "tax-page": {
     "accept-verification": "J'accepte que DossierFacile procède à une vérification automatisée de ma fiche d'imposition auprès des services des impôts",
@@ -1367,16 +1367,16 @@
       "no-shared-file": "Aucun dossier partagé pour l'instant"
     }
   },
-  "404":{
-    "title" : "Page non trouvée",
-    "subtitle" : "Erreur 404",
-    "caption" : "La page que vous cherchez est introuvable. Veuillez nous excuser pour la gêne occasionnée.",
-    "content" : {
-      "line1" : "Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible.",
-      "line2" : "Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil.",
-      "line3" : "Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information."
+  "404": {
+    "title": "Page non trouvée",
+    "subtitle": "Erreur 404",
+    "caption": "La page que vous cherchez est introuvable. Veuillez nous excuser pour la gêne occasionnée.",
+    "content": {
+      "line1": "Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible.",
+      "line2": "Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil.",
+      "line3": "Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information."
     },
-    "homepage" : "Page d'accueil",
-    "contact-us" : "Contactez-nous"
+    "homepage": "Page d'accueil",
+    "contact-us": "Contactez-nous"
   }
 }

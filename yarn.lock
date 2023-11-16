@@ -2722,7 +2722,7 @@
 
 "@intlify/vite-plugin-vue-i18n@^7.0.0":
   version "7.0.0"
-  resolved "https://registry.npmjs.org/@intlify/vite-plugin-vue-i18n/-/vite-plugin-vue-i18n-7.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/@intlify/vite-plugin-vue-i18n/-/vite-plugin-vue-i18n-7.0.0.tgz#9f33b551b7540abae6854e004b532142654a254e"
   integrity sha512-2TbDOQ8XD+vkc0s5OFmr+IY/k4mYMC7pzvx0xGQn+cU/ev314+yi7Z7N7rWcBgiYk1WOUalbGSo3d4nJDxOOyw==
   dependencies:
     "@intlify/bundle-utils" "^3.1.2"
