@@ -55,7 +55,9 @@ const store = useTenantStore();
     <Footer v-if="!isFunnel" />
 </template>
 
-<style>
+<style lang="scss">
+@import "df-shared-next/src/scss/_main.scss";
+
 #app {
   min-height: 100vh;
   display: flex;
