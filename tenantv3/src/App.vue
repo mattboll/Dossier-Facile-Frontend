@@ -4,7 +4,7 @@ import useTenantStore from './stores/tenant-store';
 import { computed } from 'vue';
 import TenantSkipLinks from './components/TenantSkipLinks.vue';
 import Menu from './components/Menu.vue';
-import MyHeader from "df-shared-next/src/Header/Header.vue";
+import MyHeader from "./components/Header.vue";
 import Footer from "df-shared-next/src/Footer/Footer.vue";
 import DeleteAccount from './components/DeleteAccount.vue';
 import Announcement from 'df-shared-next/src/components/Announcement.vue';
