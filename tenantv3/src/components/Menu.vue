@@ -108,7 +108,7 @@ import useTenantStore from "@/stores/tenant-store";
   const store = useTenantStore();
   const user = computed(() => store.user);
   const isLoggedIn = computed(() => store.isLoggedIn);
-  const newMessage = computed(() => store.newMessage);
+  const newMessage = computed(() => store.getNewMessage);
   const messageList = computed(() => store.getMessages);
 
   const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;

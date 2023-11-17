@@ -148,7 +148,7 @@ const useTenantStore = defineStore('tenant', {
         })
         .map((u: User) => ({ ...u }));
     },
-    newMessage(state: State): number {
+    getNewMessage(state: State): number {
       return state.newMessage;
     },
     spouseAuthorize(state: State): boolean {
