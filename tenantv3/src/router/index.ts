@@ -429,12 +429,12 @@ function updateKeycloakTokenAndMessages() {
 }
 
 router.beforeEach(async (to: RouteLocationNormalized, from, next: NavigationGuardNext) => {
-  // registerFunnel(to);
+  registerFunnel(to);
 
-  // to.matched.some((record) => {
-  //   const store = useTenantStore();
-  //   store.updateSkipLinks(record.meta.skipLinks as SkipLink[]);
-  // });
+  to.matched.some((record) => {
+    const store = useTenantStore();
+    store.updateSkipLinks(record.meta.skipLinks as SkipLink[]);
+  });
 
   // // TODO
   // // const lang = Vue.$cookies.get("lang") === "en" ? "en" : "fr";
