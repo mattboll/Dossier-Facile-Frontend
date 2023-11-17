@@ -440,32 +440,32 @@ router.beforeEach(async (to: RouteLocationNormalized, from, next: NavigationGuar
   // // const lang = Vue.$cookies.get("lang") === "en" ? "en" : "fr";
   // // store.dispatch("setLang", lang);
 
-  // await loadUserIfAuthenticated(next);
+  await loadUserIfAuthenticated(next);
 
-  // if (to.matched.some((record) => record.meta.requiresAuth)) {
-  //   if (!keycloak.authenticated) {
-  //     // The page is protected and the user is not authenticated. Force a login.
-  //     keycloak.login({
-  //       redirectUri: TENANT_URL + to.fullPath,
-  //     });
-  //   } else {
-  //     if (keycloak.profile?.emailVerified != true) {
-  //       // email should be validated before access to the protected page.
-  //       keycloak.logout({
-  //         redirectUri: "https:" + MAIN_URL + "/#emailNotValidated",
-  //       });
-  //     } else {
-  //       updateKeycloakTokenAndMessages();
-  //       keepGoing(to, next);
-  //       return;
-  //     }
-  //   }
-  // } else if (to.matched.some((record) => record.meta.hideForAuth)) {
-  //   if (keycloak.authenticated) {
-  //     next({ name: "Profile" });
-  //   }
-  // }
-  // keepGoing(to, next);
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!keycloak.authenticated) {
+    // The page is protected and the user is not authenticated. Force a login.
+      keycloak.login({
+        redirectUri: TENANT_URL + to.fullPath,
+      });
+    } else {
+      if (keycloak.profile?.emailVerified != true) {
+        // email should be validated before access to the protected page.
+        keycloak.logout({
+          redirectUri: "https:" + MAIN_URL + "/#emailNotValidated",
+        });
+      } else {
+        updateKeycloakTokenAndMessages();
+        keepGoing(to, next);
+        return;
+      }
+    }
+  } else if (to.matched.some((record) => record.meta.hideForAuth)) {
+    if (keycloak.authenticated) {
+      next({ name: "Profile" });
+    }
+  }
+  keepGoing(to, next);
   next()
 });
 
