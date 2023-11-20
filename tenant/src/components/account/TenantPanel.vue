@@ -7,28 +7,25 @@
           v-if="!isCotenant"
           :label="$tc('tenantpanel.clarification-title')"
           :subLabel="tenant.clarification"
-          @click-edit="goToValidationPage()"
+          @clickEdit="goToValidationPage()"
         />
-        <RowListItem
-          :label="tenant | fullName"
-          @click-edit="gotoTenantName()"
-        />
+        <RowListItem :label="tenant | fullName" @clickEdit="gotoTenantName()" />
         <FileRowListItem
           :label="$tc('tenantpanel.identification')"
           :document="document(tenant, 'IDENTIFICATION')"
           enableDownload="force"
-          @click-edit="setTenantStep(1)"
+          @clickEdit="setTenantStep(1)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.residency')"
           :document="document(tenant, 'RESIDENCY')"
-          @click-edit="setTenantStep(2)"
+          @clickEdit="setTenantStep(2)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.professional')"
           :sub-label="getProfessionalSubCategory(tenant)"
           :document="document(tenant, 'PROFESSIONAL')"
-          @click-edit="setTenantStep(3)"
+          @clickEdit="setTenantStep(3)"
         />
         <span v-if="documents(tenant, 'FINANCIAL').length > 1">
           <FileRowListItem
@@ -37,19 +34,19 @@
             :label="$tc('tenantpanel.financial')"
             :sub-label="$tc(`documents.subcategory.${doc.subCategory}`)"
             :document="doc"
-            @click-edit="setTenantStep(4)"
+            @clickEdit="setTenantStep(4)"
           />
         </span>
         <FileRowListItem
           v-else
           :label="$tc('tenantpanel.financial')"
           :document="document(tenant, 'FINANCIAL')"
-          @click-edit="setTenantStep(4)"
+          @clickEdit="setTenantStep(4)"
         />
         <FileRowListItem
           :label="$tc('tenantpanel.tax')"
           :document="document(tenant, 'TAX')"
-          @click-edit="setTenantStep(5)"
+          @clickEdit="setTenantStep(5)"
         />
       </ul>
     </div>

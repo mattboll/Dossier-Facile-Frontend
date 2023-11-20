@@ -36,7 +36,7 @@
       </DfButton>
 
       <DfButton
-        v-if="hasClickEditionListener()"
+        v-if="onClickEdit"
         class="fr-btn--icon-left fr-icon-pencil-line"
         @on-click="clickEdit()"
       >
@@ -62,7 +62,8 @@ const props = withDefaults(
     document: DfDocument,
     enableDownload: boolean,
     tagLabel?: string,
-    showValidated?: boolean;
+    showValidated?: boolean,
+    onClickEdit?: Function;
   }>(),
   {
     enableDownload: true,
@@ -70,12 +71,6 @@ const props = withDefaults(
   }
 );
 
-
-  function hasClickEditionListener() {
-    // TODO
-    // return this.$listeners && this.$listeners["click-edit"];
-    return false;
-  }
 
   function clickEdit() {
     emit("click-edit");

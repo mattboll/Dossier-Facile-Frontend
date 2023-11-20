@@ -7,28 +7,28 @@
           v-if="!isCotenant"
           :label="$t('tenantpanel.clarification-title')"
           :subLabel="props.tenant.clarification"
-          @click-edit="goToValidationPage()"
+          @clickEdit="goToValidationPage()"
         />
         <RowListItem
           :label="props.tenant | fullName"
-          @click-edit="gotoTenantName()"
+          @clickEdit="gotoTenantName()"
         />
         <FileRowListItem
           :label="$t('tenantpanel.identification')"
           :document="document(props.tenant, 'IDENTIFICATION')"
           enableDownload="force"
-          @click-edit="setTenantStep(1)"
+          @clickEdit="setTenantStep(1)"
         />
         <FileRowListItem
           :label="$t('tenantpanel.residency')"
           :document="document(props.tenant, 'RESIDENCY')"
-          @click-edit="setTenantStep(2)"
+          @clickEdit="setTenantStep(2)"
         />
         <FileRowListItem
           :label="$t('tenantpanel.professional')"
           :sub-label="getProfessionalSubCategory(props.tenant)"
           :document="document(props.tenant, 'PROFESSIONAL')"
-          @click-edit="setTenantStep(3)"
+          @clickEdit="setTenantStep(3)"
         />
         <span v-if="documents(props.tenant, 'FINANCIAL').length > 1">
           <FileRowListItem
@@ -37,19 +37,19 @@
             :label="$t('tenantpanel.financial')"
             :sub-label="$t(`documents.subcategory.${doc.subCategory}`)"
             :document="doc"
-            @click-edit="setTenantStep(4)"
+            @clickEdit="setTenantStep(4)"
           />
         </span>
         <FileRowListItem
           v-else
           :label="$t('tenantpanel.financial')"
           :document="document(props.tenant, 'FINANCIAL')"
-          @click-edit="setTenantStep(4)"
+          @clickEdit="setTenantStep(4)"
         />
         <FileRowListItem
           :label="$t('tenantpanel.tax')"
           :document="document(props.tenant, 'TAX')"
-          @click-edit="setTenantStep(5)"
+          @clickEdit="setTenantStep(5)"
         />
       </ul>
     </div>
