@@ -57,184 +57,162 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapGetters } from "vuex";
+<script setup lang="ts">
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
-import { User } from "df-shared-next/src/models/User";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import { ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
 
-@Component({
-  components: {
-    FileUpload,
-    ListItem,
-    AllDeclinedMessages,
-    ValidationProvider,
-    WarningMessage,
-    ConfirmModal,
-    DfButton,
-    DocumentHelp,
-    NakedCard,
-    SimpleRadioButtons,
-    TroubleshootingModal,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-      tenantIdentificationDocument: "getTenantIdentificationDocument",
-    }),
-  },
-})
-export default class Identification extends Vue {
-  documents = DocumentTypeConstants.IDENTIFICATION_DOCS;
+  const store = useTenantStore();
+  const user = computed(() => {
+    return store.userToEdit;
+  });
 
-  user!: User;
-  tenantIdentificationDocument!: DfDocument;
+  const documents = DocumentTypeConstants.IDENTIFICATION_DOCS;
+  const tenantIdentificationDocument = computed(() => {
+    return store.getTenantIdentificationDocument;
+  });
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+  const identificationDocument = ref(new DocumentType());
+  const isDocDeleteVisible = ref(false);
 
-  documentDeniedReasons = new DocumentDeniedReasons();
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  identificationDocument = new DocumentType();
-  isDocDeleteVisible = false;
-
-  getLocalStorageKey() {
-    return "identification_" + this.user.email;
+  function getLocalStorageKey() {
+    return "identification_" + user.value?.email;
   }
 
-  get documentStatus() {
-    return this.tenantIdentificationDocument?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return tenantIdentificationDocument.value?.documentStatus;
+  })
 
-  beforeMount() {
-    if (this.user.documents !== null) {
-      if (this.tenantIdentificationDocument !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
-          return d.value === this.tenantIdentificationDocument?.subCategory;
+
+  onBeforeMount(() => {
+    if (user.value?.documents !== null) {
+      if (tenantIdentificationDocument.value !== undefined) {
+        const localDoc = documents.find((d: DocumentType) => {
+          return d.value === tenantIdentificationDocument.value?.subCategory;
         });
         if (localDoc !== undefined) {
-          this.identificationDocument = localDoc;
+          identificationDocument.value = localDoc;
           localStorage.setItem(
-            this.getLocalStorageKey(),
-            this.identificationDocument.key || ""
+            getLocalStorageKey(),
+            identificationDocument.value.key || ""
           );
         }
-        if (this.tenantIdentificationDocument?.documentDeniedReasons) {
-          this.documentDeniedReasons = cloneDeep(
-            this.tenantIdentificationDocument.documentDeniedReasons
+        if (tenantIdentificationDocument.value?.documentDeniedReasons) {
+            documentDeniedReasons.value = cloneDeep(
+            tenantIdentificationDocument.value.documentDeniedReasons
           );
         }
       } else {
-        const key = localStorage.getItem(this.getLocalStorageKey());
+        const key = localStorage.getItem(getLocalStorageKey());
         if (key) {
-          const localDoc = this.documents.find((d: DocumentType) => {
+          const localDoc = documents.find((d: DocumentType) => {
             return d.key === key;
           });
           if (localDoc !== undefined) {
-            this.identificationDocument = localDoc;
+            identificationDocument.value = localDoc;
           }
         }
       }
     }
-  }
+  })
 
-  onSelectChange() {
+  function onSelectChange() {
     localStorage.setItem(
-      this.getLocalStorageKey(),
-      this.identificationDocument.key
+      getLocalStorageKey(),
+      identificationDocument.value.key
     );
-    if (this.user.documents !== null) {
-      const doc = this.tenantIdentificationDocument;
+    if (user.value?.documents !== null) {
+      const doc = tenantIdentificationDocument.value;
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc?.files?.length || 0) > 0 &&
-          doc?.subCategory !== this.identificationDocument.value;
+          doc?.subCategory !== identificationDocument.value.value;
       }
     }
     return false;
   }
 
-  undoSelect() {
-    if (this.user.documents !== null) {
-      const doc = this.tenantIdentificationDocument;
+  function undoSelect() {
+    if (user.value?.documents !== null) {
+      const doc = tenantIdentificationDocument.value;
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.find((d: DocumentType) => {
           return d.value === doc?.subCategory;
         });
         if (localDoc !== undefined) {
-          this.identificationDocument = localDoc;
+          identificationDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.user.documents !== null) {
-      const doc = this.tenantIdentificationDocument;
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (user.value?.documents !== null) {
+      const doc = tenantIdentificationDocument.value;
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     AnalyticsService.uploadFile("identification");
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  save() {
+  function save() {
     AnalyticsService.registerFile("identification");
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (!newFiles.length) return;
 
     if (
-      this.identificationDocument.maxFileCount &&
-      this.identificationFiles().length >
-        this.identificationDocument.maxFileCount
+      identificationDocument.value.maxFileCount &&
+      identificationFiles().length >
+        identificationDocument.value.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.identificationFiles().length,
-          this.identificationDocument.maxFileCount,
-        ]),
-      });
-      this.files = [];
+      // TODO
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     identificationFiles().length,
+      //     identificationDocument.value.maxFileCount,
+      //   ]),
+      // });
+      files.value = [];
       return;
     }
 
@@ -245,32 +223,35 @@ export default class Identification extends Vue {
 
     formData.append(
       "typeDocumentIdentification",
-      this.identificationDocument.value
+      identificationDocument.value.value
     );
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
     // TODO : remove loader when upload status is well handled (be carefull with multiple save at the same time)
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("saveTenantIdentification", formData)
+    // TODO : use new loader
+    // const loader = this.$loading.show();
+    store
+      .saveTenantIdentification(formData)
       .then(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        this.files = [];
-        Vue.toasted.global.save_success();
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        files.value = [];
+        // TODO
+        // Vue.toasted.global.save_success();
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        loader.hide();
+        // TODO
+        // loader.hide();
       });
   }
 
-  identificationFiles() {
-    const newFiles = this.files.map((f) => {
+  function identificationFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.identificationDocument.value,
+        subCategory: identificationDocument.value,
         id: f.id,
         name: f.name,
         file: f.file,
@@ -278,30 +259,29 @@ export default class Identification extends Vue {
       };
     });
     const existingFiles =
-      this.$store.getters.getTenantDocuments?.find((d: DfDocument) => {
+      store.getTenantDocuments?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       })?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     AnalyticsService.deleteFile("identification");
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  mapDocuments() {
-    return this.documents.map((d) => {
+  function mapDocuments() {
+    return documents.map((d) => {
       return { id: d.key, labelKey: d.key, value: d };
     });
   }
-}
 </script>
 
 <style scoped lang="scss"></style>

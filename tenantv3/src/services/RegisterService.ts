@@ -1,6 +1,27 @@
+import useTenantStore from "@/stores/tenant-store";
 import axios from "axios";
 
 export const RegisterService = {
+  deleteFile(id: number | string, silent = false) {
+    // TODO
+    // const loader = Vue.$loading.show();
+    const url = `https://${import.meta.env.VUE_APP_API_URL}/api/file/${id}`;
+    return axios
+      .delete(url)
+      .then(() => {
+        if (!silent) {
+          // Vue.toasted.global.delete_success();
+        }
+      })
+      .catch(() => {
+        // Vue.toasted.global.delete_failed();
+      })
+      .finally(() => {
+        // loader.hide();
+        const store = useTenantStore();
+        store.loadUser();
+      });
+  },
   deleteFileById(id: number) {
     const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios.delete(url);
