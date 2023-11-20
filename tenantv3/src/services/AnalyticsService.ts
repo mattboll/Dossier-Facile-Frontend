@@ -1,7 +1,7 @@
 
 export const AnalyticsService = {
   sendEvent(name: string, data: any) {
-    if (!process.env.VUE_APP_MATOMO_ENABLE) {
+    if (!import.meta.env.VITE_MATOMO_ENABLE) {
       return;
     }
     // TODO : always use store before analyticsService and send user id
@@ -9,12 +9,13 @@ export const AnalyticsService = {
     //   data.event_label = tenantStore.user.id;
     // }
     // Matomo already manage consent
-    window._paq.push([
-      "trackEvent",
-      data.event_category,
-      name,
-      data.event_label,
-    ]);
+    // TODO _paq is undefined
+    // window._paq.push([
+    //   "trackEvent",
+    //   data.event_category,
+    //   name,
+    //   data.event_label,
+    // ]);
   },
 
   loginSuccess() {
