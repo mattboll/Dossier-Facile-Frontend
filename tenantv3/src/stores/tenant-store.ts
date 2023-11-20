@@ -151,10 +151,10 @@ const useTenantStore = defineStore('tenant', {
     getNewMessage(state: State): number {
       return state.newMessage;
     },
-    spouseAuthorize(state: State): boolean {
+    getSpouseAuthorize(state: State): boolean {
       return state.spouseAuthorize;
     },
-    coTenantAuthorize(state: State): boolean {
+    getCoTenantAuthorize(state: State): boolean {
       return state.coTenantAuthorize;
     },
     guarantors(state: State): Guarantor[] {
@@ -233,22 +233,22 @@ const useTenantStore = defineStore('tenant', {
       }
       return financialdocuments;
     },
-    financialDocumentSelected(state: State): FinancialDocument {
+    getFinancialDocumentSelected(state: State): FinancialDocument {
       return state.financialDocumentSelected;
     },
-    editFinancialDocument(state: State): boolean {
+    getEditFinancialDocument(state: State): boolean {
       return state.editFinancialDocument;
     },
-    guarantorFinancialDocumentSelected(state: State): FinancialDocument {
+    getGuarantorFinancialDocumentSelected(state: State): FinancialDocument {
       return state.guarantorFinancialDocumentSelected;
     },
-    editGuarantorFinancialDocument(state: State): boolean {
+    getEditGuarantorFinancialDocument(state: State): boolean {
       return state.editGuarantorFinancialDocument;
     },
-    coTenants(state: State): User[] {
+    getCoTenants(state: State): User[] {
       return state.coTenants;
     },
-    getSpouse(state: State): any {
+    getSpouse(): any {
       if (this.user.apartmentSharing.applicationType === "COUPLE") {
         return this.user.apartmentSharing.tenants.find((t: any) => {
           return t.id != this.user.id;
@@ -759,7 +759,7 @@ const useTenantStore = defineStore('tenant', {
             data?.data || {}
           );
         });
-        const spouse = this.getSpouse();
+        const spouse = this.getSpouse;
         if (spouse) {
           MessageService.updateMessages(spouse.id).then((data) => {
             this.updateMessagesCommit(spouse.id,

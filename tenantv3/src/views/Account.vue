@@ -190,7 +190,7 @@ import useTenantStore from "@/stores/tenant-store";
   // const router = useRouter();
 
   const tenantFullName = computed(() => {
-    return UtilsService.getTenantFullName(user.value);
+    return UtilsService.tenantFullName(user.value);
   });
 
   onMounted(() => {
