@@ -1,7 +1,7 @@
 import { User } from "df-shared-next/src/models/User";
 import { DfDocument } from "../../../df-shared-next/src/models/DfDocument";
 import { Guarantor } from "../../../df-shared-next/src/models/Guarantor";
-import * as moment from "moment";
+import moment from "moment";
 
 export const UtilsService = {
   getLastAddedGuarantor(user: User) {
@@ -9,30 +9,6 @@ export const UtilsService = {
       return user.guarantors[user.guarantors.length - 1];
     }
     throw Error("guarantor is not found");
-  },
-  documentsFilled(user?: User) {
-    return (
-      this.hasDoc("IDENTIFICATION", user) &&
-      this.hasDoc("PROFESSIONAL", user) &&
-      this.isTenantDocumentValid("RESIDENCY", user) &&
-      this.isTenantDocumentValid("FINANCIAL", user) &&
-      this.isTenantDocumentValid("TAX", user)
-    );
-  },
-  guarantorDocumentsFilled(g: Guarantor) {
-    return (
-      (g.typeGuarantor === "NATURAL_PERSON" &&
-        this.guarantorHasDoc("IDENTIFICATION", g) &&
-        this.guarantorHasDoc("PROFESSIONAL", g) &&
-        this.isGuarantorDocumentValid("RESIDENCY", g) &&
-        this.isGuarantorDocumentValid("FINANCIAL", g) &&
-        this.isGuarantorDocumentValid("TAX", g)) ||
-      (g.typeGuarantor === "LEGAL_PERSON" &&
-        this.guarantorHasDoc("IDENTIFICATION", g) &&
-        this.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
-      (g.typeGuarantor === "ORGANISM" &&
-        this.guarantorHasDoc("IDENTIFICATION", g))
-    );
   },
   guarantorHasDoc(docType: string, g: Guarantor | User) {
     const f = g.documents?.find((d: DfDocument) => {
@@ -97,5 +73,13 @@ export const UtilsService = {
       // TODO
       // Vue.toasted.global.save_failed();
     }
+  },
+  tenantFullName(user: User) {
+    const firstName = this.capitalize(user.firstName || "");
+    const lastName = this.capitalize(user.lastName || "");
+    const preferredName = this.capitalize(user.preferredName || "");
+    return user.preferredName == null || user.preferredName.length == 0
+      ? firstName + "\xa0" + lastName
+      : firstName + "\xa0" + preferredName;
   },
 };

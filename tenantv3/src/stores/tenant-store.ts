@@ -900,7 +900,7 @@ const useTenantStore = defineStore('tenant', {
       return RegisterService.saveTenantFinancial(formData).then(
         async (response) => {
           await this.loadUserCommit(response.data);
-          const fd = await this.state.getters.tenantFinancialDocuments();
+          const fd = this.tenantFinancialDocuments;
           if (fd === undefined) {
             return Promise.resolve(response.data);
           }
@@ -927,7 +927,7 @@ const useTenantStore = defineStore('tenant', {
       return RegisterService.saveGuarantorFinancial(formData)
         .then(async (response) => {
           await this.loadUserCommit(response.data);
-          const fd = this.getters.guarantorFinancialDocuments;
+          const fd = this.guarantorFinancialDocuments;
           if (fd === undefined) {
             return Promise.resolve(response.data);
           }
@@ -935,6 +935,9 @@ const useTenantStore = defineStore('tenant', {
             const s = fd.find((f: any) => {
               return f.id.toString() === formData.get("id");
             });
+            if (s === undefined) {
+              return Promise.reject("Document not found");
+            }
             await this.selectGuarantorDocumentFinancial(s);
           } else {
             await this.selectGuarantorDocumentFinancial(fd[fd.length - 1]);
@@ -968,18 +971,18 @@ const useTenantStore = defineStore('tenant', {
       );
     },
     firstProfilePage() {
-      if (this.state.user.documents === undefined) {
+      if (this.user.documents === undefined) {
         return;
       }
       if (
-        !this.state.user.firstName ||
-        !this.state.user.lastName ||
-        (!this.state.user.zipCode && this.state.user.documents.length == 0)
+        !this.user.firstName ||
+        !this.user.lastName ||
+        (!this.user.zipCode && this.user.documents.length == 0)
       ) {
         router.push({ name: "TenantName" });
         return;
       }
-      if (!this.state.user.applicationType) {
+      if (!this.user.applicationType) {
         router.push({ name: "TenantType" });
         return;
       }
@@ -1003,32 +1006,32 @@ const useTenantStore = defineStore('tenant', {
         router.push({ name: "TenantDocuments", params: { substep: "5" } });
         return;
       }
-      if (this.state.user.guarantors) {
-        for (const g of this.state.user.guarantors) {
+      if (this.user.guarantors) {
+        for (const g of this.user.guarantors) {
           if (!UtilsService.guarantorHasDoc("IDENTIFICATION", g)) {
-            this.dispatch("setGuarantorPage", { guarantor: g, substep: 1 });
+            this.setGuarantorPage(g, 1);
             return;
           }
           if (!UtilsService.isGuarantorDocumentValid("RESIDENCY", g)) {
-            this.dispatch("setGuarantorPage", { guarantor: g, substep: 2 });
+            this.setGuarantorPage(g, 2 );
             return;
           }
           if (!UtilsService.guarantorHasDoc("PROFESSIONAL", g)) {
-            this.dispatch("setGuarantorPage", { guarantor: g, substep: 3 });
+            this.setGuarantorPage(g, 3 );
             return;
           }
           if (!UtilsService.isGuarantorDocumentValid("FINANCIAL", g)) {
-            this.dispatch("setGuarantorPage", { guarantor: g, substep: 4 });
+            this.setGuarantorPage(g, 4 );
             return;
           }
           if (!UtilsService.isGuarantorDocumentValid("TAX", g)) {
-            this.dispatch("setGuarantorPage", { guarantor: g, substep: 5 });
+            this.setGuarantorPage(g, 5 );
             return;
           }
         }
       }
 
-      if (!this.state.user.honorDeclaration) {
+      if (!this.user.honorDeclaration) {
         router.push({ name: "ValidateFile" });
         return;
       }
@@ -1037,10 +1040,10 @@ const useTenantStore = defineStore('tenant', {
     },
     updateSelectedGuarantor(tenantId: number) {
       let guarantors;
-      if (this.state.user.id === tenantId) {
-        guarantors = this.state.user.guarantors;
+      if (this.user.id === tenantId) {
+        guarantors = this.user.guarantors;
       } else {
-        const coTenant = this.state.coTenants.find((r: User) => {
+        const coTenant = this.coTenants.find((r: User) => {
           return r.id === tenantId;
         });
         guarantors = coTenant?.guarantors;
@@ -1086,8 +1089,7 @@ const useTenantStore = defineStore('tenant', {
         this.setApartmentSharingLinks(newLinks);
       });
     },
-    async updateApartmentSharingLinkStatus(
-      { link: linkToUpdate, enabled }
+    async updateApartmentSharingLinkStatus(linkToUpdate: ApartmentSharingLink, enabled: boolean
     ) {
       await ApartmentSharingLinkService.updateLinkStatus(linkToUpdate, enabled);
       const updatedLinks = this.apartmentSharingLinks.map((link) => {
@@ -1119,6 +1121,30 @@ const useTenantStore = defineStore('tenant', {
         // loader.hide();
           this.loadUser();
       });
+  },
+  documentsFilled(user?: User): any {
+    return (
+      this.hasDoc("IDENTIFICATION", user) &&
+      this.hasDoc("PROFESSIONAL", user) &&
+      this.isTenantDocumentValid("RESIDENCY", user) &&
+      this.isTenantDocumentValid("FINANCIAL", user) &&
+      this.isTenantDocumentValid("TAX", user)
+    );
+  },
+  guarantorDocumentsFilled(g: Guarantor) {
+    return (
+      (g.typeGuarantor === "NATURAL_PERSON" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+        UtilsService.guarantorHasDoc("PROFESSIONAL", g) &&
+        UtilsService.isGuarantorDocumentValid("RESIDENCY", g) &&
+        UtilsService.isGuarantorDocumentValid("FINANCIAL", g) &&
+        UtilsService.isGuarantorDocumentValid("TAX", g)) ||
+      (g.typeGuarantor === "LEGAL_PERSON" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
+      (g.typeGuarantor === "ORGANISM" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g))
+    );
   },
   },
 });

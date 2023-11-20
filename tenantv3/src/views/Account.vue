@@ -23,7 +23,7 @@
                 class="fr-callout__text"
                 v-html="$t('account.amendment-required-text')"
               ></p>
-              <DfButton @on-click="goToMessaging" primary="true">{{
+              <DfButton @on-click="goToMessaging" :primary="true">{{
                 $t("account.messaging")
               }}</DfButton>
             </div>
@@ -86,7 +86,7 @@
                       >
                         <div class="fr-grid-row">
                           <div class="name fr-col-xs-12 fr-col fr-mr-1w">
-                            {{ tenant | fullName }}
+                            {{ tenantFullName }}
                             <span
                               :class="{
                                 'fr-fi-icon-fc': tenant.franceConnect,
@@ -189,8 +189,13 @@ import useTenantStore from "@/stores/tenant-store";
   const tabIndex = ref(0);
   // const router = useRouter();
 
+  const tenantFullName = computed(() => {
+    return UtilsService.getTenantFullName(user.value);
+  });
+
   onMounted(() => {
-    window.Beacon("init", "d949ac15-a9eb-4316-b0c5-f92cecc7118f");
+    // TODO
+    // window.Beacon("init", "d949ac15-a9eb-4316-b0c5-f92cecc7118f");
     const today = new Date();
     if (
       (today.getMonth() >= 5 && today.getMonth() <= 8) ||
@@ -201,7 +206,8 @@ import useTenantStore from "@/stores/tenant-store";
   })
 
   onBeforeUnmount(() => {
-    window.Beacon("destroy");
+    // TODO
+    // window.Beacon("destroy");
   })
 
   function getTenants() {
