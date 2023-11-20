@@ -58,8 +58,8 @@ const emit = defineEmits(["click-edit"]);
 const props = withDefaults(
   defineProps<{
     label: string,
-    subLabel: string,
-    document: DfDocument,
+    subLabel?: string,
+    document?: DfDocument,
     enableDownload: boolean,
     tagLabel?: string,
     showValidated?: boolean,
@@ -93,7 +93,7 @@ const props = withDefaults(
   }
 
   function openDocument() {
-    window.open(props.document.name, "_blank");
+    window.open(props.document?.name, "_blank");
   }
 
 </script>

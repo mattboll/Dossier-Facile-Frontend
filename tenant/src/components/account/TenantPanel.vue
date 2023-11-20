@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="main-information">
-      <h3 class="fr-h4">{{ $t("tenantpanel.my-files") + tenant.firstName }}</h3>
+      <h3 class="fr-h4">
+        {{ $t("tenantpanel.my-files") + (tenant.firstName || "") }}
+      </h3>
       <ul class="fr-p-0">
         <RowListItem
           v-if="!isCotenant"
@@ -9,7 +11,10 @@
           :subLabel="tenant.clarification"
           @clickEdit="goToValidationPage()"
         />
-        <RowListItem :label="tenant | fullName" @clickEdit="gotoTenantName()" />
+        <RowListItem
+          :label="UtilsService.tenantFullName(tenant)"
+          @clickEdit="gotoTenantName()"
+        />
         <FileRowListItem
           :label="$tc('tenantpanel.identification')"
           :document="document(tenant, 'IDENTIFICATION')"
@@ -69,6 +74,7 @@ import PartnersSection from "@/components/account/PartnersSection.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileRowListItem from "@/components/documents/FileRowListItem.vue";
 import { DocumentTypeConstants } from "@/components/documents/share/DocumentTypeConstants";
+import { UtilsService } from "@/services/UtilsService";
 
 @Component({
   components: {
