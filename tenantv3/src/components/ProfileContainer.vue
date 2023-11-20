@@ -23,7 +23,6 @@ import TopEditMenu from "./editmenu/TopEditMenu.vue";
     step: Number
   });
 
-}
 </script>
 
 <style lang="scss" scoped>

@@ -14,20 +14,20 @@
         <CardRow
           @edit="selectFinancialDocument(f)"
           @remove="removeFinancial(f)"
-          :danger="tenantFinancialDocument(f).documentStatus === 'DECLINED'"
+          :danger="tenantFinancialDocument(f)?.documentStatus === 'DECLINED'"
         >
           <template v-slot:tag>
             <div class="fixed-width">
               <ColoredTag
                 :text="getDocumentName(f)"
-                :status="tenantFinancialDocument(f).documentStatus"
+                :status="tenantFinancialDocument(f)?.documentStatus"
               ></ColoredTag>
             </div>
           </template>
           <template v-slot:text>
             <div
               class="text-bold"
-              :class="{ declined: tenantFinancialDocument(f).documentStatus }"
+              :class="{ declined: tenantFinancialDocument(f)?.documentStatus }"
               :title="$t('financial-page.net-monthly')"
               v-show="f.documentType.key !== 'no-income'"
             >
@@ -58,21 +58,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
-import FileUpload from "../../uploads/FileUpload.vue";
-import { mapGetters } from "vuex";
+<script setup lang="ts">
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
-import ListItem from "../../uploads/ListItem.vue";
-import { User } from "df-shared-next/src/models/User";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import Modal from "df-shared-next/src/components/Modal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import ProfileFooter from "../../footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
@@ -80,107 +69,92 @@ import FinancialDocumentForm from "./FinancialDocumentForm.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import SimulationCaf from "../share/SimulationCaf.vue";
+import { computed, onBeforeMount } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    ColoredTag,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    WarningMessage,
-    ConfirmModal,
-    Modal,
-    DocumentHelp,
-    VGouvFrModal,
-    ProfileFooter,
-    NakedCard,
-    CardRow,
-    FinancialDocumentForm,
-    SimulationCaf,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-      editFinancialDocument: "editFinancialDocument",
-      financialDocuments: "tenantFinancialDocuments",
-    }),
-  },
-})
-export default class Financial extends Vue {
-  user!: User;
-  financialDocuments!: FinancialDocument[];
+const { t } = useI18n();
+const store = useTenantStore();
+    const user = computed(() => store.userToEdit);
+    const editFinancialDocument = computed(() => store.editFinancialDocument);
+    const financialDocuments = computed(() => store.tenantFinancialDocuments);
 
-  documents = DocumentTypeConstants.FINANCIAL_DOCS;
+  const documents = DocumentTypeConstants.FINANCIAL_DOCS;
 
-  beforeMount() {
-    this.initialize();
+  const emit = defineEmits(["on-back", "on-next"]);
+
+  onBeforeMount(() => {
+    initialize();
+  })
+
+  function documentDeniedReasons(f: FinancialDocument) {
+    return tenantFinancialDocument(f)?.documentDeniedReasons;
   }
 
-  documentDeniedReasons(f: FinancialDocument) {
-    return this.tenantFinancialDocument(f).documentDeniedReasons;
+  function documentStatus(f: FinancialDocument) {
+    return tenantFinancialDocument(f)?.documentStatus;
   }
 
-  documentStatus(f: FinancialDocument) {
-    return this.tenantFinancialDocument(f).documentStatus;
-  }
-
-  initialize() {
-    this.$store.commit("selectDocumentFinancial", undefined);
-    if (this.financialDocuments.length === 0) {
-      this.addAndSelectFinancial();
+  function initialize() {
+    store.selectDocumentFinancial(undefined);
+    if (financialDocuments.value.length === 0) {
+      addAndSelectFinancial();
     }
   }
 
-  tenantFinancialDocument(f: FinancialDocument) {
-    return this.$store.getters.getTenantDocuments?.find((d: DfDocument) => {
+  function tenantFinancialDocument(f: FinancialDocument) {
+    return store.getTenantDocuments?.find((d: DfDocument) => {
       return d.id === f.id;
     });
   }
 
-  async addAndSelectFinancial() {
-    await this.$store.commit("createDocumentFinancial");
+  async function addAndSelectFinancial() {
+    await store.createDocumentFinancial();
   }
 
-  removeFinancial(f: DfDocument) {
-    const loader = Vue.$loading.show();
-    this.$store
-      .dispatch("deleteDocument", f.id)
+  function removeFinancial(f: DfDocument) {
+    if (f.id === undefined) {
+      return;
+    }
+    // TODO
+    // const loader = Vue.$loading.show();
+    store.deleteDocument(f.id)
       .then(null, () => {
-        Vue.toasted.global.error();
+        // TODO
+        // Vue.toasted.global.error();
       })
       .finally(() => {
-        loader.hide();
-        this.initialize();
+        // TODO
+        // loader.hide();
+        initialize();
       });
-    this.$store.commit("selectDocumentFinancial", undefined);
+    store.selectDocumentFinancial(undefined);
   }
 
-  hasNoIncome() {
+  function hasNoIncome() {
     return (
-      this.financialDocuments.length > 0 &&
-      this.financialDocuments.find((f) => {
+      financialDocuments.value.length > 0 &&
+      financialDocuments.value.find((f) => {
         return f.documentType && f.documentType.key !== "no-income";
       }) === undefined
     );
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    this.$emit("on-next");
+  function goNext() {
+    emit("on-next");
   }
 
-  async selectFinancialDocument(f: FinancialDocument) {
-    await this.$store.commit("selectDocumentFinancial", f);
+  async function selectFinancialDocument(f: FinancialDocument) {
+    await store.selectDocumentFinancial(f);
   }
 
-  private getDocumentName(document: FinancialDocument): string {
-    return this.$t(`documents.${document.documentType.key}`).toString();
+  function getDocumentName(document: FinancialDocument): string {
+    return t(`documents.${document.documentType.key}`).toString();
   }
-}
 </script>
 
 <style scoped lang="scss">

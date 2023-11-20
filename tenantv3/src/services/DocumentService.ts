@@ -1,14 +1,16 @@
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
-import store from "../store";
 import { UtilsService } from "@/services/UtilsService";
+import useTenantStore from "@/stores/tenant-store";
+
+const store = useTenantStore();
 
 export const DocumentService = {
   hasDocument() {
     return (
-      store.state.user.documents !== undefined &&
-      store.state.user.documents.length > 0
+      store.user.documents !== undefined &&
+      store.user.documents.length > 0
     );
   },
   hasDoc(docType: string, tenant: User): DfDocument | undefined {
@@ -28,7 +30,7 @@ export const DocumentService = {
     });
   },
   hasFile(docType: string, tenant?: User) {
-    const user = tenant ? tenant : store.state.user;
+    const user = tenant ? tenant : store.user;
     const document: DfDocument | undefined = this.hasDoc(docType, user);
     if (document === undefined || document.files === undefined) {
       return false;
@@ -59,7 +61,7 @@ export const DocumentService = {
     return document.files.length > 0;
   },
   hasGuarantor(guarantorType: string) {
-    const g = store.state.selectedGuarantor;
+    const g = store.selectedGuarantor;
     return (
       g !== undefined &&
       g.documents !== undefined &&
@@ -67,10 +69,10 @@ export const DocumentService = {
     );
   },
   getFiles(documentCategory: string) {
-    if (!store.state.user.documents) {
+    if (!store.user.documents) {
       return [];
     }
-    const docs = store.state.user.documents.filter((d: DfDocument) => {
+    const docs = store.user.documents.filter((d: DfDocument) => {
       return d.documentCategory === documentCategory;
     });
     let files: any[] = [];
@@ -145,7 +147,7 @@ export const DocumentService = {
   },
   getGuarantorIdentityStatus(g: Guarantor): string {
     const doc = this.guarantorHasDoc(
-      g || store.state.selectedGuarantor,
+      g || store.selectedGuarantor,
       "IDENTIFICATION"
     );
     if (!doc) {
@@ -155,7 +157,7 @@ export const DocumentService = {
   },
   getGuarantorResidencyStatus(g: Guarantor): string {
     const doc = this.guarantorHasDoc(
-      g || store.state.selectedGuarantor,
+      g || store.selectedGuarantor,
       "RESIDENCY"
     );
     if (!doc) {
@@ -165,7 +167,7 @@ export const DocumentService = {
   },
   getGuarantorProfessionalStatus(g: Guarantor): string {
     const doc = this.guarantorHasDoc(
-      g || store.state.selectedGuarantor,
+      g || store.selectedGuarantor,
       "PROFESSIONAL"
     );
     if (!doc) {
@@ -175,7 +177,7 @@ export const DocumentService = {
   },
   getGuarantorFinancialStatus(g: Guarantor): string {
     const docs = this.getGuarantorDocs(
-      g || store.state.selectedGuarantor,
+      g || store.selectedGuarantor,
       "FINANCIAL"
     );
     if (docs.length <= 0) {
@@ -193,7 +195,7 @@ export const DocumentService = {
     return docs[0].documentStatus || "";
   },
   getGuarantorTaxStatus(g: Guarantor): string {
-    const doc = this.guarantorHasDoc(g || store.state.selectedGuarantor, "TAX");
+    const doc = this.guarantorHasDoc(g || store.selectedGuarantor, "TAX");
     return doc?.documentStatus || "";
   },
   getGuarantorLegalPersonIdentityStatus(guarantor: Guarantor): string {
@@ -211,7 +213,7 @@ export const DocumentService = {
     return doc.documentStatus || "";
   },
   tenantStatus(documentType: string, user?: User) {
-    const tenant = user == undefined ? store.state.user : user;
+    const tenant = user == undefined ? store.user : user;
     let status;
     switch (documentType) {
       case "IDENTITY":
@@ -272,7 +274,7 @@ export const DocumentService = {
     return status;
   },
   getCoTenantDocument(coTenantId: number, documentCategory: string) {
-    const coTenant = UtilsService.getTenant(Number(coTenantId));
+    const coTenant = store.getTenant(Number(coTenantId));
     if (coTenant.documents !== null) {
       return coTenant.documents?.find((d: DfDocument) => {
         return d.documentCategory === documentCategory;

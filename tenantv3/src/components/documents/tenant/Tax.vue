@@ -131,156 +131,130 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
-import { mapGetters } from "vuex";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
-import { User } from "df-shared-next/src/models/User";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { extend } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import TaxHelp from "../../helps/TaxHelp.vue";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import ProfileFooter from "../../footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
 import Modal from "df-shared-next/src/components/Modal.vue";
-import { LoaderComponent } from "vue-loading-overlay";
+// import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
+import { computed, onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
 
 extend("is", {
   ...is,
   message: "field-required",
-  validate: (value) => !!value,
+  validate: (value: any) => !!value,
 });
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationObserver,
-    ValidationProvider,
-    WarningMessage,
-    ConfirmModal,
-    TaxHelp,
-    ProfileFooter,
-    NakedCard,
-    TroubleshootingModal,
-    Modal,
-    DfButton,
-    WarningTaxDeclaration,
-    SimpleRadioButtons,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-      tenantTaxDocument: "getTenantTaxDocument",
-    }),
-  },
-})
-export default class Tax extends Vue {
-  documents = DocumentTypeConstants.TAX_DOCS;
+const emit = defineEmits(["on-next", "on-back"]);
+const { t } = useI18n();
 
-  user!: User;
-  tenantTaxDocument!: DfDocument;
+      const store = useTenantStore()
+      const user = computed(() => store.userToEdit)
+      const tenantTaxDocument = computed(() => store.getTenantTaxDocument)
 
-  documentDeniedReasons = new DocumentDeniedReasons();
+  const documents = ref(DocumentTypeConstants.TAX_DOCS);
 
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  uploadProgress: {
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[] );
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
-  taxDocument = new DocumentType();
+  });
+  const taxDocument = ref(new DocumentType());
 
-  customText = "";
+  const customText = ref("");
 
-  isDocDeleteVisible = false;
-  isWarningTaxSituationModalVisible = false;
-  newFiles: File[] = [];
+  const isDocDeleteVisible = ref(false);
+  const isWarningTaxSituationModalVisible = ref(false);
+  const newFiles = ref([] as File[]);
 
-  loader?: LoaderComponent;
+  // todo
+  // const loader?: LoaderComponent;
 
-  getTaxLocalStorageKey() {
-    return "tax_" + this.user.email;
+  function getTaxLocalStorageKey() {
+    return "tax_" + user.value?.email;
   }
 
-  get documentStatus() {
-    return this.tenantTaxDocument?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return tenantTaxDocument.value?.documentStatus;
+  })
 
-  beforeMount() {
-    if (this.user.documents !== null) {
-      if (this.tenantTaxDocument !== undefined) {
-        this.customText = this.tenantTaxDocument.customText || "";
-        const localDoc = this.documents.find((d: DocumentType) => {
-          return d.value === this.tenantTaxDocument?.subCategory;
+  onBeforeMount(() => {
+    if (user.value?.documents !== null) {
+      if (tenantTaxDocument.value !== undefined) {
+        customText.value = tenantTaxDocument.value.customText || "";
+        const localDoc = documents.value.find((d: DocumentType) => {
+          return d.value === tenantTaxDocument.value?.subCategory;
         });
         if (localDoc !== undefined) {
-          this.taxDocument = localDoc;
+          taxDocument.value = localDoc;
           localStorage.setItem(
-            this.getLocalStorageKey(),
-            this.taxDocument.key || ""
+            getLocalStorageKey(),
+            taxDocument.value.key || ""
           );
         }
-        if (this.tenantTaxDocument?.documentDeniedReasons) {
-          this.documentDeniedReasons = cloneDeep(
-            this.tenantTaxDocument.documentDeniedReasons
+        if (tenantTaxDocument.value?.documentDeniedReasons) {
+          documentDeniedReasons.value = cloneDeep(
+            tenantTaxDocument.value.documentDeniedReasons
           );
         }
       } else {
-        const key = localStorage.getItem(this.getLocalStorageKey());
+        const key = localStorage.getItem(getLocalStorageKey());
         if (key) {
-          const localDoc = this.documents.find((d: DocumentType) => {
+          const localDoc = documents.value.find((d: DocumentType) => {
             return d.key === key;
           });
           if (localDoc !== undefined) {
-            this.taxDocument = localDoc;
+            taxDocument.value = localDoc;
           }
         }
       }
     }
+  })
+
+  function getLocalStorageKey() {
+    return "tax_guarantor_" + user.value?.email;
   }
 
-  getLocalStorageKey() {
-    return "tax_guarantor_" + this.user.email;
-  }
-
-  onSelectChange() {
-    localStorage.setItem(this.getLocalStorageKey(), this.taxDocument.key);
-    if (this.user.documents !== null) {
-      const doc = this.tenantTaxDocument;
+  function onSelectChange() {
+    localStorage.setItem(getLocalStorageKey(), taxDocument.value.key);
+    if (user.value?.documents !== null) {
+      const doc = tenantTaxDocument.value;
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc?.files?.length || 0) > 0 &&
-          doc?.subCategory !== this.taxDocument.value;
+          doc?.subCategory !== taxDocument.value.value;
       }
     }
     return false;
   }
 
-  getRegisteredDoc() {
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+  function getRegisteredDoc() {
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
       return doc;
@@ -288,10 +262,10 @@ export default class Tax extends Vue {
     return undefined;
   }
 
-  getLocalDoc() {
-    const doc = this.getRegisteredDoc();
+  function getLocalDoc() {
+    const doc = getRegisteredDoc();
     if (doc !== undefined) {
-      const localDoc = this.documents.find((d: DocumentType) => {
+      const localDoc = documents.value.find((d: DocumentType) => {
         return d.value === doc.subCategory;
       });
       return localDoc;
@@ -299,100 +273,101 @@ export default class Tax extends Vue {
     return undefined;
   }
 
-  undoSelect() {
-    if (this.user.documents !== null) {
-      const doc = this.tenantTaxDocument;
+  function undoSelect() {
+    if (user.value?.documents !== null) {
+      const doc = tenantTaxDocument.value;
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc?.subCategory;
         });
         if (localDoc !== undefined) {
-          this.taxDocument = localDoc;
+          taxDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  async addFiles(fileList: File[]) {
-    this.newFiles = fileList;
-    this.showLoader();
+  async function addFiles(fileList: File[]) {
+    newFiles.value = fileList;
+    showLoader();
     if (await PdfAnalysisService.includesRejectedTaxDocuments(fileList)) {
-      this.isWarningTaxSituationModalVisible = true;
-      this.hideLoader();
+      isWarningTaxSituationModalVisible.value = true;
+      hideLoader();
     } else {
-      this.saveNewFiles(false);
+      saveNewFiles(false);
     }
   }
 
-  saveNewFiles(force: boolean) {
+  function saveNewFiles(force: boolean) {
     AnalyticsService.uploadFile("tax");
-    const nf = Array.from(this.newFiles).map((f) => {
+    const nf = Array.from(newFiles.value).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save(force);
+    files.value = [...files.value, ...nf];
+    save(force);
   }
 
-  forceSave() {
-    this.isWarningTaxSituationModalVisible = false;
-    this.saveNewFiles(true);
+  function forceSave() {
+    isWarningTaxSituationModalVisible.value = false;
+    saveNewFiles(true);
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  async goNext() {
-    const res = await this.save();
+  async function goNext() {
+    const res = await save();
     if (res) {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  async save(force = false): Promise<boolean> {
-    if (this.taxDocument.key === undefined) {
+  async function save(force = false): Promise<boolean> {
+    if (taxDocument.value.key === undefined) {
       return true;
     }
     AnalyticsService.registerFile("tax");
-    this.uploadProgress = {};
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (newFiles.length) {
       if (
-        this.taxDocument.maxFileCount &&
-        this.taxFiles().length > this.taxDocument.maxFileCount
+        taxDocument.value.maxFileCount &&
+        taxFiles().length > taxDocument.value.maxFileCount
       ) {
-        Vue.toasted.global.max_file({
-          message: this.$i18n.t("max-file", [
-            this.taxFiles().length,
-            this.taxDocument.maxFileCount,
-          ]),
-        });
-        this.files = [];
+        // TODO
+        // Vue.toasted.global.max_file({
+        //   message: this.$i18n.t("max-file", [
+        //     this.taxFiles().length,
+        //     this.taxDocument.maxFileCount,
+        //   ]),
+        // });
+        files.value = [];
         return false;
       }
 
@@ -402,65 +377,66 @@ export default class Tax extends Vue {
       });
     }
 
-    const d = this.getRegisteredDoc();
+    const d = getRegisteredDoc();
     if (
-      this.taxDocument.value === d?.subCategory &&
-      this.customText === (d?.customText || "") &&
+      taxDocument.value.value === d?.subCategory &&
+      customText.value === (d?.customText || "") &&
       newFiles.length <= 0
     ) {
       return true;
     }
 
-    if (this.taxDocument.key === "my-name") {
+    if (taxDocument.value.key === "my-name") {
       formData.append("noDocument", "false");
     } else {
       formData.append("noDocument", "true");
     }
 
-    formData.append("typeDocumentTax", this.taxDocument.value);
+    formData.append("typeDocumentTax", taxDocument.value.value);
 
-    if (this.taxDocument.key === "other-tax") {
-      if (!this.customText || this.customText === "") {
+    if (taxDocument.value.key === "other-tax") {
+      if (!customText.value ||customText.value === "") {
         return false;
       }
-      formData.append("customText", this.customText);
+      formData.append("customText", customText.value);
     }
 
     if (force) {
       formData.append("avisDetected", "true");
     } else {
-      const files = this.files
+      const filteredFiles = files.value
         .map((f) => f.file as File)
         .filter((f) => f !== undefined);
-      if (!(await PdfAnalysisService.includesRejectedTaxDocuments(files))) {
+      if (!(await PdfAnalysisService.includesRejectedTaxDocuments(filteredFiles))) {
         formData.append("avisDetected", "false");
       }
     }
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    this.showLoader();
-    return await this.$store
-      .dispatch("saveTenantTax", formData)
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    showLoader();
+    return await store
+      .saveTenantTax(formData)
       .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
+        files.value = [];
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        // TODO
+        // Vue.toasted.global.save_success();
         return true;
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
         return false;
       })
       .finally(() => {
-        this.hideLoader();
+        hideLoader();
       });
   }
 
-  taxFiles() {
-    const newFiles = this.files.map((f) => {
+  function taxFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.taxDocument.value,
+        subCategory: taxDocument.value.value,
         id: f.id,
         name: f.name,
         file: f,
@@ -468,39 +444,40 @@ export default class Tax extends Vue {
       };
     });
     const existingFiles =
-      this.$store.getters.getTenantDocuments?.find((d: DfDocument) => {
+      store.getTenantDocuments?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       })?.files || [];
-    return [...newFiles, ...existingFiles];
+    return [...newFiles, ...existingFiles] as DfFile[];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     AnalyticsService.deleteFile("tax");
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  showLoader() {
-    if (this.loader === undefined) {
-      this.loader = this.$loading.show();
-    }
+  function showLoader() {
+    // todo
+    // if (this.loader === undefined) {
+    //   this.loader = this.$loading.show();
+    // }
   }
 
-  hideLoader() {
-    this.loader?.hide();
-    this.loader = undefined;
+  function hideLoader() {
+    // todo
+    // this.loader?.hide();
+    // this.loader = undefined;
   }
 
-  mapDocuments() {
-    return this.documents.map((d) => {
+  function mapDocuments() {
+    return documents.value.map((d) => {
       return { id: d.key, labelKey: d.key, value: d };
     });
   }
-}
 </script>

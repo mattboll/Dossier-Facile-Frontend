@@ -1,10 +1,10 @@
 <template>
   <v-gouv-fr-modal>
     <template v-slot:button>
-      {{ $t("troubleshootingmodal.more-information") }}
+      {{ t("troubleshootingmodal.more-information") }}
     </template>
     <template v-slot:title>
-      {{ $t("troubleshootingmodal.more-information") }}
+      {{ t("troubleshootingmodal.more-information") }}
     </template>
     <template v-slot:content>
       <p>
@@ -14,14 +14,10 @@
   </v-gouv-fr-modal>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    VGouvFrModal,
-  },
-})
-export default class TroubleshootingModal extends Vue {}
+const { t } = useI18n();
+
 </script>

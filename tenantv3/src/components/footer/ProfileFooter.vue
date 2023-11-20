@@ -12,28 +12,31 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+<script setup lang="ts">
 import FooterContainer from "./FooterContainer.vue";
 import BackNext from "./BackNext.vue";
 
-@Component({
-  components: { VGouvFrButton, FooterContainer, BackNext },
-})
-export default class ProfileFooter extends Vue {
-  @Prop({ default: true }) showBack!: boolean;
-  @Prop({ default: false }) disabled!: boolean;
-  @Prop() nextLabel?: string;
+  const props = withDefaults(
+    defineProps<{
+      showBack: boolean;
+      disabled: boolean;
+      nextLabel?: string;
+    }>(),
+    {
+      showBack: true,
+      disabled: false,
+    }
+  );
 
-  nextAction() {
-    this.$emit("on-next");
+  const emit = defineEmits(["on-next", "on-back"]);
+
+  function nextAction() {
+    emit("on-next");
   }
 
-  backAction() {
-    this.$emit("on-back");
+  function backAction() {
+    emit("on-back");
   }
-}
 </script>
 
 <style lang="scss"></style>

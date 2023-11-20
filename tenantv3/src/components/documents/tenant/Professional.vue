@@ -84,11 +84,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
-import { mapGetters } from "vuex";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
@@ -110,169 +108,152 @@ import { ValidationProvider } from "vee-validate";
 import { extend } from "vee-validate";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    WarningMessage,
-    ConfirmModal,
-    DocumentHelp,
-    VGouvFrModal,
-    NakedCard,
-    ValidationProvider,
-    TroubleshootingModal,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-      tenantProfessionalDocument: "getTenantProfessionalDocument",
-    }),
-  },
-})
-export default class Professional extends Vue {
-  documents = DocumentTypeConstants.PROFESSIONAL_DOCS;
 
-  user!: User;
-  tenantProfessionalDocument!: DfDocument;
+const store = useTenantStore();
+const user = computed(() => store.userToEdit);
+const tenantProfessionalDocument = computed(() => store.getTenantProfessionalDocument);
 
-  documentDeniedReasons = new DocumentDeniedReasons();
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  uploadProgress: {
+  const documents = ref(DocumentTypeConstants.PROFESSIONAL_DOCS);
+
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
-  professionalDocument = new DocumentType();
-  isDocDeleteVisible = false;
+  });
+  const professionalDocument = ref(new DocumentType());
+  const isDocDeleteVisible = ref(false);
 
-  getLocalStorageKey() {
-    return "professional_" + this.user.email;
+  function getLocalStorageKey() {
+    return "professional_" + user.value?.email;
   }
 
-  get documentStatus() {
-    return this.tenantProfessionalDocument?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return tenantProfessionalDocument.value?.documentStatus;
+  })
 
-  beforeMount() {
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+  onBeforeMount(() => {
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.professionalDocument = localDoc;
+          professionalDocument.value = localDoc;
           localStorage.setItem(
-            this.getLocalStorageKey(),
-            this.professionalDocument.key || ""
+            getLocalStorageKey(),
+            professionalDocument.value.key || ""
           );
         }
-        if (this.tenantProfessionalDocument?.documentDeniedReasons) {
-          this.documentDeniedReasons = cloneDeep(
-            this.tenantProfessionalDocument.documentDeniedReasons
+        if (tenantProfessionalDocument.value?.documentDeniedReasons) {
+          documentDeniedReasons.value = cloneDeep(
+            tenantProfessionalDocument.value.documentDeniedReasons
           );
         }
       } else {
-        const key = localStorage.getItem(this.getLocalStorageKey());
+        const key = localStorage.getItem(getLocalStorageKey());
         if (key) {
-          const localDoc = this.documents.find((d: DocumentType) => {
+          const localDoc = documents.value.find((d: DocumentType) => {
             return d.key === key;
           });
           if (localDoc !== undefined) {
-            this.professionalDocument = localDoc;
+            professionalDocument.value = localDoc;
           }
         }
       }
     }
-  }
+  })
 
-  onSelectChange() {
+  function onSelectChange() {
     localStorage.setItem(
-      this.getLocalStorageKey(),
-      this.professionalDocument.key
+      getLocalStorageKey(),
+      professionalDocument.value.key
     );
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc.files?.length || 0) > 0 &&
-          doc.subCategory !== this.professionalDocument.value;
+          doc.subCategory !== professionalDocument.value.value;
       }
     }
     return false;
   }
 
-  undoSelect() {
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+  function undoSelect() {
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.professionalDocument = localDoc;
+          professionalDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.user.documents !== null) {
-      const doc = this.user.documents?.find((d: DfDocument) => {
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (user.value?.documents !== null) {
+      const doc = user.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     AnalyticsService.uploadFile("professional");
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
-  save() {
+  function save() {
     AnalyticsService.registerFile("professional");
-    this.uploadProgress = {};
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (!newFiles.length) return;
 
     if (
-      this.professionalDocument.maxFileCount &&
-      this.professionalFiles().length > this.professionalDocument.maxFileCount
+      professionalDocument.value.maxFileCount &&
+      professionalFiles().length > professionalDocument.value.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.professionalFiles().length,
-          this.professionalDocument.maxFileCount,
-        ]),
-      });
-      this.files = [];
+      // TODO
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     this.professionalFiles().length,
+      //     this.professionalDocument.maxFileCount,
+      //   ]),
+      // });
+      files.value = [];
       return;
     }
     Array.from(Array(newFiles.length).keys()).forEach((x) => {
@@ -282,55 +263,54 @@ export default class Professional extends Vue {
 
     formData.append(
       "typeDocumentProfessional",
-      this.professionalDocument.value
+      professionalDocument.value.value
     );
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("saveTenantProfessional", formData)
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    // TODO
+    // const loader = this.$loading.show();
+    store.saveTenantProfessional(formData)
       .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
+        files.value = [];
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        // Vue.toasted.global.save_success();
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  professionalFiles() {
-    const newFiles = this.files.map((f) => {
+  function professionalFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.professionalDocument.value,
+        subCategory: professionalDocument.value.value,
         id: f.id,
         name: f.name,
         size: f.size,
       };
     });
     const existingFiles =
-      this.$store.getters.getTenantDocuments?.find((d: DfDocument) => {
+      store.getTenantDocuments?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       })?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     AnalyticsService.deleteFile("professional");
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
-}
 </script>
 
 <style scoped lang="scss"></style>
