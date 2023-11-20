@@ -15,24 +15,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import LeftEditMenu from "./editmenu/LeftEditMenu.vue";
 import TopEditMenu from "./editmenu/TopEditMenu.vue";
-import { UtilsService } from "../services/UtilsService";
 
-@Component({
-  components: {
-    LeftEditMenu,
-    TopEditMenu,
-  },
-})
-export default class ProfileContainer extends Vue {
-  @Prop() step!: number;
+  const props = defineProps({
+    step: Number
+  });
 
-  isMobile() {
-    return UtilsService.isMobile();
-  }
 }
 </script>
 
