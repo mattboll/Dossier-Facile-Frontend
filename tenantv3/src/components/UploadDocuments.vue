@@ -45,77 +45,65 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import Identification from "./documents/tenant/Identification.vue";
 import Residency from "./documents/tenant/Residency.vue";
 import Professional from "./documents/tenant/Professional.vue";
 import Financial from "./documents/tenant/Financial.vue";
 import Tax from "./documents/tenant/Tax.vue";
-import { mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import { AnalyticsService } from "../services/AnalyticsService";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import { DocumentService } from "@/services/DocumentService";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
-@Component({
-  components: {
-    Tax,
-    Financial,
-    Professional,
-    Residency,
-    Identification,
-    ProfileFooter,
-    ConfirmModal,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class UploadDocuments extends Vue {
-  @Prop({ default: 0 }) substep!: number;
-  user!: User;
-  showNbDocumentsResidency = false;
-  showNbDocumentsResidencyTenant = false;
+    const store = useTenantStore();
+    const user = computed(() => store.user);
+    const router = useRouter();
 
-  updateSubstep(s: number) {
-    this.$router.push({
+    const props = defineProps<{ substep: number }>();
+
+  const showNbDocumentsResidency = ref(false);
+  const showNbDocumentsResidencyTenant = ref(false);
+
+  function updateSubstep(s: number) {
+    router.push({
       name: "TenantDocuments",
-      params: { substep: this.substep === s ? "0" : s.toString() },
+      params: { substep: props.substep === s ? "0" : s.toString() },
     });
   }
 
-  goToGuarantor() {
+  function goToGuarantor() {
     AnalyticsService.validateFunnel();
-    if (this.user.guarantors.length > 0) {
-      this.$router.push({
+    if (user.value.guarantors.length > 0) {
+      router.push({
         name: "GuarantorList",
       });
       return;
     }
-    this.$router.push({
+    router.push({
       name: "GuarantorChoice",
     });
   }
 
-  goBack() {
-    if (this.substep > 1) {
-      this.$router.push({
+  function goBack() {
+    if (props.substep > 1) {
+      router.push({
         name: "TenantDocuments",
-        params: { substep: (this.substep - 1).toString() },
+        params: { substep: (props.substep - 1).toString() },
       });
     } else {
-      this.$router.push({
+      router.push({
         name: "TenantType",
       });
     }
   }
 
-  checkResidencyAndGoNext() {
-    const docs = DocumentService.getDocs("RESIDENCY", this.user);
+  function checkResidencyAndGoNext() {
+    const docs = DocumentService.getDocs("RESIDENCY", user.value);
     if (docs.length === 1) {
       const d = docs[0];
       if (d.subCategory === "TENANT") {
@@ -124,7 +112,7 @@ export default class UploadDocuments extends Vue {
           0
         );
         if ((nbPages || 0) < 3) {
-          this.showNbDocumentsResidencyTenant = true;
+          showNbDocumentsResidencyTenant.value = true;
           AnalyticsService.missingResidencyDocumentDetected();
           return;
         }
@@ -137,28 +125,27 @@ export default class UploadDocuments extends Vue {
           0
         );
         if ((nbPages || 0) < 3) {
-          this.showNbDocumentsResidency = true;
+          showNbDocumentsResidency.value = true;
           AnalyticsService.missingResidencyDocumentDetected();
           return;
         }
       }
     }
-    this.goNext();
+    goNext();
   }
 
-  cancelAndgoNext() {
+  function cancelAndgoNext() {
     AnalyticsService.forceMissingResidencyDocument();
-    this.goNext();
+    goNext();
   }
 
-  goNext() {
-    if (this.substep < 5) {
-      this.updateSubstep(this.substep + 1);
+  function goNext() {
+    if (props.substep < 5) {
+      updateSubstep(props.substep + 1);
     } else {
-      this.goToGuarantor();
+      goToGuarantor();
     }
   }
-}
 </script>
 
 <style scoped lang="scss">

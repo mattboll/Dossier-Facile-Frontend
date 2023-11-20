@@ -4,6 +4,7 @@ import useTenantStore from '@/stores/tenant-store';
 import type { SkipLink } from 'df-shared-next/src/models/SkipLink';
 import keycloak from '../plugin/keycloak';
 import Home from '../views/Home.vue';
+import { FUNNEL_SKIP_LINKS } from '@/models/SkipLinkModel';
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const TENANT_URL = import.meta.env.VITE_FULL_TENANT_URL;
@@ -95,18 +96,18 @@ const router = createRouter({
   //   component: () =>
   //     import(/* webpackChunkName: "profile" */ "../views/TypeInformation.vue"),
   // },
-  // {
-  //   path: "/documents-locataire/:substep",
-  //   name: "TenantDocuments",
-  //   meta: {
-  //     title: "Mes documents - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/TenantDocument.vue"),
-  // },
+  {
+    path: "/documents-locataire/:substep",
+    name: "TenantDocuments",
+    meta: {
+      title: "Mes documents - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/TenantDocument.vue"),
+  },
   // {
   //   path: "/documents-colocataire/:tenantId/:step/:substep/",
   //   name: "CoTenantDocuments",
