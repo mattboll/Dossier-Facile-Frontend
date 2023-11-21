@@ -19,24 +19,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-
-@Component
-export default class DocumentInsert extends Vue {
-  @Prop({
-    default() {
-      return [];
-    },
-  })
-  allowList!: string[];
-  @Prop({
-    default() {
-      return [];
-    },
-  })
-  blockList!: string[];
-}
+<script setup lang="ts">
+  const props = withDefaults(defineProps<{
+    allowList: string[],
+    blockList: string[],
+  }>(), {
+    allowList: () => [],
+    blockList: () => [],
+  });
 </script>
 
 <style scoped lang="scss">

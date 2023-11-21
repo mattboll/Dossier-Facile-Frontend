@@ -23,20 +23,17 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 import DeclinedMessage from "df-shared-next/src/components/DeclinedMessage.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
-import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component({
-  components: {
-    DeclinedMessage,
-  },
-})
-export default class AllDeclinedMessages extends Vue {
-  @Prop({ default: null }) documentDeniedReasons?: DocumentDeniedReasons | null;
-  @Prop({ default: "" }) documentStatus?: string;
-}
+  const props = withDefaults(defineProps<{
+    documentDeniedReasons?: DocumentDeniedReasons | null;
+    documentStatus?: string;
+  }>(), {
+    documentDeniedReasons: null,
+    documentStatus: "",
+  });
 </script>
 
 <style scoped lang="scss">

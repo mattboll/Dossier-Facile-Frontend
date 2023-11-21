@@ -51,7 +51,7 @@
     </div>
     <h2 class="small-title" v-if="displayGuarantorName()">
       {{
-        $t("topeditmenu.i-add", [
+        t("topeditmenu.i-add", [
           `${selectedGuarantor.firstName} ${selectedGuarantor.lastName}`,
         ])
       }}
@@ -118,7 +118,7 @@
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION_LEGAL_PERSON"
           substep="0"
-          :active="getGuarantorCurrentStep(0)"
+          :active="getGuarantorCurrentStep(0, undefined)"
         />
         <GuarantorDocumentLink
           class="ml-5"
@@ -126,7 +126,7 @@
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION"
           substep="1"
-          :active="getGuarantorCurrentStep(1)"
+          :active="getGuarantorCurrentStep(1, undefined)"
         />
       </div>
       <div
@@ -140,7 +140,7 @@
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION_ORGANISM"
           substep="0"
-          :active="getGuarantorCurrentStep(0)"
+          :active="getGuarantorCurrentStep(0, undefined)"
         />
       </div>
     </div>
@@ -285,88 +285,84 @@
   </div>
 </template>
 
-<script lang="ts">
-import StepNumber from "df-shared-next/src/components/StepNumber.vue";
-import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
-import { mapState } from "vuex";
+<script setup lang="ts">
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
 import TenantDocumentLink from "./documents/TenantDocumentLink.vue";
 import GuarantorDocumentLink from "./documents/GuarantorDocumentLink.vue";
 import CoTenantDocumentLink from "./documents/CoTenantDocumentLink.vue";
 import CoTenantGuarantorDocumentLink from "./documents/CoTenantGuarantorDocumentLink.vue";
+import { useI18n } from "vue-i18n";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-@Component({
-  components: {
-    StepNumber,
-    ColoredTag,
-    TenantDocumentLink,
-    GuarantorDocumentLink,
-    CoTenantDocumentLink,
-    CoTenantGuarantorDocumentLink,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-      user: "user",
-      coTenants: "coTenants",
-    }),
-  },
-})
-export default class TopEditMenu extends Vue {
-  @Prop({ default: 0 }) step!: number;
-  selectedGuarantor!: Guarantor;
-  user!: User;
-  coTenants!: User[];
+const store = useTenantStore();
+const selectedGuarantor = computed(() => store.selectedGuarantor);
+const user = computed(() => store.user);
+const coTenants = computed(() => store.coTenants);
+const route = useRoute();
 
-  mounted() {
-    this.autoScroll("td", "tcontainer");
-    this.autoScroll("gd", "gcontainer");
-  }
+const { t } = useI18n();
 
-  displayGuarantorName(): boolean {
+  const props = withDefaults(
+    defineProps<{
+      step: number;
+    }>(),
+    {
+      step: 0,
+    }
+  );
+
+
+  onMounted(() => {
+    autoScroll("td", "tcontainer");
+    autoScroll("gd", "gcontainer");
+  })
+
+  function displayGuarantorName(): boolean {
     const isGuarantorSelected =
-      !!this.selectedGuarantor?.lastName && !!this.selectedGuarantor?.firstName;
-    if (this.step === 3) {
+      !!selectedGuarantor.value?.lastName && !!selectedGuarantor.value?.firstName;
+    if (props.step === 3) {
       return isGuarantorSelected;
     }
-    if (this.step === 5 && this.isCouple()) {
+    if (props.step === 5 && isCouple()) {
       return isGuarantorSelected;
     }
     return false;
   }
 
-  autoScroll(refd: string, refContainer: string) {
-    const element = this.$refs[refd + this.$route.params.substep] as any;
-    if (element === undefined) {
-      return;
-    }
-    const container = this.$refs[refContainer] as any;
-    if (container === undefined) {
-      return;
-    }
-    const left =
-      element.offsetLeft - (container.offsetWidth - element.offsetWidth) / 2;
-    container.scrollTo(left, 0);
+  function autoScroll(refd: string, refContainer: string) {
+    // TODO
+    // const element = this.$refs[refd + route.params.substep] as any;
+    // if (element === undefined) {
+    //   return;
+    // }
+    // const container = this.$refs[refContainer] as any;
+    // if (container === undefined) {
+    //   return;
+    // }
+    // const left =
+    //   element.offsetLeft - (container.offsetWidth - element.offsetWidth) / 2;
+    // container.scrollTo(left, 0);
   }
 
-  getClass(s: number) {
+  function getClass(s: number) {
     let res = "";
-    if (this.step !== s + 1) {
+    if (props.step !== s + 1) {
       res += " small ";
     }
-    if (this.step === 2 && s === 1) {
-      res += ` rad${this.$route.params.substep} `;
+    if (props.step === 2 && s === 1) {
+      res += ` rad${route.params.substep} `;
     }
-    if (this.getStep(s)) {
+    if (getStep(s)) {
       return res + "active";
     }
     return res;
   }
 
-  getStep(s: number) {
-    switch (this.step) {
+  function getStep(s: number) {
+    switch (props.step) {
       case 0:
       case 1:
         return s <= 0;
@@ -385,57 +381,56 @@ export default class TopEditMenu extends Vue {
     }
   }
 
-  getStepTitle() {
-    if (this.step <= 1) {
-      return this.$i18n.t("personal-information");
+  function getStepTitle() {
+    if (props.step <= 1) {
+      return t("personal-information");
     }
-    if (this.step === 2) {
-      return this.$i18n.t("my-document");
+    if (props.step === 2) {
+      return t("my-document");
     }
-    if (this.step === 3) {
-      return this.$i18n.t("my-guarantor");
+    if (props.step === 3) {
+      return t("my-guarantor");
     }
-    if (this.step === 4 && this.isCouple()) {
-      return this.$i18n.t("my-cotenant");
+    if (props.step === 4 && isCouple()) {
+      return t("my-cotenant");
     }
-    if (this.step === 5 && this.isCouple()) {
-      return this.$i18n.t("my-cotenant-guarantor");
+    if (props.step === 5 && isCouple()) {
+      return t("my-cotenant-guarantor");
     }
-    if (this.step === 6 && this.isCouple()) {
-      return this.$i18n.t("validate-file");
+    if (props.step === 6 && isCouple()) {
+      return t("validate-file");
     }
-    if (this.step === 4 && !this.isCouple()) {
-      return this.$i18n.t("validate-file");
+    if (props.step === 4 && !isCouple()) {
+      return t("validate-file");
     }
     return "";
   }
 
-  getGuarantorCurrentStep(substep: number, g: Guarantor): boolean {
-    const s = Number(this.$route.params.substep) || 0;
+  function getGuarantorCurrentStep(substep: number, g: Guarantor | undefined): boolean {
+    const s = Number(route.params.substep) || 0;
     return (
-      (this.step === 3 || this.step === 5) &&
+      (props.step === 3 || props.step === 5) &&
       s === substep &&
-      (g === undefined || this.selectedGuarantor.id === g.id)
+      (g === undefined || selectedGuarantor.value.id === g.id)
     );
   }
 
-  getCurrentSubStep() {
-    return Number(this.$route.params.substep) || 0;
+  function getCurrentSubStep() {
+    return Number(route.params.substep) || 0;
   }
 
-  getTenantCurrentStep(substep: number): boolean {
-    const s = Number(this.$route.params.substep) || 0;
-    return this.step === 2 && s === substep;
+  function getTenantCurrentStep(substep: number): boolean {
+    const s = Number(route.params.substep) || 0;
+    return props.step === 2 && s === substep;
   }
 
-  isCouple() {
-    return this.user.applicationType === "COUPLE";
+  function isCouple() {
+    return user.value.applicationType === "COUPLE";
   }
 
-  getCoTenant(index: number): User {
-    return this.coTenants[index];
+  function getCoTenant(index: number): User {
+    return coTenants.value[index];
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

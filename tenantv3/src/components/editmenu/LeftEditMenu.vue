@@ -5,7 +5,7 @@
         <div class="step-number">{{ getStepNumber("information") }}</div>
         <div class="step-title">
           <router-link :to="{ name: 'TenantName' }" class="fr-link">
-            {{ $t("personal-information") }}
+            {{ t("personal-information") }}
           </router-link>
         </div>
       </div>
@@ -13,8 +13,8 @@
         <div class="ml-5">
           <router-link :to="{ name: 'Profile' }">
             <ColoredTag
-              :label="$tc('lefteditmenu.identity')"
-              :text="user | fullName"
+              :label="t('lefteditmenu.identity')"
+              :text="UtilsService.tenantFullName(user)"
               status="NAME"
             />
           </router-link>
@@ -22,8 +22,8 @@
         <div class="ml-5" v-if="user.applicationType">
           <router-link :to="{ name: 'TenantType' }">
             <ColoredTag
-              :label="$tc('lefteditmenu.file-type')"
-              :text="$tc(`lefteditmenu.${user.applicationType}`)"
+              :label="t('lefteditmenu.file-type')"
+              :text="t(`lefteditmenu.${user.applicationType}`)"
               :status="user.applicationType"
               :active="step < 2"
             ></ColoredTag>
@@ -36,7 +36,7 @@
           <router-link
             class="fr-link"
             :to="{ name: 'TenantDocuments', params: { substep: '1' } }"
-            >{{ $t("my-document") }}
+            >{{ t("my-document") }}
           </router-link>
         </div>
       </div>
@@ -78,7 +78,7 @@
         <div class="step-number">{{ getStepNumber("guarantor") }}</div>
         <div class="step-title">
           <router-link class="fr-link" :to="getGuarantorLink()"
-            >{{ $t("my-guarantor") }}
+            >{{ t("my-guarantor") }}
           </router-link>
         </div>
       </div>
@@ -149,14 +149,14 @@
               :guarantor="selectedGuarantor"
               document-type="IDENTIFICATION_LEGAL_PERSON"
               substep="0"
-              :active="getGuarantorCurrentStep(0)"
+              :active="getGuarantorCurrentStep(0, undefined)"
             />
             <GuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
               document-type="IDENTIFICATION"
               substep="1"
-              :active="getGuarantorCurrentStep(1)"
+              :active="getGuarantorCurrentStep(1, undefined)"
             />
           </div>
           <div v-if="selectedGuarantor.typeGuarantor === 'ORGANISM'">
@@ -165,7 +165,7 @@
               :guarantor="selectedGuarantor"
               document-type="IDENTIFICATION_ORGANISM"
               substep="0"
-              :active="getGuarantorCurrentStep(0)"
+              :active="getGuarantorCurrentStep(0, undefined)"
             />
           </div>
         </div>
@@ -187,7 +187,7 @@
                 tenantId: getCoTenant(0).id,
               },
             }"
-            >{{ $t("my-cotenant") }}
+            >{{ t("my-cotenant") }}
           </router-link>
         </div>
       </div>
@@ -270,7 +270,7 @@
               )
             "
           >
-            {{ $t("my-cotenant-guarantor") }}
+            {{ t("my-cotenant-guarantor") }}
           </router-link>
         </div>
       </div>
@@ -389,7 +389,7 @@
               name: 'ValidateFileStep',
               params: { step: getStepNumber('validate') },
             }"
-            >{{ $t("validate-file") }}
+            >{{ t("validate-file") }}
           </router-link>
         </div>
       </div>
@@ -399,104 +399,100 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { mapState } from "vuex";
-import StatusIcon from "df-shared-next/src/components/StatusIcon.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import { User } from "df-shared-next/src/models/User";
-import DocumentLink from "./documents/DocumentLink.vue";
 import GuarantorDocumentLink from "./documents/GuarantorDocumentLink.vue";
 import TenantDocumentLink from "./documents/TenantDocumentLink.vue";
 import CoTenantDocumentLink from "./documents/CoTenantDocumentLink.vue";
 import CoTenantGuarantorDocumentLink from "./documents/CoTenantGuarantorDocumentLink.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useRoute } from "vue-router";
+import { UtilsService } from "@/services/UtilsService";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    StatusIcon,
-    ColoredTag,
-    DocumentLink,
-    TenantDocumentLink,
-    GuarantorDocumentLink,
-    CoTenantDocumentLink,
-    CoTenantGuarantorDocumentLink,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-      user: "user",
-    }),
-  },
-})
-export default class LeftEditMenu extends Vue {
-  @Prop({ default: 0 }) step!: number;
-  selectedGuarantor!: Guarantor;
-  coTenants: User[] = [];
-  user!: User;
+    const store = useTenantStore();
+    const route = useRoute();
+    const selectedGuarantor = computed(() => store.selectedGuarantor)
+    const user = computed(() => store.user)
+const { t } = useI18n();
 
-  @Watch("user")
-  loadCotenants() {
-    this.coTenants = this.user.apartmentSharing?.tenants?.filter((r: User) => {
-      return r.id != this.user.id;
+  const props = withDefaults(
+    defineProps<{
+      step: number;
+    }>(),
+    {
+      step: 0,
+    }
+  );
+
+  const coTenants = ref([] as User[]);
+
+  // TODO
+  // @Watch("user")
+  function loadCotenants() {
+    coTenants.value = user.value.apartmentSharing?.tenants?.filter((r: User) => {
+      return r.id != user.value.id;
     }) as User[];
-    if (!this.coTenants) {
+    if (!coTenants.value) {
       return [];
     }
   }
 
-  beforeMount() {
-    this.loadCotenants();
-  }
+  onBeforeMount(() => {
+    loadCotenants();
+  });
 
-  getClass(s: number) {
-    if (s <= this.step) {
+  function getClass(s: number) {
+    if (s <= props.step) {
       return "active";
     }
     return "";
   }
 
-  getTenantCurrentStep(substep: number): boolean {
-    const s = Number(this.$route.params.substep) || 0;
-    return this.step === 2 && s === substep;
+  function getTenantCurrentStep(substep: number): boolean {
+    const s = Number(route.params.substep) || 0;
+    return props.step === 2 && s === substep;
   }
 
-  getGuarantorCurrentStep(substep: number, g: Guarantor): boolean {
-    const s = Number(this.$route.params.substep) || 0;
+  function getGuarantorCurrentStep(substep: number, g: Guarantor | undefined): boolean {
+    const s = Number(route.params.substep) || 0;
     return (
-      (this.step === 3 || this.step === 5) &&
+      (props.step === 3 || props.step === 5) &&
       s === substep &&
-      (g === undefined || this.selectedGuarantor.id === g.id)
+      (g === undefined || selectedGuarantor.value.id === g.id)
     );
   }
 
-  getCurrentSubStep() {
-    return Number(this.$route.params.substep) || 0;
+  function getCurrentSubStep() {
+    return Number(route.params.substep) || 0;
   }
 
-  getGuarantorLink() {
-    if (this.user.guarantors.length > 0) {
+  function getGuarantorLink() {
+    if (user.value.guarantors.length > 0) {
       return { name: "GuarantorList" };
     }
     return { name: "GuarantorChoice" };
   }
 
-  getTenantGuarantorLink(tenant: User, stepNum: number) {
+  function getTenantGuarantorLink(tenant: User, stepNum: number) {
     return {
       name: "TenantGuarantors",
       params: { tenantId: Number(tenant.id), step: stepNum },
     };
   }
 
-  isCouple() {
-    return this.user.applicationType === "COUPLE";
+  function isCouple() {
+    return user.value.applicationType === "COUPLE";
   }
 
-  getCoTenant(index: number): User {
-    return this.coTenants[index];
+  function getCoTenant(index: number): User {
+    return coTenants.value[index];
   }
 
-  getStepNumber(stepName: string): number {
+  function getStepNumber(stepName: string): number {
     switch (stepName) {
       case "information":
         return 1;
@@ -509,19 +505,18 @@ export default class LeftEditMenu extends Vue {
       case "coTenantGuarantor":
         return 5;
       case "validate":
-        return this.user.applicationType == "COUPLE" ? 6 : 4;
+        return user.value.applicationType == "COUPLE" ? 6 : 4;
     }
 
     return -1;
   }
 
-  getName(user: User): string {
+  function getName(user: User): string {
     if (user.preferredName) {
       return `${user.firstName} ${user.preferredName}`;
     }
     return `${user.firstName} ${user.lastName}`;
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

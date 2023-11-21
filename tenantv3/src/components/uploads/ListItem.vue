@@ -15,18 +15,18 @@
         v-if="file.path || file.preview"
         class="fr-btn--icon-left fr-fi-eye-line fr-mr-md-2w fr-mr-1w"
         @on-click="openDoc()"
-        :title="$t('listitem.show')"
+        :title="t('listitem.show')"
       >
-        <span class="fr-hidden fr-unhidden-lg">{{ $t("listitem.see") }}</span>
+        <span class="fr-hidden fr-unhidden-lg">{{ t("listitem.see") }}</span>
       </DfButton>
       <DfButton
         @on-click="remove()"
         class="fr-btn--icon-left fr-icon-delete-line"
         type="button"
-        :title="$t('listitem.remove')"
+        :title="t('listitem.remove')"
       >
         <span class="fr-hidden fr-unhidden-lg">{{
-          $t("listitem.delete")
+          t("listitem.delete")
         }}</span>
       </DfButton>
     </div>
@@ -40,12 +40,12 @@
       @valid="validDeleteFile()"
       @cancel="undoDeleteFile()"
     >
-      {{ $t("listitem.will-delete-file") }}
+      {{ t("listitem.will-delete-file") }}
     </ConfirmModal>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Progress from "./Progress.vue";
@@ -54,59 +54,58 @@ import Modal from "df-shared-next/src/components/Modal.vue";
 import { AnalyticsService } from "../../services/AnalyticsService";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
+import { useI18n } from "vue-i18n";
+import { ref } from "vue";
 
-@Component({
-  components: {
-    Progress,
-    ShowDoc,
-    Modal,
-    ConfirmModal,
-    DfButton,
-  },
-})
-export default class ListItem extends Vue {
-  @Prop({ default: "" }) file!: DfFile;
-  @Prop({ default: "idle" }) uploadState!: string;
-  @Prop({ default: 0 }) percentage!: number;
+const { t } = useI18n();
+const emit = defineEmits(["remove"]);
 
-  isDocModalVisible = false;
-  confirmDeleteFile = false;
+const props = withDefaults(defineProps<{
+  file: DfFile;
+  uploadState: string;
+  percentage: number;
+}>(), {
+  uploadState: "idle",
+  percentage: 0,
+});
 
-  remove() {
-    this.confirmDeleteFile = true;
+  const isDocModalVisible = ref(false);
+  const confirmDeleteFile = ref(false);
+
+  function remove() {
+    confirmDeleteFile.value = true;
   }
 
-  validDeleteFile() {
-    this.$emit("remove");
-    this.confirmDeleteFile = false;
+  function validDeleteFile() {
+    emit("remove");
+    confirmDeleteFile.value = false;
   }
 
-  undoDeleteFile() {
-    this.confirmDeleteFile = false;
+  function undoDeleteFile() {
+    confirmDeleteFile.value = false;
     return false;
   }
 
-  openDoc() {
+  function openDoc() {
     AnalyticsService.viewFromMain();
-    this.isDocModalVisible = true;
+    isDocModalVisible.value = true;
   }
 
-  getSize() {
-    if (this.file.size) {
-      const kb = this.file.size / 1000;
+  function getSize() {
+    if (props.file.size) {
+      const kb = props.file.size / 1000;
       if (kb > 1000) {
         const mb = kb / 1000;
-        return `${mb.toFixed(2)} ${this.$i18n.t("listitem.mb")}`;
+        return `${mb.toFixed(2)} ${t("listitem.mb")}`;
       }
-      return `${kb.toFixed(2)} ${this.$i18n.t("listitem.kb")}`;
+      return `${kb.toFixed(2)} ${t("listitem.kb")}`;
     }
     return "-";
   }
 
-  getName() {
-    return this.file.name ? this.file.name : this.file.originalName;
+  function getName() {
+    return props.file.name ? props.file.name : props.file.originalName;
   }
-}
 </script>
 
 <style scoped lang="scss">
