@@ -6,11 +6,11 @@
         <RowListItem
           v-if="!isCotenant"
           :label="$t('tenantpanel.clarification-title')"
-          :subLabel="props.tenant.clarification"
+          :subLabel="props.tenant.clarification || ''"
           @clickEdit="goToValidationPage()"
         />
         <RowListItem
-          :label="props.tenant | fullName"
+          :label="UtilsService.tenantFullName(props.tenant)"
           @clickEdit="gotoTenantName()"
         />
         <FileRowListItem
@@ -68,6 +68,7 @@ import FileRowListItem from "@/components/documents/FileRowListItem.vue";
 import { DocumentTypeConstants } from "@/components/documents/share/DocumentTypeConstants";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { UtilsService } from "@/services/UtilsService";
 
 const props = withDefaults(
   defineProps<{
