@@ -8,134 +8,132 @@
           </h1>
           <h1 class="fr-h6" v-else>{{ $t("guarantortax.title") }}</h1>
           <div class="fr-mt-3w">{{ $t("guarantortax.situation") }}</div>
-
+          
           <div class="fr-mt-3w">
             <SimpleRadioButtons
-              name="application-type-selector"
-              v-model="taxDocument"
-              @input="onSelectChange"
-              :elements="mapDocuments()"
+            name="application-type-selector"
+            v-model="taxDocument"
+            @input="onSelectChange"
+            :elements="mapDocuments()"
             ></SimpleRadioButtons>
           </div>
           <div
-            class="fr-mb-3w"
-            v-if="taxDocument.key && taxDocument.key === 'other-tax'"
-          >
-            <validation-provider rules="required" v-slot="{ errors, valid }">
-              <div
-                class="fr-input-group"
-                :class="errors[0] ? 'fr-input-group--error' : ''"
-              >
-                <label class="fr-label" for="customText">{{
-                  $t("guarantortax.custom-text")
-                }}</label>
-                <textarea
-                  v-model="customText"
-                  class="form-control fr-input validate-required"
-                  :class="{
-                    'fr-input--valid': valid,
-                    'fr-input--error': errors[0],
-                  }"
-                  id="customText"
-                  name="customText"
-                  placeholder=""
-                  type="text"
-                  required
-                  maxlength="2000"
-                  rows="4"
-                />
-                <span class="fr-error-text" v-if="errors[0]">{{
-                  $t(errors[0])
-                }}</span>
-              </div>
-            </validation-provider>
-          </div>
-        </NakedCard>
-      </form>
-      <NakedCard
-        class="fr-p-md-5w fr-mt-3w"
-        v-if="taxDocument.key === 'my-name' || taxFiles().length > 0"
-      >
-        <div class="fr-mb-3w">
-          <p
-            v-html="$t(`explanation-text.${guarantorKey()}.${taxDocument.key}`)"
-          ></p>
-        </div>
-        <AllDeclinedMessages
           class="fr-mb-3w"
-          :documentDeniedReasons="documentDeniedReasons"
-          :documentStatus="documentStatus"
-        ></AllDeclinedMessages>
-        <WarningTaxDeclaration />
-
-        <div v-if="taxFiles().length > 0" class="fr-col-md-12 fr-mt-3w">
-          <ListItem
-            v-for="(file, k) in taxFiles()"
-            :key="k"
-            :file="file"
-            @remove="remove(file)"
-          />
-        </div>
-        <div class="fr-mb-3w fr-mt-3w">
-          <FileUpload
-            :current-status="fileUploadStatus"
-            @add-files="addFiles"
-            @reset-files="resetFiles"
-          ></FileUpload>
-        </div>
-      </NakedCard>
-      <GuarantorFooter
-        @on-back="goBack"
-        @on-next="validate().then(goNext)"
-      ></GuarantorFooter>
-    </ValidationObserver>
-    <ConfirmModal
-      v-if="isDocDeleteVisible"
-      @valid="validSelect()"
-      @cancel="undoSelect()"
-    >
-      <span>{{ $t("guarantortax.will-delete-files") }}</span>
-    </ConfirmModal>
-    <Modal
-      v-if="isWarningTaxSituationModalVisible"
-      @close="isWarningTaxSituationModalVisible = false"
-    >
-      <template v-slot:body>
-        <div class="warning-tax-modal fr-pl-md-3w fr-pr-md-3w fr-pb-md-3w">
-          <h1 class="avis-title fr-h4">
-            <i class="ri-alarm-warning-line"></i>
-
-            {{ $t("tax-page.avis-detected") }}
-          </h1>
-          <p>
-            {{ $t("tax-page.avis-text1") }}
-          </p>
-          <p>
-            {{ $t("tax-page.avis-text2") }}
-          </p>
-          <hr class="mobile" />
-          <div class="btn-align">
-            <DfButton
-              @on-click="isWarningTaxSituationModalVisible = false"
-              :primary="true"
-              >{{ $t("tax-page.avis-btn") }}</DfButton
+          v-if="taxDocument.key && taxDocument.key === 'other-tax'"
+          >
+          <validation-provider rules="required" v-slot="{ errors, valid }">
+            <div
+            class="fr-input-group"
+            :class="errors[0] ? 'fr-input-group--error' : ''"
             >
+            <label class="fr-label" for="customText">{{
+              $t("guarantortax.custom-text")
+            }}</label>
+            <textarea
+            v-model="customText"
+            class="form-control fr-input validate-required"
+            :class="{
+              'fr-input--valid': valid,
+              'fr-input--error': errors[0],
+            }"
+            id="customText"
+            name="customText"
+            placeholder=""
+            type="text"
+            required
+            maxlength="2000"
+            rows="4"
+            />
+            <span class="fr-error-text" v-if="errors[0]">{{
+              $t(errors[0])
+            }}</span>
           </div>
-          <div class="btn-align fr-mt-2w">
-            <a @click="forceSave" href="#">{{ $t("tax-page.avis-force") }}</a>
-          </div>
-        </div>
-      </template>
-    </Modal>
+        </validation-provider>
+      </div>
+    </NakedCard>
+  </form>
+  <NakedCard
+  class="fr-p-md-5w fr-mt-3w"
+  v-if="taxDocument.key === 'my-name' || taxFiles().length > 0"
+  >
+  <div class="fr-mb-3w">
+    <p
+    v-html="$t(`explanation-text.${guarantorKey()}.${taxDocument.key}`)"
+    ></p>
+  </div>
+  <AllDeclinedMessages
+  class="fr-mb-3w"
+  :documentDeniedReasons="documentDeniedReasons"
+  :documentStatus="documentStatus"
+  ></AllDeclinedMessages>
+  <WarningTaxDeclaration />
+  
+  <div v-if="taxFiles().length > 0" class="fr-col-md-12 fr-mt-3w">
+    <ListItem
+    v-for="(file, k) in taxFiles()"
+    :key="k"
+    :file="file"
+    @remove="remove(file)"
+    />
+  </div>
+  <div class="fr-mb-3w fr-mt-3w">
+    <FileUpload
+    :current-status="fileUploadStatus"
+    @add-files="addFiles"
+    @reset-files="resetFiles"
+    ></FileUpload>
+  </div>
+</NakedCard>
+<GuarantorFooter
+@on-back="goBack"
+@on-next="validate().then(goNext)"
+></GuarantorFooter>
+</ValidationObserver>
+<ConfirmModal
+v-if="isDocDeleteVisible"
+@valid="validSelect()"
+@cancel="undoSelect()"
+>
+<span>{{ $t("guarantortax.will-delete-files") }}</span>
+</ConfirmModal>
+<Modal
+v-if="isWarningTaxSituationModalVisible"
+@close="isWarningTaxSituationModalVisible = false"
+>
+<template v-slot:body>
+  <div class="warning-tax-modal fr-pl-md-3w fr-pr-md-3w fr-pb-md-3w">
+    <h1 class="avis-title fr-h4">
+      <i class="ri-alarm-warning-line"></i>
+      
+      {{ $t("tax-page.avis-detected") }}
+    </h1>
+    <p>
+      {{ $t("tax-page.avis-text1") }}
+    </p>
+    <p>
+      {{ $t("tax-page.avis-text2") }}
+    </p>
+    <hr class="mobile" />
+    <div class="btn-align">
+      <DfButton
+      @on-click="isWarningTaxSituationModalVisible = false"
+      :primary="true"
+      >{{ $t("tax-page.avis-btn") }}</DfButton
+      >
+    </div>
+    <div class="btn-align fr-mt-2w">
+      <a @click="forceSave" href="#">{{ $t("tax-page.avis-force") }}</a>
+    </div>
   </div>
 </template>
+</Modal>
+</div>
+</template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+<script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
-import { mapGetters, mapState } from "vuex";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
@@ -165,304 +163,283 @@ import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclar
 import { UtilsService } from "@/services/UtilsService";
 import { User } from "df-shared-next/src/models/User";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
+import { computed, onMounted, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
 
-extend("is", {
-  ...is,
-  message: "field-required",
-  validate: (value) => !!value,
-});
-
-@Component({
-  components: {
-    WarningTaxDeclaration,
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationObserver,
-    ValidationProvider,
-    WarningMessage,
-    ConfirmModal,
-    VGouvFrModal,
-    TaxHelp,
-    GuarantorFooter,
-    NakedCard,
-    TroubleshootingModal,
-    Modal,
-    DfButton,
-    SimpleRadioButtons,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-    }),
-    ...mapGetters({
-      user: "userToEdit",
-    }),
-  },
-})
-export default class GuarantorTax extends Vue {
-  @Prop() tenantId?: string;
-  @Prop({ default: false }) isCotenant?: boolean;
-  user!: User;
-
-  selectedGuarantor!: Guarantor;
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  uploadProgress: {
+// TODO
+// extend("is", {
+  //   ...is,
+  //   message: "field-required",
+  //   validate: (value) => !!value,
+  // });
+  
+const { t } = useI18n();
+  const store = useTenantStore();
+  const selectedGuarantor = computed(() => {
+    return store.selectedGuarantor;
+  });
+  const user = computed(() => {
+    return store.userToEdit;
+  });
+  
+  const props = withDefaults(defineProps<{
+    tenantId?: string;
+    isCotenant?: boolean;
+  }>(), {
+    isCotenant: false,
+  });
+  
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files =ref([] as DfFile[] );
+  const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
-  taxDocument = new DocumentType();
-  documentDeniedReasons = new DocumentDeniedReasons();
-
-  customText = "";
-
-  documents = DocumentTypeConstants.GUARANTOR_TAX_DOCS;
-  isDocDeleteVisible = false;
-  newFiles: File[] = [];
-  isWarningTaxSituationModalVisible = false;
-
-  loader?: LoaderComponent;
-
-  getRegisteredDoc() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  } );
+  const taxDocument = ref(new DocumentType());
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  
+  const customText = ref("");
+  
+  const documents = ref(DocumentTypeConstants.GUARANTOR_TAX_DOCS);
+  const isDocDeleteVisible = ref(false);
+  const newFiles = ref([] as File[]);
+  const isWarningTaxSituationModalVisible = ref(false);
+  
+  
+  // TODO
+  // const loader?: LoaderComponent;
+  
+  function getRegisteredDoc() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
       return doc;
     }
     return undefined;
   }
-
-  getLocalDoc() {
-    const doc = this.getRegisteredDoc();
-    if (doc !== undefined) {
-      const localDoc = this.documents.find((d: DocumentType) => {
-        return d.value === doc.subCategory;
-      });
-      return localDoc;
-    }
-    return undefined;
+  
+  const documentStatus = computed(() => {
+    return guarantorTaxDocument()?.documentStatus;
+  })
+  
+  function guarantorTaxDocument() {
+    return store.getGuarantorTaxDocument;
   }
-
-  get documentStatus() {
-    return this.guarantorTaxDocument()?.documentStatus;
+  
+  function getLocalStorageKey() {
+    return "tax_guarantor_" + user.value?.email;
   }
-
-  guarantorTaxDocument() {
-    return this.$store.getters.getGuarantorTaxDocument;
-  }
-
-  getLocalStorageKey() {
-    return "tax_guarantor_" + this.user.email;
-  }
-
-  onSelectChange() {
-    localStorage.setItem(this.getLocalStorageKey(), this.taxDocument.key);
-    if (this.user.documents !== null) {
-      const doc = this.guarantorTaxDocument();
+  
+  function onSelectChange() {
+    localStorage.setItem(getLocalStorageKey(), taxDocument.value.key);
+    if (user.value?.documents !== null) {
+      const doc = guarantorTaxDocument();
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
-          (doc?.files?.length || 0) > 0 &&
-          doc?.subCategory !== this.taxDocument.value;
+        isDocDeleteVisible.value =
+        (doc?.files?.length || 0) > 0 &&
+        doc?.subCategory !== taxDocument.value.value;
       }
     }
     return false;
   }
-
-  undoSelect() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  
+  function undoSelect() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.taxDocument = localDoc;
+          taxDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
-
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
-
-  updateGuarantorData() {
-    if (this.selectedGuarantor.documents !== null) {
-      if (this.guarantorTaxDocument() !== undefined) {
-        this.customText = this.guarantorTaxDocument().customText || "";
-        const localDoc = this.documents.find((d: DocumentType) => {
-          return d.value === this.guarantorTaxDocument()?.subCategory;
+  
+  function updateGuarantorData() {
+    if (selectedGuarantor.value?.documents !== null) {
+      if (guarantorTaxDocument() !== undefined) {
+        customText.value = guarantorTaxDocument()?.customText || "";
+        const localDoc = documents.value.find((d: DocumentType) => {
+          return d.value === guarantorTaxDocument()?.subCategory;
         });
         if (localDoc !== undefined) {
-          this.taxDocument = localDoc;
+          taxDocument.value = localDoc;
           localStorage.setItem(
-            this.getLocalStorageKey(),
-            this.taxDocument.key || ""
+          getLocalStorageKey(),
+          taxDocument.value.key || ""
           );
         }
         const docDeniedReasons =
-          this.guarantorTaxDocument()?.documentDeniedReasons;
+        guarantorTaxDocument()?.documentDeniedReasons;
         if (docDeniedReasons !== undefined) {
-          this.documentDeniedReasons = cloneDeep(docDeniedReasons);
+          documentDeniedReasons.value = cloneDeep(docDeniedReasons);
         }
       } else {
-        const key = localStorage.getItem(this.getLocalStorageKey());
+        const key = localStorage.getItem(getLocalStorageKey());
         if (key) {
-          const localDoc = this.documents.find((d: DocumentType) => {
+          const localDoc = documents.value.find((d: DocumentType) => {
             return d.key === key;
           });
           if (localDoc !== undefined) {
-            this.taxDocument = localDoc;
+            taxDocument.value = localDoc;
           }
         }
       }
     }
   }
-
-  mounted() {
-    this.updateGuarantorData();
-  }
-
-  async addFiles(fileList: File[]) {
-    this.newFiles = fileList;
-    this.showLoader();
+  
+  onMounted(() => {
+    updateGuarantorData();
+  })
+  
+  async function addFiles(fileList: File[]) {
+    newFiles.value = fileList;
+    showLoader();
     if (await PdfAnalysisService.includesRejectedTaxDocuments(fileList)) {
-      this.isWarningTaxSituationModalVisible = true;
-      this.hideLoader();
+      isWarningTaxSituationModalVisible.value = true;
+      hideLoader();
     } else {
-      this.saveNewFiles(false);
+      saveNewFiles(false);
     }
   }
-
-  forceSave() {
-    this.isWarningTaxSituationModalVisible = false;
-    this.saveNewFiles(true);
+  
+  function forceSave() {
+    isWarningTaxSituationModalVisible.value = false;
+    saveNewFiles(true);
   }
-
-  saveNewFiles(force: boolean) {
+  
+  function saveNewFiles(force: boolean) {
     AnalyticsService.uploadFile("tax");
-    const nf = Array.from(this.newFiles).map((f) => {
+    const nf = Array.from(newFiles.value).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save(force);
+    files.value = [...files.value, ...nf];
+    save(force);
   }
-
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
-
-  async save(force = false) {
-    if (!this.taxDocument.key) {
+  
+  async function save(force = false) {
+    if (!taxDocument.value.key) {
       return true;
     }
-    this.uploadProgress = {};
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (newFiles.length) {
       if (
-        this.taxDocument.maxFileCount &&
-        this.taxFiles().length > this.taxDocument.maxFileCount
+      taxDocument.value.maxFileCount &&
+      taxFiles().length > taxDocument.value.maxFileCount
       ) {
-        Vue.toasted.global.max_file({
-          message: this.$i18n.t("max-file", [
-            this.taxFiles().length,
-            this.taxDocument.maxFileCount,
-          ]),
-        });
-        this.files = [];
+        // TODO
+        // Vue.toasted.global.max_file({
+        //   message: t("max-file", [
+        //   taxFiles().length,
+        //   taxDocument.value.maxFileCount,
+        //   ]),
+        // });
+        files.value = [];
         return false;
       }
-
+      
       Array.from(Array(newFiles.length).keys()).forEach((x) => {
         const f: File = newFiles[x].file || new File([], "");
         formData.append(`${fieldName}[${x}]`, f, newFiles[x].name);
       });
     }
-
-    const d = this.getRegisteredDoc();
+    
+    const d = getRegisteredDoc();
     if (
-      this.taxDocument.value === d?.subCategory &&
-      this.customText === (d?.customText || "") &&
-      newFiles.length <= 0
+    taxDocument.value.value === d?.subCategory &&
+    customText.value === (d?.customText || "") &&
+    newFiles.length <= 0
     ) {
       return true;
     }
-
-    if (this.taxDocument.key === "my-name") {
+    
+    if (taxDocument.value.key === "my-name") {
       formData.append("noDocument", "false");
     } else {
       formData.append("noDocument", "true");
     }
-
+    
     if (force) {
       formData.append("avisDetected", "true");
     } else {
-      const files = this.files
-        .map((f) => f.file as File)
-        .filter((f) => f !== undefined);
-      if (!(await PdfAnalysisService.includesRejectedTaxDocuments(files))) {
+      const filesToSave = files.value
+      .map((f) => f.file as File)
+      .filter((f) => f !== undefined);
+      if (!(await PdfAnalysisService.includesRejectedTaxDocuments(filesToSave))) {
         formData.append("avisDetected", "false");
       }
     }
-
-    formData.append("typeDocumentTax", this.taxDocument.value);
-
-    if (this.taxDocument.key === "other-tax") {
-      if (!this.customText || this.customText === "") {
+    
+    formData.append("typeDocumentTax", taxDocument.value.value);
+    
+    if (taxDocument.value.key === "other-tax") {
+      if (!customText.value || customText.value === "") {
         return false;
       }
-      formData.append("customText", this.customText);
+      formData.append("customText", customText.value);
     }
-
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    formData.append("guarantorId", this.$store.getters.guarantor.id);
-
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId);
+    
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    if (store.guarantor.id) {
+      formData.append("guarantorId", store.guarantor.id.toString());
     }
-    this.showLoader();
-    await this.$store
-      .dispatch("saveGuarantorTax", formData)
-      .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
-      })
-      .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        UtilsService.handleCommonSaveError(err);
-      })
-      .finally(() => {
-        this.hideLoader();
-      });
+    
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId);
+    }
+    showLoader();
+    await store
+    .saveGuarantorTax(formData)
+    .then(() => {
+      files.value = [];
+      fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+      // Vue.toasted.global.save_success();
+    })
+    .catch((err) => {
+      fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+      UtilsService.handleCommonSaveError(err);
+    })
+    .finally(() => {
+      // this.hideLoader();
+    });
     return true;
   }
-
-  taxFiles() {
-    const newFiles = this.files.map((f) => {
+  
+  function taxFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.taxDocument.value,
+        subCategory: taxDocument.value.value,
         id: f.id,
         name: f.name,
         file: f,
@@ -470,70 +447,69 @@ export default class GuarantorTax extends Vue {
       };
     });
     const existingFiles =
-      this.$store.getters.getGuarantorDocuments?.find((d: DfDocument) => {
-        return d.documentCategory === "TAX";
-      })?.files || [];
+    store.getGuarantorDocuments?.find((d: DfDocument) => {
+      return d.documentCategory === "TAX";
+    })?.files || [];
     return [...newFiles, ...existingFiles];
   }
-
-  async remove(file: DfFile, silent = false) {
+  
+  async function remove(file: DfFile, silent = false) {
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
-
-  async goNext() {
-    const res = await this.save();
+  
+  async function goNext() {
+    const res = await save();
     if (res) {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
-
-  goBack() {
-    this.$emit("on-back");
+  
+  function goBack() {
+    emit("on-back");
   }
-
-  guarantorKey() {
-    if (this.isCotenant) {
+  
+  function guarantorKey() {
+    if (isCotenant.value) {
       return "cotenant-guarantor";
     }
     return "guarantor";
   }
-
-  showLoader() {
-    if (this.loader === undefined) {
-      this.loader = this.$loading.show();
+  
+  function showLoader() {
+    // if (this.loader === undefined) {
+      //   this.loader = this.$loading.show();
+      // }
+    }
+    
+    function hideLoader() {
+      // this.loader?.hide();
+      // this.loader = undefined;
+    }
+    
+    function mapDocuments() {
+      const suffixKey = props.isCotenant ? "-cotenant" : "";
+      return documents.value.map((d) => {
+        return {
+          id: d.key,
+          labelKey: "guarantortax." + d.key + suffixKey,
+          value: d,
+        };
+      });
+    }
+  </script>
+  
+  <style scoped lang="scss">
+  .spa {
+    min-height: 2rem;
+    @media all and (min-width: 768px) {
+      width: 14rem;
     }
   }
-
-  hideLoader() {
-    this.loader?.hide();
-    this.loader = undefined;
-  }
-
-  mapDocuments() {
-    const suffixKey = this.isCotenant ? "-cotenant" : "";
-    return this.documents.map((d) => {
-      return {
-        id: d.key,
-        labelKey: "guarantortax." + d.key + suffixKey,
-        value: d,
-      };
-    });
-  }
-}
-</script>
-
-<style scoped lang="scss">
-.spa {
-  min-height: 2rem;
-  @media all and (min-width: 768px) {
-    width: 14rem;
-  }
-}
 </style>
