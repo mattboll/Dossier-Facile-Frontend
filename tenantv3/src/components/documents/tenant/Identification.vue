@@ -7,7 +7,7 @@
       <div class="fr-mt-3w">
         <SimpleRadioButtons
           name="application-type-selector"
-          v-model="identificationDocument"
+          :value="identificationDocument"
           @input="onSelectChange"
           :elements="mapDocuments()"
         ></SimpleRadioButtons>
@@ -133,7 +133,8 @@ import { computed, onBeforeMount, ref } from "vue";
     }
   })
 
-  function onSelectChange() {
+  function onSelectChange($event: any) {
+    identificationDocument.value = $event;
     localStorage.setItem(
       getLocalStorageKey(),
       identificationDocument.value.key
