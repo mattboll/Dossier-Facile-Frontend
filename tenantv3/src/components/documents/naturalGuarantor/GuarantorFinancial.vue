@@ -8,31 +8,31 @@
     <div v-if="!editFinancialDocument">
       <NakedCard class="fr-p-md-5w fr-mb-3w">
         <div>
-          <h1 class="fr-h6">{{ $t("guarantorfinancial.title") }}</h1>
-          <div>{{ $t("guarantorfinancial.subtitle") }}</div>
+          <h1 class="fr-h6">{{ t("guarantorfinancial.title") }}</h1>
+          <div>{{ t("guarantorfinancial.subtitle") }}</div>
         </div>
       </NakedCard>
       <div v-for="(f, k) in financialDocuments" :key="k">
         <CardRow
           @edit="selectFinancialDocument(f)"
           @remove="removeFinancial(f)"
-          :danger="guarantorFinancialDocument(f).documentStatus === 'DECLINED'"
+          :danger="guarantorFinancialDocument(f)?.documentStatus === 'DECLINED'"
         >
           <template v-slot:tag>
             <div class="fixed-width">
               <ColoredTag
                 :text="getDocumentName(f)"
-                :status="guarantorFinancialDocument(f).documentStatus"
+                :status="guarantorFinancialDocument(f)?.documentStatus"
               ></ColoredTag>
             </div>
           </template>
           <template v-slot:text>
             <div
               class="text-bold"
-              :title="$t('guarantorfinancial.net-monthly')"
+              :title="t('guarantorfinancial.net-monthly')"
               v-show="f.documentType.key !== 'no-income'"
             >
-              {{ f.monthlySum }} {{ $t("guarantorfinancial.monthly") }}
+              {{ f.monthlySum }} {{ t("guarantorfinancial.monthly") }}
             </div>
           </template>
           <template v-slot:bottom>
@@ -50,7 +50,7 @@
           v-if="!hasNoIncome()"
           class="add-income-btn"
         >
-          {{ $t("guarantorfinancial.add-income") }}
+          {{ t("guarantorfinancial.add-income") }}
         </button>
       </div>
       <ProfileFooter @on-back="goBack" @on-next="goNext"></ProfileFooter>
@@ -58,133 +58,102 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
-import FileUpload from "../../uploads/FileUpload.vue";
-import { mapGetters } from "vuex";
+<script setup lang="ts">
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
-import ListItem from "../../uploads/ListItem.vue";
-import { User } from "df-shared-next/src/models/User";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-
-import DfButton from "df-shared-next/src/Button/Button.vue";
-
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
-import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import Modal from "df-shared-next/src/components/Modal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import ProfileFooter from "../../footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
 import GuarantorFinancialDocumentForm from "./GuarantorFinancialDocumentForm.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    ColoredTag,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    DfButton,
-    WarningMessage,
-    ConfirmModal,
-    Modal,
-    DocumentHelp,
-    VGouvFrModal,
-    ProfileFooter,
-    NakedCard,
-    CardRow,
-    GuarantorFinancialDocumentForm,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-      editFinancialDocument: "editGuarantorFinancialDocument",
-      financialDocuments: "guarantorFinancialDocuments",
-    }),
-  },
-})
-export default class GuarantorFinancial extends Vue {
-  @Prop() tenantId?: string;
+const { t } = useI18n();
 
-  user!: User;
-  financialDocuments!: FinancialDocument[];
+const store = useTenantStore();
+      const editFinancialDocument = computed(() => store.editGuarantorFinancialDocument);
+      const financialDocuments = computed(() => store.guarantorFinancialDocuments);
 
-  documents = DocumentTypeConstants.GUARANTOR_FINANCIAL_DOCS;
+      const emit = defineEmits(["on-back", "on-next"]);
 
-  beforeMount() {
-    this.initialize();
-  }
+  const props = defineProps({
+    tenantId: String
+  });
 
-  initialize() {
-    this.$store.commit("selectGuarantorDocumentFinancial", undefined);
-    if (this.financialDocuments.length === 0) {
-      this.addAndSelectFinancial();
+  onBeforeMount(() => {
+    initialize();
+  })
+
+  function initialize() {
+    store.selectGuarantorDocumentFinancial(undefined);
+    if (financialDocuments.value.length === 0) {
+      addAndSelectFinancial();
     }
   }
 
-  documentDeniedReasons(f: FinancialDocument) {
-    return this.guarantorFinancialDocument(f).documentDeniedReasons;
+  function documentDeniedReasons(f: FinancialDocument) {
+    return guarantorFinancialDocument(f)?.documentDeniedReasons;
   }
 
-  documentStatus(f: FinancialDocument) {
-    return this.guarantorFinancialDocument(f).documentStatus;
+  function documentStatus(f: FinancialDocument) {
+    return guarantorFinancialDocument(f)?.documentStatus;
   }
 
-  guarantorFinancialDocument(f: FinancialDocument) {
-    return this.$store.getters.getGuarantorDocuments?.find((d: DfDocument) => {
+  function guarantorFinancialDocument(f: FinancialDocument) {
+    return store.getGuarantorDocuments?.find((d: DfDocument) => {
       return d.id === f.id;
     });
   }
 
-  async addAndSelectFinancial() {
-    await this.$store.commit("createGuarantorDocumentFinancial");
+  async function addAndSelectFinancial() {
+    await store.createGuarantorDocumentFinancial();
   }
 
-  removeFinancial(f: DfDocument) {
-    const loader = Vue.$loading.show();
-    this.$store
-      .dispatch("deleteDocument", f.id)
+  function removeFinancial(f: DfDocument) {
+    if (!f.id) {
+      return;
+    }
+    // TODO
+    // const loader = Vue.$loading.show();
+    store
+      .deleteDocument(f.id)
       .then(null, () => {
-        Vue.toasted.global.error();
+        // Vue.toasted.global.error();
       })
       .finally(() => {
-        loader.hide();
-        this.initialize();
+        // loader.hide();
+        initialize();
       });
-    this.$store.commit("selectGuarantorDocumentFinancial", undefined);
+    store.selectGuarantorDocumentFinancial(undefined);
   }
 
-  hasNoIncome() {
+  function hasNoIncome() {
     return (
-      this.financialDocuments.length > 0 &&
-      this.financialDocuments.find((f) => {
+      financialDocuments.value.length > 0 &&
+      financialDocuments.value.find((f) => {
         return f.documentType && f.documentType.key !== "no-income";
       }) === undefined
     );
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    this.$emit("on-next");
+  function goNext() {
+    emit("on-next");
   }
 
-  async selectFinancialDocument(f: FinancialDocument) {
-    await this.$store.commit("selectGuarantorDocumentFinancial", f);
+  async function selectFinancialDocument(f: FinancialDocument) {
+    await store.selectGuarantorDocumentFinancial(f);
   }
 
-  private getDocumentName(document: FinancialDocument): string {
-    return this.$t(`documents.${document.documentType.key}`).toString();
+  function getDocumentName(document: FinancialDocument): string {
+    return t(`documents.${document.documentType.key}`).toString();
   }
-}
 </script>
 
 <style scoped lang="scss">

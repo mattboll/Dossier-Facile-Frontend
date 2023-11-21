@@ -42,7 +42,7 @@ interface State {
   newMessage: number;
   messageList: DfMessage[][];
   skipLinks: SkipLink[];
-  guarantorFinancialDocumentSelected: FinancialDocument;
+  guarantorFinancialDocumentSelected: FinancialDocument | undefined;
   editGuarantorFinancialDocument: boolean;
   apartmentSharingLinks: ApartmentSharingLink[];
 }
@@ -457,7 +457,7 @@ const useTenantStore = defineStore('tenant', {
       );
       this.editFinancialDocument = true;
     },
-    selectGuarantorDocumentFinancial(d: FinancialDocument) {
+    selectGuarantorDocumentFinancial(d: FinancialDocument | undefined) {
       Object.assign(this.guarantorFinancialDocumentSelected, d);
       Object.assign(this.editGuarantorFinancialDocument, d !== undefined);
     },
