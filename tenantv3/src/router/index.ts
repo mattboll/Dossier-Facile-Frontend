@@ -1,10 +1,10 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 import useTenantStore from '@/stores/tenant-store';
-import type { SkipLink } from 'df-shared-next/src/models/SkipLink';
+import { CONTENT, type SkipLink } from 'df-shared-next/src/models/SkipLink';
 import keycloak from '../plugin/keycloak';
 import Home from '../views/Home.vue';
-import { FUNNEL_SKIP_LINKS } from '@/models/SkipLinkModel';
+import { FOOTER_NAVIGATION, FUNNEL_SKIP_LINKS } from '@/models/SkipLinkModel';
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const TENANT_URL = import.meta.env.VITE_FULL_TENANT_URL;
@@ -72,18 +72,18 @@ const router = createRouter({
   //   component: () =>
   //     import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
   // },
-  // {
-  //   path: "/nom-locataire",
-  //   name: "TenantName",
-  //   meta: {
-  //     title: "Édition du profil - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: [CONTENT, FOOTER_NAVIGATION],
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
-  // },
+  {
+    path: "/nom-locataire",
+    name: "TenantName",
+    meta: {
+      title: "Édition du profil - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: [CONTENT, FOOTER_NAVIGATION],
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
+  },
   // {
   //   path: "/type-locataire",
   //   name: "TenantType",

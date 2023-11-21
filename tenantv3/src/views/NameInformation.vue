@@ -40,37 +40,23 @@
   </aside>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import NameInformationForm from "../components/NameInformationForm.vue";
-import ProfileContainer from "../components/ProfileContainer.vue";
-import NakedCard from "df-shared-next/src/components/NakedCard.vue";
-import { mapState } from "vuex";
-import { User } from "df-shared-next/src/models/User";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeUnmount, onMounted } from "vue";
 
-@Component({
-  components: {
-    NameInformationForm,
-    ProfileContainer,
-    NakedCard,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class NameInformation extends Vue {
-  user!: User;
+const store = useTenantStore();
+const user = computed(() => { return store.user });
 
-  mounted() {
-    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
+  onMounted(() => {
+    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+  })
 
-  beforeDestroy() {
-    window.Beacon("destroy");
-  }
-}
+  onBeforeUnmount(() => {
+    // TODO
+    // window.Beacon("destroy");
+  })
+
 </script>
 
 <style lang="scss" scoped>
