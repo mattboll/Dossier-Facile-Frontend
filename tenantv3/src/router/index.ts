@@ -148,20 +148,20 @@ const router = createRouter({
         /* webpackChunkName: "profile" */ "../views/GuarantorListPage.vue"
       ),
   },
-  // {
-  //   path: "/garants-locataire/:tenantId/:step",
-  //   name: "TenantGuarantors",
-  //   meta: {
-  //     title: "Édition du garant du locataire - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "profile" */ "../views/TenantGuarantorsPage.vue"
-  //     ),
-  // },
+  {
+    path: "/garants-locataire/:tenantId/:step",
+    name: "TenantGuarantors",
+    meta: {
+      title: "Édition du garant du locataire - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "profile" */ "../views/TenantGuarantorsPage.vue"
+      ),
+  },
   // {
   //   path: "/validation-dossier",
   //   name: "ValidateFile",

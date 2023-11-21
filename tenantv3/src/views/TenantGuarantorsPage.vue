@@ -21,119 +21,100 @@
   </ProfileContainer>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+<script setup lang="ts">
 import TenantGuarantorChoice from "../components/TenantGuarantorChoice.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
-import { mapGetters } from "vuex";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import TenantGuarantorDocuments from "../components/TenantGuarantorDocuments.vue";
 import TenantGuarantorList from "./TenantGuarantorList.vue";
-import { User } from "df-shared-next/src/models/User";
-import TenantGuarantorName from "../components/documents/naturalGuarantor/TenantGuarantorName.vue";
-import OrganismCert from "../components/documents/organismGuarantor/OrganismCert.vue";
-import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
-import CorporationIdentification from "../components/documents/legalPersonGuarantor/CorporationIdentification.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-@Component({
-  components: {
-    TenantGuarantorName,
-    TenantGuarantorChoice,
-    TenantGuarantorList,
-    TenantGuarantorDocuments,
-    ProfileContainer,
-    OrganismCert,
-    CorporationIdentification,
-    GuarantorFooter,
-  },
-  computed: {
-    ...mapGetters({
-      coTenants: "coTenants",
-    }),
-  },
-})
-export default class TenantGuarantorsPage extends Vue {
-  coTenants!: User[];
-  guarantors?: Guarantor[] = [];
+      const store = useTenantStore();
+const coTenants =  computed(() => store.coTenants);
 
-  @Watch("coTenants")
-  protected onCotenantsChange(): any {
-    this.guarantors =
-      this.coTenants.find((t) => {
-        return t.id === Number(this.$route.params.tenantId);
+  const guarantors = ref([] as Guarantor[]);
+  const route = useRoute();
+  const router = useRouter();
+
+  // TODO
+  // @Watch("coTenants")
+  function onCotenantsChange(): any {
+    guarantors.value =
+      coTenants.value.find((t) => {
+        return t.id === Number(route.params.tenantId);
       })?.guarantors || [];
   }
 
-  beforeMount() {
-    this.onCotenantsChange();
+  onBeforeMount(() => {
+    onCotenantsChange();
+  })
+
+  function getStep() {
+    return Number(route.params.step) || 0;
   }
 
-  getStep() {
-    return Number(this.$route.params.step) || 0;
+  function getTenantId(): number {
+    return Number(route.params.tenantId);
   }
 
-  getTenantId(): number {
-    return Number(this.$route.params.tenantId);
-  }
-
-  onEdit(g: Guarantor) {
-    this.$router.push({
+  function onEdit(g: Guarantor) {
+    router.push({
       name: "TenantGuarantorDocuments",
       params: {
-        step: this.getStep().toString(),
+        step: getStep().toString(),
         substep: "0",
-        tenantId: this.getTenantId().toString(),
+        tenantId: getTenantId().toString(),
         guarantorId: g.id?.toString() as string,
       },
     });
   }
 
-  mounted() {
-    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
+  onMounted(() => {
+    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+  })
 
-  beforeDestroy() {
-    window.Beacon("destroy");
-  }
+  onBeforeUnmount(() => {
+    // window.Beacon("destroy");
+  })
 
-  updateGuarantorType(value: string) {
+  function updateGuarantorType(value: string) {
     if (value == "NO_GUARANTOR") {
-      this.goNext();
+      goNext();
     } else {
-      if (this.guarantors === undefined) {
+      if (guarantors.value === undefined) {
         return;
       }
 
-      this.$router.push({
+      router.push({
         name: "TenantGuarantorDocuments",
         params: {
-          step: this.getStep().toString(),
+          step: getStep().toString(),
           substep: "0",
-          tenantId: this.getTenantId().toString(),
-          guarantorId: this.guarantors[0].id?.toString() || "0",
+          tenantId: getTenantId().toString(),
+          guarantorId: guarantors.value[0].id?.toString() || "0",
         },
       });
     }
   }
 
-  goBack() {
-    this.$router.push({
+  function goBack() {
+    router.push({
       name: "CoTenantDocuments",
       params: {
         step: "4",
         substep: "5",
-        tenantId: this.getTenantId().toString(),
+        tenantId: getTenantId().toString(),
       },
     });
   }
 
-  goNext() {
-    this.$router.push({
+  function goNext() {
+    router.push({
       name: "ValidateFileStep",
-      params: { step: Number(this.getStep() + 1).toString() },
+      params: { step: Number(getStep() + 1).toString() },
     });
   }
-}
 </script>
 
 <style lang="scss" scoped>
