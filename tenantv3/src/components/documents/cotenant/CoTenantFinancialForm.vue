@@ -130,7 +130,7 @@ import { DocumentType } from "df-shared-next/src/models/Document";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";

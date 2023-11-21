@@ -109,7 +109,7 @@ import { User } from "df-shared-next/src/models/User";
 import RoommatesInformation from "./RoommatesInformation.vue";
 import CoupleInformation from "./CoupleInformation.vue";
 import { mapGetters, mapState } from "vuex";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import SubmitButton from "df-shared-next/src/Button/SubmitButton.vue";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";

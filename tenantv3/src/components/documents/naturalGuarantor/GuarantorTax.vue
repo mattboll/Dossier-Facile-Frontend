@@ -143,7 +143,7 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { extend } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";

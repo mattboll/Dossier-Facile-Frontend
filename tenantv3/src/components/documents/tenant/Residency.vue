@@ -138,7 +138,7 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { cloneDeep } from "lodash";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
-import { ValidationObserver } from "vee-validate";
+// import { ValidationObserver } from "vee-validate";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
 import { computed, onBeforeMount, ref } from "vue";

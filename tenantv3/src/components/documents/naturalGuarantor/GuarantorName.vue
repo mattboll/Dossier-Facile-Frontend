@@ -87,7 +87,7 @@ import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";

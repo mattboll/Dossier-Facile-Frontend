@@ -81,7 +81,7 @@ import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { RegisterService } from "../../../services/RegisterService";

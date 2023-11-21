@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";

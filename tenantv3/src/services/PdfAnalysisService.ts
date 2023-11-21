@@ -1,23 +1,25 @@
-import * as pdfjs from "pdfjs-dist/webpack";
-import type { PDFDocumentProxy } from "pdfjs-dist";
+// import * as pdfjs from "pdfjs-dist/webpack";
+// import type { PDFDocumentProxy } from "pdfjs-dist";
 import { AnalyticsService } from "./AnalyticsService";
 
-function loadPdfDocument(file: File): Promise<PDFDocumentProxy> {
-  return file.arrayBuffer().then((data) => pdfjs.getDocument(data).promise);
-}
+// function loadPdfDocument(file: File): Promise<PDFDocumentProxy> {
+//   return file.arrayBuffer().then((data) => pdfjs.getDocument(data).promise);
+// }
 
 function readPdfFirstPage(file: File): Promise<string> {
-  return (
-    loadPdfDocument(file)
-      .then((pdf) => pdf.getPage(1))
-      .then((page) => {
-        const content = page.getTextContent();
-        page.cleanup();
-        return content;
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((content) => content.items.map((item: any) => item.str).join(""))
-  );
+  // todo
+  return Promise.resolve("truc")
+  // return (
+  //   loadPdfDocument(file)
+  //     .then((pdf) => pdf.getPage(1))
+  //     .then((page) => {
+  //       const content = page.getTextContent();
+  //       page.cleanup();
+  //       return content;
+  //     })
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     .then((content) => content.items.map((item: any) => item.str).join(""))
+  // );
 }
 
 export const PdfAnalysisService = {

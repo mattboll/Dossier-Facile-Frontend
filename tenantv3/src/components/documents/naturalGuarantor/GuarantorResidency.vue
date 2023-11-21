@@ -129,7 +129,7 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { UtilsService } from "@/services/UtilsService";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";

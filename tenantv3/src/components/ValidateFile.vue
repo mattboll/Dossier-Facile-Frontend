@@ -107,7 +107,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { ValidationProvider, ValidationObserver } from "vee-validate";
+// import { ValidationProvider, ValidationObserver } from "vee-validate";
 import { mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";

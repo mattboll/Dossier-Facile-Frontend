@@ -52,7 +52,8 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import FieldLabel from "./FieldLabel.vue";
-import { ValidationProvider } from "vee-validate";
+// TODO
+// import { ValidationProvider } from "vee-validate";
 
 const { t } = useI18n();
 

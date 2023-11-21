@@ -208,7 +208,7 @@ import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import { regex } from "vee-validate/dist/rules";

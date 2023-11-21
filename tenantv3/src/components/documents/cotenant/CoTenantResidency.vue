@@ -70,7 +70,7 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import FooterContainer from "@/components/footer/FooterContainer.vue";
 import BackNext from "@/components/footer/BackNext.vue";
 import { DocumentService } from "@/services/DocumentService";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 
 @Component({
   components: {
