@@ -13,27 +13,22 @@
   />
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+<script setup lang="ts">
 import DocumentLink from "./DocumentLink.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DocumentService } from "@/services/DocumentService";
 import { DocumentType } from "./DocumentType";
 import { User } from "df-shared-next/src/models/User";
 
-@Component({
-  components: { ColoredTag, DocumentLink },
-})
-export default class CoTenantGuarantorDocumentLink extends Vue {
-  @Prop() guarantor!: Guarantor;
-  @Prop() coTenant!: User;
-  @Prop() documentType!: DocumentType;
-  @Prop() substep!: number;
-  @Prop() active!: boolean;
+  const props = defineProps<{
+    guarantor: Guarantor;
+    coTenant: User;
+    documentType: DocumentType;
+    substep: number;
+    active: boolean;
+  }>();
 
-  private getStatus() {
-    return DocumentService.guarantorStatus(this.documentType, this.guarantor);
+  function getStatus() {
+    return DocumentService.guarantorStatus(props.documentType, props.guarantor);
   }
-}
 </script>
