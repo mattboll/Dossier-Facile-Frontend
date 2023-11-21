@@ -2,42 +2,36 @@
   <div>
     <FooterContainer>
       <BackNext
-        :showBack="showBack"
-        @on-next="nextAction()"
-        @on-back="backAction()"
+      :showBack="showBack"
+      @on-next="nextAction()"
+      @on-back="backAction()"
       >
-      </BackNext>
-    </FooterContainer>
-  </div>
+    </BackNext>
+  </FooterContainer>
+</div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+<script setup lang="ts">
 import FooterContainer from "./FooterContainer.vue";
-import { mapGetters } from "vuex";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import BackNext from "./BackNext.vue";
 
-@Component({
-  components: { VGouvFrButton, FooterContainer, BackNext },
-  computed: {
-    ...mapGetters({
-      guarantors: "guarantors",
-    }),
-  },
-})
-export default class ProfileFooter extends Vue {
-  @Prop({ default: true }) showBack!: boolean;
+const emit = defineEmits(["on-next", "on-back"]);
 
-  guarantors!: Guarantor[];
 
-  nextAction() {
-    this.$emit("on-next");
-  }
+const props = withDefaults(
+defineProps<{
+  showBack?: boolean;
+}>(),
+{
+  showBack: true,
+}
+);
 
-  backAction() {
-    this.$emit("on-back");
-  }
+function nextAction() {
+  emit("on-next");
+}
+
+function backAction() {
+  emit("on-back");
 }
 </script>

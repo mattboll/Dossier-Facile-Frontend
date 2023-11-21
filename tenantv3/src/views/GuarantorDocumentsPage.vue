@@ -4,48 +4,39 @@
   </ProfileContainer>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+import useTenantStore from "@/stores/tenant-store";
 import GuarantorDocuments from "../components/GuarantorDocuments.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
-import { mapGetters } from "vuex";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { computed, onBeforeMount, onBeforeUnmount, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-@Component({
-  components: {
-    GuarantorDocuments,
-    ProfileContainer,
-  },
-  computed: {
-    ...mapGetters({
-      guarantors: "guarantors",
-    }),
-  },
-})
-export default class GuarantorDocumentsPage extends Vue {
-  guarantors!: Guarantor[];
-
-  async beforeMount() {
-    if (this.$route.params.guarantorId) {
-      const g = this.guarantors.find((g: Guarantor) => {
-        return g.id?.toString() == this.$route.params.guarantorId;
+      const store = useTenantStore();
+      const guarantors = computed(() => {
+        return store.guarantors;
       });
-      await this.$store.commit("setSelectedGuarantor", g);
+      const route = useRoute();
+
+  onBeforeMount(async () => {
+    if (route.params.guarantorId) {
+      const g = guarantors.value.find((g: Guarantor) => {
+        return g.id?.toString() == route.params.guarantorId;
+      });
+      await store.setSelectedGuarantor(g);
     }
-  }
+  })
 
-  mounted() {
-    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
+  onMounted(() => {
+    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+  })
 
-  beforeDestroy() {
-    window.Beacon("destroy");
+  onBeforeUnmount(() => {
+    // window.Beacon("destroy");
+  })
+  function getStep() {
+    return Number(route.params.substep) || 0;
   }
-
-  getStep() {
-    return Number(this.$route.params.substep) || 0;
-  }
-}
 </script>
 
 <style lang="scss" scoped>

@@ -186,30 +186,31 @@ const router = createRouter({
     component: () =>
       import(/* webpackChunkName: "profile" */ "../views/ValidateFilePage.vue"),
   },
-  // {
-  //   path: "/info-garant/:substep/:guarantorId?",
-  //   name: "GuarantorDocuments",
-  //   meta: {
-  //     title: "Mon garant - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   beforeEnter: async (to, from, next) => {
-  //     if (
-  //       (!store.state.selectedGuarantor.firstName ||
-  //         !store.state.selectedGuarantor.lastName) &&
-  //       to.params.substep !== "0"
-  //     ) {
-  //       next({ name: "GuarantorDocuments", params: { substep: "0" } });
-  //     }
-  //     next();
-  //   },
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "profile" */ "../views/GuarantorDocumentsPage.vue"
-  //     ),
-  // },
+  {
+    path: "/info-garant/:substep/:guarantorId?",
+    name: "GuarantorDocuments",
+    meta: {
+      title: "Mon garant - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    beforeEnter: async (to, from, next) => {
+      const store = useTenantStore();
+      if (
+        (!store.selectedGuarantor?.firstName ||
+          !store.selectedGuarantor?.lastName) &&
+        to.params.substep !== "0"
+      ) {
+        next({ name: "GuarantorDocuments", params: { substep: "0" } });
+      }
+      next();
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "profile" */ "../views/GuarantorDocumentsPage.vue"
+      ),
+  },
   // {
   //   path: "/info-garant-locataire/:tenantId/:guarantorId/:step/:substep?",
   //   name: "TenantGuarantorDocuments",
