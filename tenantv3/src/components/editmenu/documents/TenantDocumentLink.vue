@@ -1,6 +1,6 @@
 <template>
   <DocumentLink
-    person-type="TENANT"
+    :person-type="PersonType.TENANT"
     :router-params="{ substep: substep }"
     :document-type="documentType"
     :status="getStatus()"
@@ -8,23 +8,19 @@
   />
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+<script setup lang="ts">
 import DocumentLink from "./DocumentLink.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { DocumentType } from "./DocumentType";
+import { PersonType } from "./PersonType";
 
-@Component({
-  components: { ColoredTag, DocumentLink },
-})
-export default class TenantDocumentLink extends Vue {
-  @Prop() documentType!: DocumentType;
-  @Prop() substep!: number;
-  @Prop() active!: boolean;
+  const props = defineProps<{
+    documentType: DocumentType;
+    substep: number;
+    active: boolean;
+  }>();
 
-  private getStatus() {
-    return DocumentService.tenantStatus(this.documentType);
+  function getStatus() {
+    return DocumentService.tenantStatus(props.documentType) || '';
   }
-}
 </script>

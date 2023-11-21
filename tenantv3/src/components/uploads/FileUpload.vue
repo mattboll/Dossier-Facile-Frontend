@@ -11,97 +11,73 @@
           accept="image/png, image/jpeg, application/pdf"
         />
         <div v-if="!isSaving()" class="fr-mt-2w fr-mb-2w">
-          {{ $t("fileupload.drag-and-drop-files") }}
+          {{ t("fileupload.drag-and-drop-files") }}
           <br />
-          {{ $t("fileupload.files-format") }}<br />
+          {{ t("fileupload.files-format") }}<br />
           {{ getSizeLimit() }}<br />
           {{ getPagesLimit() }}<br />
-          {{ $t("fileupload.or") }}<br />
-          <a href="#">{{ $t("fileupload.browse-files") }}</a>
+          {{ t("fileupload.or") }}<br />
+          <a href="#">{{ t("fileupload.browse-files") }}</a>
         </div>
         <div v-if="isSaving()">
-          {{ $t("fileupload.uploading-files") }}
+          {{ t("fileupload.uploading-files") }}
         </div>
       </div>
     </form>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
+import { useI18n } from "vue-i18n";
 
-const { STATUS_INITIAL, STATUS_SUCCESS, STATUS_SAVING, STATUS_FAILED } =
-  UploadStatus;
+const { t } = useI18n();
+const emit = defineEmits(["reset-files", "add-files"]);
 
-@Component
-export default class FileUpload extends Vue {
-  @Prop({ default: STATUS_INITIAL }) currentStatus!: number;
-  @Prop({ default: 0 }) page!: number;
-  @Prop({ default: 10 }) size!: number;
+const props = withDefaults(defineProps<{ currentStatus: number, page: number, size: number }>(), {
+    currentStatus: UploadStatus.STATUS_INITIAL,
+    page: 0,
+    size: 10,
+  });
 
-  uploadedFiles = [];
-  fileCount = 0;
-
-  canUpload() {
-    return (
-      this.currentStatus === STATUS_INITIAL ||
-      this.currentStatus === STATUS_SUCCESS
-    );
+  function isSaving() {
+    return props.currentStatus === UploadStatus.STATUS_SAVING;
   }
 
-  isSaving() {
-    return this.currentStatus === STATUS_SAVING;
-  }
-
-  isSuccess() {
-    return this.currentStatus === STATUS_SUCCESS;
-  }
-
-  isFailed() {
-    return this.currentStatus === STATUS_FAILED;
-  }
-
-  reset() {
-    this.uploadedFiles = [];
-    this.fileCount = 0;
-    this.$emit("reset-files");
-  }
-
-  filesChange(e: any) {
+  function filesChange(e: any) {
     [...e.target.files].forEach((f: File) => {
-      if (f.size > this.size * 1024 * 1024) {
-        Vue.toasted.global.error_toast({
-          message: this.$i18n.t("fileupload.file-too-big", [this.size]),
-        });
+      if (f.size > props.size * 1024 * 1024) {
+        // TODO
+        // Vue.toasted.global.error_toast({
+        //   message: this.$i18n.t("fileupload.file-too-big", [this.size]),
+        // });
         return false;
       }
       return true;
     });
     const fileList = [...e.target.files].filter((f: File) => {
-      return f.size < this.size * 1024 * 1024;
+      return f.size < props.size * 1024 * 1024;
     });
-    this.$emit("add-files", fileList);
+    emit("add-files", fileList);
     const form = document.getElementsByName("uploadForm");
     form.forEach((f: any) => {
       f.reset();
     });
   }
 
-  getSizeLimit() {
-    if (this.size > 0) {
-      return this.$i18n.t("fileupload.size", [this.size]);
+  function getSizeLimit() {
+    if (props.size > 0) {
+      return t("fileupload.size", [props.size]);
     }
     return "";
   }
 
-  getPagesLimit() {
-    if (this.page > 0) {
-      return this.$i18n.t("fileupload.pages", [this.page]);
+  function getPagesLimit() {
+    if (props.page > 0) {
+      return t("fileupload.pages", [props.page]);
     }
     return "";
   }
-}
 </script>
 
 <style scoped lang="scss">

@@ -45,15 +45,12 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+<script setup lang="ts">
 import pdf from "vue-pdf";
 
-@Component({
-  components: { pdf },
-})
-export default class PdfViewer extends Vue {
-  @Prop() private src!: string;
+  const props = defineProps({
+    src: String
+  });
 
   loadedRatio = 0;
   page = 1;

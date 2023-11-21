@@ -1,6 +1,6 @@
 <template>
   <DocumentLink
-    person-type="GUARANTOR"
+    :person-type="PersonType.GUARANTOR"
     :router-params="{ substep: substep, guarantorId: guarantor.id }"
     :document-type="documentType"
     :status="getStatus()"
@@ -8,28 +8,24 @@
   />
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+<script setup lang="ts">
 import DocumentLink from "./DocumentLink.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DocumentService } from "@/services/DocumentService";
 import { DocumentType } from "./DocumentType";
+import { PersonType } from "./PersonType";
 
-@Component({
-  components: { ColoredTag, DocumentLink },
-})
-export default class GuarantorDocumentLink extends Vue {
-  @Prop() guarantor!: Guarantor;
-  @Prop() documentType!: DocumentType;
-  @Prop() substep!: number;
-  @Prop() active!: boolean;
+  const props = defineProps<{
+    guarantor: Guarantor;
+    documentType: DocumentType;
+    substep: number;
+    active: boolean;
+  }>();
 
-  private getStatus() {
+  function getStatus() {
     return DocumentService.guarantorStatus(
-      this.documentType.toString(),
-      this.guarantor
-    );
+      props.documentType.toString(),
+      props.guarantor
+    ) || '';
   }
-}
 </script>

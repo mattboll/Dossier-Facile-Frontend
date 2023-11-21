@@ -10,10 +10,10 @@
         :secondary="true"
         :btn-type="'button'"
         @click="backAction()"
-        :aria-label="$t('backnext.back-aria-label')"
+        :aria-label="t('backnext.back-aria-label')"
       >
         <i class="color--primary ri-arrow-left-s-line mobile"></i>
-        <span class="desktop">{{ $t("backnext.back") }}</span>
+        <span class="desktop">{{ t("backnext.back") }}</span>
       </v-gouv-fr-button>
       <div v-if="!showBack"></div>
       <div class="fr-grid-row flex-1">
@@ -21,42 +21,42 @@
         <v-gouv-fr-button
           class="next-btn"
           :secondary="false"
-          :label="nextLabel ? nextLabel : $t('backnext.continue')"
+          :label="nextLabel ? nextLabel : t('backnext.continue')"
           :btn-type="'submit'"
           :disabled="disabled"
           @click="nextAction()"
-          :aria-label="$t('backnext.continue-aria-label')"
+          :aria-label="t('backnext.continue-aria-label')"
         ></v-gouv-fr-button>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+<script setup lang="ts">
 import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import { UtilsService } from "../../services/UtilsService";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: { VGouvFrButton },
-})
-export default class BackNext extends Vue {
-  @Prop({ default: true }) showBack!: boolean;
-  @Prop({ default: false }) disabled?: boolean;
-  @Prop() nextLabel?: string;
+const { t } = useI18n();
 
-  isMobile() {
+  const props = withDefaults(defineProps<{ showBack?: boolean, disabled?: boolean, nextLabel?: string }>(), {
+    showBack: true,
+    disabled: false
+  });
+
+  const emit = defineEmits(["on-back", "on-next"]);
+
+  function isMobile() {
     return UtilsService.isMobile();
   }
 
-  backAction() {
-    this.$emit("on-back");
+  function backAction() {
+    emit("on-back");
   }
 
-  nextAction() {
-    this.$emit("on-next");
+  function nextAction() {
+    emit("on-next");
   }
-}
 </script>
 
 <style lang="scss" scoped>

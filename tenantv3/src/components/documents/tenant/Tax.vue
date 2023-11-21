@@ -7,7 +7,7 @@
           <div class="fr-mt-3w">
             <SimpleRadioButtons
               name="application-type-selector"
-              v-model="taxDocument"
+              :value="taxDocument"
               @input="onSelectChange"
               :elements="mapDocuments()"
             ></SimpleRadioButtons>
@@ -138,9 +138,9 @@ import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import { extend } from "vee-validate";
+// import { extend } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
-import { ValidationObserver, ValidationProvider } from "vee-validate";
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
@@ -153,7 +153,6 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { cloneDeep } from "lodash";
 import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
 import Modal from "df-shared-next/src/components/Modal.vue";
-// import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
@@ -161,11 +160,12 @@ import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 
-extend("is", {
-  ...is,
-  message: "field-required",
-  validate: (value: any) => !!value,
-});
+// TODO
+// extend("is", {
+//   ...is,
+//   message: "field-required",
+//   validate: (value: any) => !!value,
+// });
 
 const emit = defineEmits(["on-next", "on-back"]);
 const { t } = useI18n();

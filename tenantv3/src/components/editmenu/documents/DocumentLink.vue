@@ -2,7 +2,7 @@
   <div>
     <router-link
       :to="{
-        name: getTargetComponent(personType),
+        name: getTargetComponent(),
         params: routerParams,
       }"
     >
@@ -15,44 +15,38 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import { DocumentType, DocumentTypeTranslations } from "./DocumentType";
+import { useI18n } from "vue-i18n";
+import type { PersonType } from "./PersonType";
 
-@Component({
-  components: { ColoredTag },
-})
-export default class DocumentLink extends Vue {
-  @Prop() personType!: PersonType;
-  @Prop() routerParams?: any;
-  @Prop() documentType!: DocumentType;
-  @Prop() status!: string;
-  @Prop() active!: boolean;
+const { t } = useI18n();
 
-  private componentsPerType: { [type in PersonType]: string } = {
+  const props = defineProps<{
+    personType: PersonType;
+    routerParams?: any;
+    documentType: DocumentType;
+    status: string;
+    active: boolean;
+  }>();
+
+  const componentsPerType: { [type in PersonType]: string } = {
     TENANT: "TenantDocuments",
     GUARANTOR: "GuarantorDocuments",
     COTENANT: "CoTenantDocuments",
     COTENANT_GUARANTOR: "TenantGuarantorDocuments",
   };
 
-  private getText(): string {
-    const translationKey = DocumentTypeTranslations[this.documentType];
-    return this.$i18n.t(translationKey).toString();
+  function getText(): string {
+    const translationKey = DocumentTypeTranslations[props.documentType];
+    return t(translationKey).toString();
   }
 
-  private getTargetComponent() {
-    return this.componentsPerType[this.personType];
+  function getTargetComponent() {
+    return componentsPerType[props.personType];
   }
-}
 
-export enum PersonType {
-  TENANT = "TENANT",
-  GUARANTOR = "GUARANTOR",
-  COTENANT = "COTENANT",
-  COTENANT_GUARANTOR = "COTENANT_GUARANTOR",
-}
 </script>
 
 <style scoped lang="css">
