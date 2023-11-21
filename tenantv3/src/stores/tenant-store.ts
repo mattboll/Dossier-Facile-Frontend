@@ -31,7 +31,7 @@ declare const window: Window;
 
 interface State {
   user: User;
-  selectedGuarantor: Guarantor;
+  selectedGuarantor: Guarantor | undefined;
   status: { loggedIn: boolean };
   isFunnel: boolean;
   spouseAuthorize: boolean;

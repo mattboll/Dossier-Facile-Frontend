@@ -60,18 +60,18 @@ const router = createRouter({
   //       /* webpackChunkName: "forgottenPassword" */ "../views/ForgottenPasswordPage.vue"
   //     ),
   // },
-  // {
-  //   path: "/profile",
-  //   name: "Profile",
-  //   meta: {
-  //     title: "Édition du profil - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: [CONTENT, FOOTER_NAVIGATION],
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
-  // },
+  {
+    path: "/profile",
+    name: "Profile",
+    meta: {
+      title: "Édition du profil - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: [CONTENT, FOOTER_NAVIGATION],
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
+  },
   {
     path: "/nom-locataire",
     name: "TenantName",
@@ -84,18 +84,18 @@ const router = createRouter({
     component: () =>
       import(/* webpackChunkName: "profile" */ "../views/NameInformation.vue"),
   },
-  // {
-  //   path: "/type-locataire",
-  //   name: "TenantType",
-  //   meta: {
-  //     title: "Mes informations - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/TypeInformation.vue"),
-  // },
+  {
+    path: "/type-locataire",
+    name: "TenantType",
+    meta: {
+      title: "Mes informations - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/TypeInformation.vue"),
+  },
   {
     path: "/documents-locataire/:substep",
     name: "TenantDocuments",
@@ -108,18 +108,18 @@ const router = createRouter({
     component: () =>
       import(/* webpackChunkName: "profile" */ "../views/TenantDocument.vue"),
   },
-  // {
-  //   path: "/documents-colocataire/:tenantId/:step/:substep/",
-  //   name: "CoTenantDocuments",
-  //   meta: {
-  //     title: "Édition du profil - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/CoTenantDocument.vue"),
-  // },
+  {
+    path: "/documents-colocataire/:tenantId/:step/:substep/",
+    name: "CoTenantDocuments",
+    meta: {
+      title: "Édition du profil - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/CoTenantDocument.vue"),
+  },
   // {
   //   path: "/choix-garant",
   //   name: "GuarantorChoice",
@@ -134,20 +134,20 @@ const router = createRouter({
   //       /* webpackChunkName: "profile" */ "../views/GuarantorChoicePage.vue"
   //     ),
   // },
-  // {
-  //   path: "/liste-garants",
-  //   name: "GuarantorList",
-  //   meta: {
-  //     title: "Mon garant - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "profile" */ "../views/GuarantorListPage.vue"
-  //     ),
-  // },
+  {
+    path: "/liste-garants",
+    name: "GuarantorList",
+    meta: {
+      title: "Mon garant - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "profile" */ "../views/GuarantorListPage.vue"
+      ),
+  },
   // {
   //   path: "/garants-locataire/:tenantId/:step",
   //   name: "TenantGuarantors",

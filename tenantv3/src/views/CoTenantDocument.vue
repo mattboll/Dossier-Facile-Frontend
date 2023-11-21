@@ -25,25 +25,25 @@
       ></CoTenantResidency>
       <ConfirmModal
         v-if="showNbDocumentsResidency"
-        :validate-btn-text="$t('add-new-documents')"
-        :cancel-btn-text="$t('next-step')"
+        :validate-btn-text="t('add-new-documents')"
+        :cancel-btn-text="t('next-step')"
         @cancel="cancelAndgoNext()"
         @close="showNbDocumentsResidency = false"
         @valid="showNbDocumentsResidency = false"
       >
-        {{ $t("cotenantdocument.warning-need-residency-documents.p1") }}
+        {{ t("cotenantdocument.warning-need-residency-documents.p1") }}
         <ul>
           <li>
-            {{ $t("cotenantdocument.warning-need-residency-documents.list1") }}
+            {{ t("cotenantdocument.warning-need-residency-documents.list1") }}
           </li>
           <li>
-            {{ $t("cotenantdocument.warning-need-residency-documents.list2") }}
+            {{ t("cotenantdocument.warning-need-residency-documents.list2") }}
           </li>
           <li>
-            {{ $t("cotenantdocument.warning-need-residency-documents.list3") }}
+            {{ t("cotenantdocument.warning-need-residency-documents.list3") }}
           </li>
         </ul>
-        {{ $t("cotenantdocument.warning-need-residency-documents.p2") }}
+        {{ t("cotenantdocument.warning-need-residency-documents.p2") }}
       </ConfirmModal>
     </div>
     <div v-if="getSubStep() === 3">
@@ -70,9 +70,7 @@
   </ProfileContainer>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import UploadDocuments from "../components/UploadDocuments.vue";
+<script setup lang="ts">
 import ProfileContainer from "../components/ProfileContainer.vue";
 import FooterContainer from "../components/footer/FooterContainer.vue";
 import BackNext from "../components/footer/BackNext.vue";
@@ -83,74 +81,67 @@ import CoTenantProfessional from "../components/documents/cotenant/CoTenantProfe
 import CoTenantFinancialList from "../components/documents/cotenant/CoTenantFinancialList.vue";
 import CoTenantTax from "../components/documents/cotenant/CoTenantTax.vue";
 import { DocumentService } from "@/services/DocumentService";
-import { UtilsService } from "@/services/UtilsService";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { AnalyticsService } from "@/services/AnalyticsService";
+import { useI18n } from "vue-i18n";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    UploadDocuments,
-    ProfileContainer,
-    FooterContainer,
-    BackNext,
-    CoTenantIdentification,
-    CoTenantResidency,
-    CoTenantProfessional,
-    CoTenantFinancialList,
-    CoTenantTax,
-    CoTenantName,
-    ConfirmModal,
-  },
-})
-export default class CoTenantDocument extends Vue {
-  showNbDocumentsResidency = false;
-  mounted() {
-    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
+const { t } = useI18n();
+const store = useTenantStore();
 
-  beforeDestroy() {
-    window.Beacon("destroy");
-  }
+const router = useRouter();
+const route = useRoute();
+  const showNbDocumentsResidency = ref(false);
 
-  goBack() {
-    if (this.getSubStep() > 0) {
-      this.$router.push({
+  onMounted(() => {
+    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+  })
+
+  onBeforeUnmount(() => {
+    // window.Beacon("destroy");
+  })
+
+  function goBack() {
+    if (getSubStep() > 0) {
+      router.push({
         name: "CoTenantDocuments",
         params: {
-          substep: Number(this.getSubStep() - 1).toString(),
-          tenantId: this.getTenantId(),
+          substep: Number(getSubStep() - 1).toString(),
+          tenantId: getTenantId(),
         },
       });
       return;
     }
-    this.$router.push({
+    router.push({
       name: "GuarantorChoice",
     });
   }
 
-  goNext() {
-    if (this.getSubStep() < 5) {
-      this.$router.push({
+  function goNext() {
+    if (getSubStep() < 5) {
+      router.push({
         name: "CoTenantDocuments",
         params: {
-          substep: Number(this.getSubStep() + 1).toString(),
-          tenantId: this.getTenantId(),
+          substep: Number(getSubStep() + 1).toString(),
+          tenantId: getTenantId(),
         },
       });
       return;
     } else {
-      this.$router.push({
+      router.push({
         name: "TenantGuarantors",
         params: {
-          tenantId: this.getTenantId().toString(),
+          tenantId: getTenantId().toString(),
           step: "5",
         },
       });
     }
   }
 
-  checkResidencyAndGoNext() {
-    const user = UtilsService.getTenant(Number(this.getTenantId()));
+  function checkResidencyAndGoNext() {
+    const user = store.getTenant(Number(getTenantId()));
     const docs = DocumentService.getDocs("RESIDENCY", user);
     if (docs.length === 1) {
       const d = docs[0];
@@ -160,30 +151,30 @@ export default class CoTenantDocument extends Vue {
           0
         );
         if ((nbPages || 0) < 3) {
-          this.showNbDocumentsResidency = true;
+          showNbDocumentsResidency.value = true;
           AnalyticsService.missingResidencyDocumentDetected();
           return;
         }
       }
     }
-    this.goNext();
+    goNext();
   }
 
-  cancelAndgoNext() {
+  function cancelAndgoNext() {
     AnalyticsService.forceMissingResidencyDocument();
-    this.goNext();
+    goNext();
   }
 
-  getTenantId() {
-    return this.$route.params.tenantId;
+  function getTenantId() {
+    return route.params.tenantId;
   }
-  getStep() {
-    return Number(this.$route.params.step) || 0;
+
+  function getStep() {
+    return Number(route.params.step) || 0;
   }
-  getSubStep() {
-    return Number(this.$route.params.substep) || 0;
+  function getSubStep() {
+    return Number(route.params.substep) || 0;
   }
-}
 </script>
 
 <style lang="scss" scoped>

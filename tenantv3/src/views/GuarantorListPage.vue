@@ -38,9 +38,7 @@
   </ProfileContainer>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapState } from "vuex";
+<script setup lang="ts">
 import { User } from "df-shared-next/src/models/User";
 import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "../components/helps/GuarantorChoiceHelp.vue";
@@ -48,65 +46,52 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
-@Component({
-  components: {
-    GuarantorFooter,
-    GuarantorChoiceHelp,
-    NakedCard,
-    ProfileContainer,
-    CardRow,
-    ColoredTag,
-    VGouvFrModal,
-    ConfirmModal,
-    TroubleshootingModal,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class GuarantorListPage extends Vue {
-  user!: User;
+const { t } = useI18n();
+    const store = useTenantStore();
+    const user = computed(() => store.user);
+const router = useRouter();
 
-  isRemoveGuarantor = false;
+  const isRemoveGuarantor = ref(false);
 
-  beforeMount() {
-    this.$store.commit("setSelectedGuarantor", undefined);
-  }
+  onBeforeMount(() => {
+    store.setSelectedGuarantor(undefined);
+  })
 
-  getGuarantorName(g: Guarantor) {
+  function getGuarantorName(g: Guarantor) {
     if (g.firstName || g.lastName) {
       return `${g.firstName || ""} ${g.lastName || ""}`;
     }
     if (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) {
       return g.legalPersonName;
     }
-    return this.$i18n.t("guarantorlistpage.guarantor." + g.typeGuarantor);
+    return t("guarantorlistpage.guarantor." + g.typeGuarantor);
   }
 
-  goBack() {
-    if (this.user?.guarantors && this.user?.guarantors.length > 0) {
-      this.$router.push({ name: "TenantDocuments", params: { substep: "5" } });
+  function goBack() {
+    if (user.value?.guarantors && user.value?.guarantors.length > 0) {
+      router.push({ name: "TenantDocuments", params: { substep: "5" } });
       return;
     }
-    this.$router.push({
+    router.push({
       name: "GuarantorChoice",
     });
   }
 
-  goNext() {
-    if (this.user.applicationType == "COUPLE") {
-      const cotenant = this.user.apartmentSharing?.tenants.find(
-        (t) => t.id != this.user.id
+  function goNext() {
+    if (user.value.applicationType == "COUPLE") {
+      const cotenant = user.value.apartmentSharing?.tenants.find(
+        (t) => t.id != user.value.id
       ) as User;
-      this.$router.push({
+      router.push({
         name: "CoTenantDocuments",
         params: {
           step: "4",
@@ -116,12 +101,12 @@ export default class GuarantorListPage extends Vue {
       });
       return;
     }
-    this.$router.push({
+    router.push({
       name: "ValidateFile",
     });
   }
 
-  getStatus(g: Guarantor) {
+  function getStatus(g: Guarantor) {
     if (!g.documents) {
       return "";
     }
@@ -152,40 +137,40 @@ export default class GuarantorListPage extends Vue {
     return "VALIDATED";
   }
 
-  async editGuarantor(g: Guarantor) {
-    this.$store.commit("setSelectedGuarantor", g);
-    this.$router.push({
+  async function editGuarantor(g: Guarantor) {
+    store.setSelectedGuarantor(g);
+    router.push({
       name: "GuarantorDocuments",
       params: { substep: "0" },
     });
   }
 
-  removeGuarantor(g: Guarantor) {
-    this.$store.dispatch("deleteGuarantor", g).then(
+  function removeGuarantor(g: Guarantor) {
+    store.deleteGuarantor(g).then(
       () => {
-        if (!this.user.guarantors?.length || 0 >= 1) {
-          this.$router.push({ name: "GuarantorChoice" });
+        if (!user.value.guarantors?.length || 0 >= 1) {
+          router.push({ name: "GuarantorChoice" });
         }
-        this.isRemoveGuarantor = false;
+        isRemoveGuarantor.value = false;
       },
       () => {
-        Vue.toasted.global.error();
+        // TODO
+        // Vue.toasted.global.error();
       }
     );
   }
 
-  hasOneNaturalGuarantor() {
+  function hasOneNaturalGuarantor() {
     return (
-      this.user.guarantors &&
-      this.user.guarantors.length === 1 &&
-      this.user.guarantors[0].typeGuarantor === "NATURAL_PERSON"
+      user.value.guarantors &&
+      user.value.guarantors.length === 1 &&
+      user.value.guarantors[0].typeGuarantor === "NATURAL_PERSON"
     );
   }
 
-  addNaturalGuarantor() {
-    this.$store.dispatch("addNaturalGuarantor");
+  function addNaturalGuarantor() {
+    store.addNaturalGuarantor();
   }
-}
 </script>
 
 <style scoped lang="scss">
