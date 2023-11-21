@@ -3,9 +3,9 @@
     <NakedCard class="fr-p-md-5w">
       <div>
         <h1 class="fr-h6" v-if="isCotenant">
-          {{ $t("guarantorprofessional.title-cotenant") }}
+          {{ t("guarantorprofessional.title-cotenant") }}
         </h1>
-        <h1 class="fr-h6" v-else>{{ $t("guarantorprofessional.title") }}</h1>
+        <h1 class="fr-h6" v-else>{{ t("guarantorprofessional.title") }}</h1>
         <TroubleshootingModal>
           <GuarantorChoiceHelp></GuarantorChoiceHelp>
           <DocumentInsert
@@ -21,7 +21,7 @@
             v-slot="{ errors, valid }"
           >
             <label v-if="isCotenant">{{
-              $t("guarantorprofessional.select-label-cotenant")
+              t("guarantorprofessional.select-label-cotenant")
             }}</label>
             <select
               v-model="professionalDocument"
@@ -36,11 +36,11 @@
               aria-label="Select professional situation"
             >
               <option v-for="d in documents" :value="d" :key="d.key">
-                {{ $t(d.key) }}
+                {{ t(d.key) }}
               </option>
             </select>
             <span class="fr-error-text" v-if="errors[0]">
-              {{ $t(errors[0]) }}
+              {{ t(errors[0]) }}
             </span>
           </validation-provider>
         </div>
@@ -51,7 +51,7 @@
       @valid="validSelect()"
       @cancel="undoSelect()"
     >
-      <span>{{ $t("guarantorprofessional.will-delete-files") }}</span>
+      <span>{{ t("guarantorprofessional.will-delete-files") }}</span>
     </ConfirmModal>
     <NakedCard
       class="fr-p-md-5w fr-mt-3w"
@@ -60,7 +60,7 @@
       <div class="fr-mb-3w">
         <p
           v-html="
-            $t(
+            t(
               `explanation-text.${guarantorKey()}.professional.${
                 professionalDocument.key
               }`
@@ -92,176 +92,167 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+<script setup lang="ts">
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
-import { mapState } from "vuex";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-import { ValidationProvider } from "vee-validate";
+// import { ValidationProvider } from "vee-validate";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
+import { useI18n } from "vue-i18n";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted, ref } from "vue";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    WarningMessage,
-    ConfirmModal,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    ValidationProvider,
-    TroubleshootingModal,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-    }),
-  },
-})
-export default class GuarantorProfessional extends Vue {
-  @Prop() tenantId?: string;
-  @Prop({ default: false }) isCotenant?: boolean;
+const { t } = useI18n();
+    const store = useTenantStore();
+    const selectedGuarantor = computed(() => {
+      return store.selectedGuarantor;
+    });
 
-  selectedGuarantor!: Guarantor;
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  uploadProgress: {
+
+  // @Prop() tenantId?: string;
+  // @Prop({ default: false }) isCotenant?: boolean;
+  const props = withDefaults(defineProps<{
+    tenantId?: string;
+    isCotenant?: boolean;
+  }>(), {
+    tenantId: undefined,
+    isCotenant: false,
+  });
+
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+  const uploadProgress: {
     [key: string]: { state: string; percentage: number };
   } = {};
-  professionalDocument = new DocumentType();
-  documents = DocumentTypeConstants.GUARANTOR_PROFESSIONAL_DOCS;
-  isDocDeleteVisible = false;
-  documentDeniedReasons = new DocumentDeniedReasons();
+  const professionalDocument = ref(new DocumentType());
+  const documents = ref(DocumentTypeConstants.GUARANTOR_PROFESSIONAL_DOCS);
+  const isDocDeleteVisible = ref(false);
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
 
-  mounted() {
-    this.updateGuarantorData();
+  onMounted(() => {
+    updateGuarantorData();
+  })
+
+  const documentStatus = computed(() => {
+    return guarantorProfessionalDocument()?.documentStatus;
+  })
+
+  function guarantorProfessionalDocument() {
+    return store.getGuarantorProfessionalDocument;
   }
 
-  get documentStatus() {
-    return this.guarantorProfessionalDocument()?.documentStatus;
-  }
-
-  guarantorProfessionalDocument() {
-    return this.$store.getters.getGuarantorProfessionalDocument;
-  }
-
-  updateGuarantorData() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function updateGuarantorData() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.professionalDocument = localDoc;
+          professionalDocument.value = localDoc;
         }
       }
-      if (this.guarantorProfessionalDocument()?.documentDeniedReasons) {
-        this.documentDeniedReasons = cloneDeep(
-          this.guarantorProfessionalDocument()?.documentDeniedReasons
-        );
+      const ddr = guarantorProfessionalDocument()?.documentDeniedReasons;
+      if (ddr) {
+        documentDeniedReasons.value= cloneDeep(ddr);
       }
     }
   }
 
-  onSelectChange() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function onSelectChange() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc.files?.length || 0) > 0 &&
-          doc.subCategory !== this.professionalDocument.value;
+          doc.subCategory !== professionalDocument.value.value;
       }
     }
     return false;
   }
 
-  undoSelect() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function undoSelect() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.professionalDocument = localDoc;
+          professionalDocument.value = localDoc;
         }
       }
     }
     this.isDocDeleteVisible = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
-  save() {
-    this.uploadProgress = {};
+  function save() {
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (!newFiles.length) return;
 
     if (
-      this.professionalDocument.maxFileCount &&
-      this.professionalFiles().length > this.professionalDocument.maxFileCount
+      professionalDocument.value.maxFileCount &&
+      professionalFiles().length > professionalDocument.value.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.professionalFiles().length,
-          this.professionalDocument.maxFileCount,
-        ]),
-      });
-      this.files = [];
+      // TODO
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     this.professionalFiles().length,
+      //     this.professionalDocument.maxFileCount,
+      //   ]),
+      // });
+      files.value = [];
       return;
     }
     Array.from(Array(newFiles.length).keys()).forEach((x) => {
@@ -271,67 +262,70 @@ export default class GuarantorProfessional extends Vue {
 
     formData.append(
       "typeDocumentProfessional",
-      this.professionalDocument.value
+      professionalDocument.value.value
     );
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    if (this.$store.getters.guarantor.id) {
-      formData.append("guarantorId", this.$store.getters.guarantor.id);
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    if (store.guarantor.id) {
+      formData.append("guarantorId", store.guarantor.id.toString());
     }
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId);
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId);
     }
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("saveGuarantorProfessional", formData)
+
+    // TODO
+    // const loader = this.$loading.show();
+    store
+      .saveGuarantorProfessional(formData)
       .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
+        files.value = [];
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        // TODO
+        // Vue.toasted.global.save_success();
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        loader.hide();
+        // TODO
+        // loader.hide();
       });
   }
 
-  professionalFiles() {
-    const newFiles = this.files.map((f) => {
+  function professionalFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.professionalDocument.value,
+        subCategory: professionalDocument.value.value,
         id: f.id,
         name: f.name,
         size: f.size,
       };
     });
     const existingFiles =
-      this.$store.getters.getGuarantorDocuments?.find((d: DfDocument) => {
+      store.getGuarantorDocuments?.find((d: DfDocument) => {
         return d.documentCategory === "PROFESSIONAL";
       })?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  guarantorKey() {
-    if (this.tenantId != null) {
+  function guarantorKey() {
+    if (props.tenantId != null) {
       return "cotenant-guarantor";
     }
     return "guarantor";
   }
-}
 </script>
 
 <style scoped lang="scss"></style>
