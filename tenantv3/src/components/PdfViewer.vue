@@ -46,39 +46,39 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import pdf from "vue-pdf";
 
   const props = defineProps({
     src: String
   });
 
-  loadedRatio = 0;
-  page = 1;
-  numPages = 0;
-  rotate = 0;
+  const loadedRatio = ref(0);
+  const page = ref(1);
+  const numPages = ref(0);
+  const rotate = ref(0);
 
-  decreasePage() {
-    if (this.page > 1) {
-      this.page--;
+  function decreasePage() {
+    if (page.value > 1) {
+      page.value--;
     }
-    if (this.page >= this.numPages) {
-      this.page = this.numPages - 1;
+    if (page.value >= numPages.value) {
+      page.value = numPages.value - 1;
     }
   }
 
-  increasePage() {
-    if (this.page < this.numPages) {
-      this.page++;
+  function increasePage() {
+    if (page.value < numPages.value) {
+      page.value++;
     }
-    if (this.page < 1) {
-      this.page = 1;
+    if (page.value < 1) {
+      page.value = 1;
     }
   }
 
-  error(err: any) {
+  function error(err: any) {
     console.log(err);
   }
-}
 </script>
 
 <style scoped lang="scss">

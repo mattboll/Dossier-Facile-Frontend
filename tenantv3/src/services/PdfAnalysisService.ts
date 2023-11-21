@@ -1,5 +1,5 @@
 import * as pdfjs from "pdfjs-dist/webpack";
-import { PDFDocumentProxy } from "pdfjs-dist";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 import { AnalyticsService } from "./AnalyticsService";
 
 function loadPdfDocument(file: File): Promise<PDFDocumentProxy> {

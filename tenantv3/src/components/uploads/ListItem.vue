@@ -47,7 +47,6 @@
 
 <script setup lang="ts">
 import { DfFile } from "df-shared-next/src/models/DfFile";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import Progress from "./Progress.vue";
 import ShowDoc from "../documents/share/ShowDoc.vue";
 import Modal from "df-shared-next/src/components/Modal.vue";

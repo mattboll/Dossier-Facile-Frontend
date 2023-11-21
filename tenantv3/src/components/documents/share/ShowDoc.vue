@@ -2,22 +2,23 @@
   <div class="fr-container">
     <div class="fr-grid-row justify-content-center">
       <div class="fr-col-12">
-        <div v-if="file.path">
+        <div v-if="file?.path">
           <AuthImage
-            :src="file.path"
+            :src="file?.path"
             v-if="isImage()"
             :alt="$t('showdoc.preview')"
           />
-          <PdfViewer
+          <!-- TODO -->
+          <!-- <PdfViewer
             :src="pdfContent"
             v-if="!isImage() && isLoaded"
-          ></PdfViewer>
+          ></PdfViewer> -->
         </div>
         <div v-else>
-          <div v-if="file.numberOfPages && file.numberOfPages > 0">
-            {{ $t("showdoc.number-of-pages", [file.numberOfPages]) }}
+          <div v-if="file?.numberOfPages && file?.numberOfPages > 0">
+            {{ $t("showdoc.number-of-pages", [file?.numberOfPages]) }}
           </div>
-          <AuthImage :src="file.preview" :alt="$t('showdoc.preview')" />
+          <AuthImage :src="file?.preview || ''" :alt="$t('showdoc.preview')" />
         </div>
       </div>
     </div>
@@ -26,7 +27,7 @@
 
 <script setup lang="ts">
 import { DfFile } from "df-shared-next/src/models/DfFile";
-import PdfViewer from "../../PdfViewer.vue";
+// import PdfViewer from "../../PdfViewer.vue";
 import AuthImage from "df-shared-next/src/components/AuthImage.vue";
 import { ImageService } from "../../../services/ImageService";
 import axios from "axios";
