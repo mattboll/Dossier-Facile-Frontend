@@ -5,7 +5,7 @@ export const RegisterService = {
   deleteFile(id: number | string, silent = false) {
     // TODO
     // const loader = Vue.$loading.show();
-    const url = `https://${import.meta.env.VUE_APP_API_URL}/api/file/${id}`;
+    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios
       .delete(url)
       .then(() => {

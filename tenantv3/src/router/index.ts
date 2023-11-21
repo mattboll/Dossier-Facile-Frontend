@@ -174,18 +174,18 @@ const router = createRouter({
   //   component: () =>
   //     import(/* webpackChunkName: "profile" */ "../views/ValidateFilePage.vue"),
   // },
-  // {
-  //   path: "/validation-dossier/:step",
-  //   name: "ValidateFileStep",
-  //   meta: {
-  //     title: "Validation du dossier locataire - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "profile" */ "../views/ValidateFilePage.vue"),
-  // },
+  {
+    path: "/validation-dossier/:step",
+    name: "ValidateFileStep",
+    meta: {
+      title: "Validation du dossier locataire - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "../views/ValidateFilePage.vue"),
+  },
   // {
   //   path: "/info-garant/:substep/:guarantorId?",
   //   name: "GuarantorDocuments",
