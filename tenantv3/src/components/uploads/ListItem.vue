@@ -61,8 +61,8 @@ const emit = defineEmits(["remove"]);
 
 const props = withDefaults(defineProps<{
   file: DfFile;
-  uploadState: string;
-  percentage: number;
+  uploadState?: string;
+  percentage?: number;
 }>(), {
   uploadState: "idle",
   percentage: 0,

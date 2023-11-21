@@ -2,13 +2,13 @@
   <div>
     <NakedCard class="fr-p-md-5w">
       <div>
-        <validation-provider
+        <!-- <validation-provider
           rules="select"
           name="professionalDocument"
           v-slot="{ errors, valid }"
-        >
+        > -->
           <h1 class="fr-h6">
-            {{ $t("professional-page.select-label") }}
+            {{ t("professional-page.select-label") }}
           </h1>
           <TroubleshootingModal>
             <DocumentHelp></DocumentHelp>
@@ -18,26 +18,28 @@
               v-if="professionalDocument.key"
             ></DocumentInsert>
           </TroubleshootingModal>
+          <!-- TODO -->
+            <!-- :class="{
+              'fr-select--valid': valid,
+              'fr-select--error': errors[0],
+            }" -->
           <select
             v-model="professionalDocument"
             class="fr-select fr-mb-3w fr-mt-3w"
-            :class="{
-              'fr-select--valid': valid,
-              'fr-select--error': errors[0],
-            }"
             id="select"
             as="select"
             @change="onSelectChange()"
             aria-label="Select professional situation"
           >
             <option v-for="d in documents" :value="d" :key="d.key">
-              {{ $t(d.key) }}
+              {{ t(d.key) }}
             </option>
           </select>
-          <span class="fr-error-text" v-if="errors[0]">
-            {{ $t(errors[0]) }}
-          </span>
-        </validation-provider>
+          <!-- TODO -->
+          <!-- <span class="fr-error-text" v-if="errors[0]">
+            {{ t(errors[0]) }}
+          </span> -->
+        <!-- </validation-provider> -->
       </div>
     </NakedCard>
     <NakedCard
@@ -47,7 +49,7 @@
       <div class="fr-mb-3w">
         <div
           v-html="
-            $t(
+            t(
               `explanation-text.tenant.professional.${professionalDocument.key}`
             )
           "
@@ -79,7 +81,7 @@
       @valid="validSelect()"
       @cancel="undoSelect()"
     >
-      <span>{{ $t("professional-page.will-delete-files") }}</span>
+      <span>{{ t("professional-page.will-delete-files") }}</span>
     </ConfirmModal>
   </div>
 </template>
@@ -93,12 +95,9 @@ import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import { User } from "df-shared-next/src/models/User";
 import DocumentHelp from "../../helps/DocumentHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
@@ -110,7 +109,9 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 
 const store = useTenantStore();
 const user = computed(() => store.userToEdit);

@@ -8,6 +8,8 @@
 import UploadDocuments from "../components/UploadDocuments.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
 import { onBeforeUnmount, onMounted } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
   onMounted(() => {
     // TODO
@@ -20,9 +22,7 @@ import { onBeforeUnmount, onMounted } from "vue";
   })
 
   function getStep() {
-    return 0
-    // TODO
-    // return Number(this.$route.params.substep) || 0;
+    return Number(route.params.substep) || 0;
   }
 </script>
 
