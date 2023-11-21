@@ -1,21 +1,16 @@
 <template>
   <div>
-    <p v-html="$t('guarantorchoicehelp.paragraph1')"></p>
-    <p v-html="$t('guarantorchoicehelp.paragraph2')"></p>
-    <p v-html="$t('guarantorchoicehelp.paragraph3')"></p>
+    <p v-html="t('guarantorchoicehelp.paragraph1')"></p>
+    <p v-html="t('guarantorchoicehelp.paragraph2')"></p>
+    <p v-html="t('guarantorchoicehelp.paragraph3')"></p>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import Card from "df-shared-next/src/components/Card.vue";
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: { Card },
-})
-export default class GuarantorChoiceHelp extends Vue {
-  expanded = false;
-}
+const { t } = useI18n();
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
