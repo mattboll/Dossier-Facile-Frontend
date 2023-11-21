@@ -24,37 +24,33 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DfFile } from "df-shared-next/src/models/DfFile";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import PdfViewer from "../../PdfViewer.vue";
 import AuthImage from "df-shared-next/src/components/AuthImage.vue";
 import { ImageService } from "../../../services/ImageService";
 import axios from "axios";
+import { onMounted, ref } from "vue";
 
-@Component({
-  components: {
-    PdfViewer,
-    AuthImage,
-  },
-})
-export default class ShowDoc extends Vue {
-  @Prop({ default: "" }) file!: DfFile;
-  isLoaded = false;
-  pdfContent = {};
+  const props = defineProps({ file: DfFile });
 
-  isImage() {
-    return ImageService.isImage(this.file);
+  const isLoaded = ref(false);
+  const pdfContent = ref({});
+
+  function isImage() {
+    if (!props.file) {
+      return false;
+    }
+    return ImageService.isImage(props.file);
   }
 
-  mounted() {
-    if (this.file.path && !this.isImage()) {
-      axios.get(this.file.path, { responseType: "blob" }).then((response) => {
+  onMounted(() => {
+    if (props.file?.path && !isImage()) {
+      axios.get(props.file.path, { responseType: "blob" }).then((response) => {
         const blob = new Blob([response.data], { type: "application/pdf" });
-        this.pdfContent = window.URL.createObjectURL(blob);
-        this.isLoaded = true;
+        pdfContent.value = window.URL.createObjectURL(blob);
+        isLoaded.value = true;
       });
     }
-  }
-}
+  })
 </script>

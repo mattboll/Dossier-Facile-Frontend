@@ -40,29 +40,36 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-@Component
-export default class Progress extends Vue {
-  @Prop() public percentage!: number;
-  @Prop({ default: "#42b983" })
-  public color!: string;
-  @Prop({ default: "#f66" })
-  public errorColor!: string;
-  @Prop({ default: "pending" })
-  public state!: string;
-  public radius = 16;
-  private circumference = this.radius * 2 * Math.PI;
-  private strokeDashoffset = this.circumference;
-  @Watch("percentage")
-  onPercentageChanged(val: number, oldVal: number) {
-    const offset = this.circumference - (val / 100) * this.circumference;
-    this.strokeDashoffset = offset;
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
+
+  const props = withDefaults(defineProps<{
+    percentage: number;
+    color?: string;
+    errorColor?: string;
+    state?: string;
+  }>(), {
+    percentage: 0,
+    color: "#42b983",
+    errorColor: "#f66",
+    state: "pending",
+  });
+
+  const radius = 16;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = ref(circumference);
+
+
+  // TODO
+  // @Watch("percentage")
+  function onPercentageChanged(val: number, oldVal: number) {
+    const offset = circumference - (val / 100) * circumference;
+    strokeDashoffset.value = offset;
   }
-  mounted() {
-    this.onPercentageChanged(this.percentage, 0);
-  }
-}
+  onMounted(() => {
+    onPercentageChanged(props.percentage, 0);
+  })
 </script>
 
 <style scoped lang="scss">
