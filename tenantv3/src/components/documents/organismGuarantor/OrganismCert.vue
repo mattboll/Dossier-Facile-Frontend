@@ -5,12 +5,6 @@
         <h1 class="fr-h6">
           {{ getTitle() }}
         </h1>
-        <TroubleshootingModal>
-          <DocumentInsert
-            :allow-list="acceptedProofs"
-            :block-list="refusedProofs"
-          ></DocumentInsert>
-        </TroubleshootingModal>
         <AllDeclinedMessages
           class="fr-mb-3w"
           :documentDeniedReasons="documentDeniedReasons"
@@ -23,10 +17,10 @@
             :file="file"
             @remove="remove(file)"
             :uploadState="
-              uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
+              file.id && uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
             "
             :percentage="
-              uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
+              file.id && uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
             "
           />
         </div>
@@ -43,19 +37,19 @@
 </template>
 
 <script setup lang="ts">
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { RegisterService } from "../../../services/RegisterService";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
+import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import useTenantStore from "@/stores/tenant-store";
 
   const props = defineProps<{
     tenantId?: number,
@@ -63,57 +57,58 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
     guarantor?: Guarantor,
   }>();
 
+const { t } = useI18n();
+const store = useTenantStore();
+
   const MAX_FILE_COUNT = 5;
-  acceptedProofs = ["Certificat de garantie valide d'un organisme"];
-  refusedProofs = ["Tout autre document"];
 
-  documentDeniedReasons?: DocumentDeniedReasons;
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
 
-  files: DfFile[] = [];
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  uploadProgress: {
+  const files = ref([] as DfFile[]);
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
+  });
 
-  mounted() {
-    this.loadDocument();
+  onMounted(() => {
+    loadDocument();
+  })
+
+  function getTitle() {
+    const userType = props.isCotenant ? "cotenant" : "tenant";
+    return t(`explanation-text.${userType}.organism-guarantor`);
   }
 
-  getTitle() {
-    const userType = this.isCotenant ? "cotenant" : "tenant";
-    return this.$t(`explanation-text.${userType}.organism-guarantor`);
-  }
-
-  guarantorId() {
-    if (this.guarantor) {
-      return this.guarantor.id;
+  function guarantorId() {
+    if (props.guarantor) {
+      return props.guarantor.id;
     }
-    return this.$store.getters.guarantor.id;
+    return store.guarantor.id;
   }
 
-  get documentStatus() {
-    return this.guarantorIdentificationDocument()?.documentStatus;
-  }
+  const documentStatus = computed(() =>  {
+    return guarantorIdentificationDocument()?.documentStatus;
+  })
 
-  guarantorIdentificationDocument(): DfDocument {
-    if (this.guarantor) {
-      return this.guarantor.documents?.find((d: DfDocument) => {
+  function guarantorIdentificationDocument(): DfDocument | undefined {
+    if (props.guarantor) {
+      return props.guarantor.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       }) as DfDocument;
     }
-    return this.$store.getters.getGuarantorIdentificationDocument;
+    return store.getGuarantorIdentificationDocument;
   }
 
-  addFiles(newFiles: File[]) {
-    if (this.files.length >= MAX_FILE_COUNT) {
-      this.displayTooManyFilesToast();
+  function addFiles(newFiles: File[]) {
+    if (files.value.length >= MAX_FILE_COUNT) {
+      displayTooManyFilesToast();
       return;
     }
-    this.save(newFiles);
+    save(newFiles);
   }
 
-  save(files: File[]) {
-    this.uploadProgress = {};
+  function save(files: File[]) {
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
     if (!files.length) return;
@@ -124,61 +119,66 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
     formData.append("noDocument", "false");
 
-    if (this.guarantorId()) {
-      formData.append("guarantorId", this.guarantorId());
+    const gId = guarantorId()
+    if (gId) {
+      formData.append("guarantorId", gId.toString());
     }
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId.toString());
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId.toString());
     }
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    const loader = this.$loading.show();
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    // const loader = this.$loading.show();
     RegisterService.saveOrganismIdentification(formData)
       .then(async (response: any) => {
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
-        await this.$store.commit("loadUser", response.data);
-        this.loadDocument();
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        // Vue.toasted.global.save_success();
+        await store.loadUserCommit(response.data);
+        loadDocument();
       })
       .catch(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        Vue.toasted.global.save_failed();
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+        // Vue.toasted.global.save_failed();
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  remove(file: DfFile) {
+  function remove(file: DfFile) {
     if (file.id) {
       RegisterService.deleteFile(file.id);
     }
-    const firstIndex = this.files.findIndex((f) => f.id === file.id);
-    this.files.splice(firstIndex, 1);
-    this.documentDeniedReasons = undefined;
+    const firstIndex = files.value.findIndex((f) => f.id === file.id);
+    files.value.splice(firstIndex, 1);
+    documentDeniedReasons.value = new DocumentDeniedReasons();
   }
 
-  private loadDocument() {
+  function loadDocument() {
     // This is a needed workaround for now, since we can't identify the currently
     // edited guarantor (and thus the corresponding document) from state
-    const document = this.guarantorIdentificationDocument();
-    this.documentDeniedReasons = document?.documentDeniedReasons;
-    this.files = document?.files || [];
+    const document = guarantorIdentificationDocument();
+    if (document?.documentDeniedReasons) {
+      documentDeniedReasons.value = document.documentDeniedReasons;
+    } else {
+      documentDeniedReasons.value = new DocumentDeniedReasons();
+    }
+    files.value = document?.files || [];
   }
 
-  private displayTooManyFilesToast() {
-    Vue.toasted.global.max_file({
-      message: this.$i18n.t("max-file", [
-        this.files.length,
-        MAX_FILE_COUNT,
-      ]),
-    });
+  function displayTooManyFilesToast() {
+    // TODO
+    // Vue.toasted.global.max_file({
+    //   message: this.$i18n.t("max-file", [
+    //     this.files.length,
+    //     MAX_FILE_COUNT,
+    //   ]),
+    // });
   }
-}
 </script>
 
 <style scoped lang="scss">
