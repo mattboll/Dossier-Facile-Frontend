@@ -77,10 +77,10 @@
               :file="file"
               @remove="remove(file)"
               :uploadState="
-                uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
+                file.id && uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
               "
               :percentage="
-                uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
+                file.id && uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
               "
             />
           </div>
@@ -98,9 +98,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
+<script setup lang="ts">
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
@@ -117,186 +115,178 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { cloneDeep } from "lodash";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
+import { computed, onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    ValidationObserver,
-    VGouvFrModal,
-    NakedCard,
-    GuarantorFooter,
-  },
-})
-export default class RepresentativeIdentification extends Vue {
-  @Prop() tenantId?: number;
-  @Prop() guarantor?: Guarantor;
+  const documents = DocumentTypeConstants.REPRESENTATIVE_IDENTIFICATION;
+  const props = defineProps<{
+    tenantId?: number;
+    guarantor?: Guarantor;
+  }>();
+  const store = useTenantStore();
+  const emit = defineEmits(["on-next", "on-back"]);
 
-  MAX_FILE_COUNT = 5;
+  const MAX_FILE_COUNT = 5;
 
-  identificationDocument = new DocumentType();
-  documentDeniedReasons = new DocumentDeniedReasons();
+  const identificationDocument = ref(new DocumentType());
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
 
-  files: File[] = [];
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  uploadProgress: {
+  const files = ref([] as File[]);
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
-  firstName = "";
+  });
+  const firstName = ref("");
 
-  beforeMount() {
-    this.firstName = this.getGuarantor().firstName || "";
-    if (this.getGuarantor().documents !== null) {
-      const doc = this.guarantorIdentificationDocument();
+  onBeforeMount(() => {
+    firstName.value = getGuarantor().firstName || "";
+    if (getGuarantor().documents !== null) {
+      const doc = guarantorIdentificationDocument();
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.identificationDocument = localDoc;
+          identificationDocument.value = localDoc;
         }
       }
     }
-    if (this.guarantorIdentificationDocument()?.documentDeniedReasons) {
-      this.documentDeniedReasons = cloneDeep(
-        this.guarantorIdentificationDocument()!.documentDeniedReasons!
+    if (guarantorIdentificationDocument()?.documentDeniedReasons) {
+      documentDeniedReasons.value = cloneDeep(
+        guarantorIdentificationDocument()!.documentDeniedReasons!
       );
     }
-  }
+  })
 
-  getGuarantor() {
-    if (this.guarantor) {
-      return this.guarantor;
+  function getGuarantor() {
+    if (props.guarantor) {
+      return props.guarantor;
     }
-    return this.$store.getters.guarantor;
+    return store.guarantor;
   }
 
-  get documentStatus() {
-    return this.guarantorIdentificationDocument()?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return guarantorIdentificationDocument()?.documentStatus;
+  })
 
-  guarantorIdentificationDocument(): DfDocument {
-    if (this.guarantor) {
-      return this.guarantor.documents?.find((d: DfDocument) => {
+  function guarantorIdentificationDocument(): DfDocument | undefined {
+    if (props.guarantor) {
+      return props.guarantor.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       }) as DfDocument;
     }
-    return this.$store.getters.getGuarantorIdentificationDocument;
+    return store.getGuarantorIdentificationDocument;
   }
 
-  addFiles(fileList: File[]) {
-    this.files = [...this.files, ...fileList];
-    this.save();
+  function addFiles(fileList: File[]) {
+    files.value = [...files.value, ...fileList];
+    save();
   }
 
-  save() {
-    if (!this.firstName) {
+  function save() {
+    if (!firstName.value) {
       return Promise.reject();
     }
-    this.uploadProgress = {};
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    if (this.getGuarantor().id) {
-      formData.append("guarantorId", this.getGuarantor().id);
+    const gId = getGuarantor().id;
+    if (gId) {
+      formData.append("guarantorId", gId.toString());
     }
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId.toString());
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId.toString());
     }
-    if (this.firstName) {
-      formData.append("firstName", this.firstName);
+    if (firstName.value) {
+      formData.append("firstName", firstName.value);
     }
 
-    if (!this.files.length) {
-      const loader = this.$loading.show();
+    if (!files.value.length) {
+      // const loader = this.$loading.show();
       return RegisterService.saveLegalPersonRepresentantName(formData)
         .then(() => {
-          this.files = [];
-          this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-          this.$store.dispatch("loadUser");
-          Vue.toasted.global.save_success();
+          files.value = [];
+          fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+          store.loadUser();
+          // Vue.toasted.global.save_success();
           return Promise.resolve(true);
         })
         .catch((err: unknown) => {
-          this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-          Vue.toasted.global.save_failed();
+          fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+          // Vue.toasted.global.save_failed();
           return Promise.reject(err);
         })
         .finally(() => {
-          loader.hide();
+          // loader.hide();
         });
     }
 
-    if (this.listFiles().length > this.MAX_FILE_COUNT) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.listFiles().length,
-          this.MAX_FILE_COUNT,
-        ]),
-      });
+    if (listFiles().length > MAX_FILE_COUNT) {
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     this.listFiles().length,
+      //     this.MAX_FILE_COUNT,
+      //   ]),
+      // });
       return Promise.reject();
     }
-    Array.from(Array(this.files.length).keys()).forEach((x) => {
-      formData.append(`${fieldName}[${x}]`, this.files[x], this.files[x].name);
+    Array.from(Array(files.value.length).keys()).forEach((x) => {
+      formData.append(`${fieldName}[${x}]`, files.value[x], files.value[x].name);
     });
 
     formData.append(
       "typeDocumentIdentification",
-      this.identificationDocument.value
+      identificationDocument.value.value
     );
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    const loader = this.$loading.show();
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    // const loader = this.$loading.show();
     return RegisterService.saveRepresentativeIdentification(formData)
       .then(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        this.$store.dispatch("loadUser");
-        Vue.toasted.global.save_success();
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        store.loadUser();
+        // Vue.toasted.global.save_success();
         return Promise.resolve(true);
       })
       .catch(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        Vue.toasted.global.save_failed();
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+        // Vue.toasted.global.save_failed();
         return Promise.reject();
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    this.save().then(() => {
-      this.$emit("on-next");
+  function goNext() {
+    save().then(() => {
+      emit("on-next");
     });
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  remove(file: DfFile) {
+  function remove(file: DfFile) {
     if (file.id) {
       RegisterService.deleteFile(file.id);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && f.size === file.size;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
-  listFiles() {
-    const existingFiles = this.guarantorIdentificationDocument()?.files || [];
+  function listFiles() {
+    const existingFiles = guarantorIdentificationDocument()?.files || [];
     return existingFiles;
   }
 
-  documents = DocumentTypeConstants.REPRESENTATIVE_IDENTIFICATION;
-}
 </script>
 
 <style scoped lang="scss">

@@ -216,7 +216,6 @@ import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
-import { mapGetters, mapState } from "vuex";
 import Modal from "df-shared-next/src/components/Modal.vue";
 import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";

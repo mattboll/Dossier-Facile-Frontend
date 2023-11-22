@@ -48,10 +48,10 @@
               :file="file"
               @remove="remove(file)"
               :uploadState="
-                uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
+                file.id && uploadProgress[file.id] ? uploadProgress[file.id].state : 'idle'
               "
               :percentage="
-                uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
+                file.id && uploadProgress[file.id] ? uploadProgress[file.id].percentage : 0
               "
             />
           </div>
@@ -69,9 +69,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
+<script setup lang="ts">
 import FileUpload from "../../uploads/FileUpload.vue";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
@@ -80,170 +78,148 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { RegisterService } from "../../../services/RegisterService";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
+import { computed, onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    ValidationObserver,
-    VGouvFrModal,
-    NakedCard,
-    GuarantorFooter,
-  },
-})
-export default class CorporationIdentification extends Vue {
-  @Prop() tenantId?: number;
-  @Prop() guarantor?: Guarantor;
+const store = useTenantStore();
 
-  organismName = "";
-  acceptedProofs = [
-    this.$i18n.t("corporationidentification.kbis"),
-    this.$i18n.t("corporationidentification.status"),
-    this.$i18n.t("corporationidentification.all-accepted"),
-  ];
-  refusedProofs = [
-    this.$i18n.t("corporationidentification.balance-sheet"),
-    this.$i18n.t("corporationidentification.urssaf"),
-    this.$i18n.t("corporationidentification.all-other"),
-  ];
+  const props = defineProps<{
+    tenantId?: number;
+    guarantor?: Guarantor;
+  }>();
 
-  documentDeniedReasons = new DocumentDeniedReasons();
+  const organismName = ref("");
 
-  files: DfFile[] = [];
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  uploadProgress: {
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+
+  const files = ref([] as DfFile[]);
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
+  });
+  const emit = defineEmits(["on-back", "on-next"]);
 
-  beforeMount() {
-    this.organismName = this.getGuarantor().legalPersonName || "";
+  onBeforeMount(() => {
+    organismName.value = getGuarantor().legalPersonName || "";
     if (
-      this.guarantorIdentificationLegalPersonDocument()?.documentDeniedReasons
+      guarantorIdentificationLegalPersonDocument()?.documentDeniedReasons
     ) {
-      this.documentDeniedReasons = cloneDeep(
-        this.guarantorIdentificationLegalPersonDocument()!
+      documentDeniedReasons.value = cloneDeep(
+        guarantorIdentificationLegalPersonDocument()!
           .documentDeniedReasons!
       );
     }
-  }
+  })
 
-  getGuarantor() {
-    if (this.guarantor) {
-      return this.guarantor;
+  function getGuarantor() {
+    if (props.guarantor) {
+      return props.guarantor;
     }
-    return this.$store.getters.guarantor;
+    return store.guarantor;
   }
 
-  get documentStatus() {
-    return this.guarantorIdentificationLegalPersonDocument()?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return guarantorIdentificationLegalPersonDocument()?.documentStatus;
+  })
 
-  guarantorIdentificationLegalPersonDocument(): DfDocument {
-    if (this.guarantor) {
-      return this.guarantor.documents?.find((d: DfDocument) => {
+  function guarantorIdentificationLegalPersonDocument(): DfDocument | undefined {
+    if (props.guarantor) {
+      return props.guarantor.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION_LEGAL_PERSON";
       }) as DfDocument;
     }
-    return this.$store.getters.getGuarantorIdentificationLegalPersonDocument;
+    return store.getGuarantorIdentificationLegalPersonDocument;
   }
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
 
-  save() {
-    if (!this.organismName) {
+  function save() {
+    if (!organismName.value) {
       return Promise.resolve(true);
     }
-    this.uploadProgress = {};
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    formData.append("legalPersonName", this.organismName);
-
-    if (this.getGuarantor().id) {
-      formData.append("guarantorId", this.getGuarantor().id);
+    formData.append("legalPersonName", organismName.value);
+const gId = getGuarantor().id
+    if (gId) {
+      formData.append("guarantorId", gId.toString());
     }
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId.toString());
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId.toString());
     }
 
-    const loader = this.$loading.show();
-    if (!this.files.length) {
+    // const loader = this.$loading.show();
+    if (!files.value.length) {
       return RegisterService.saveCorporationName(formData)
         .then(() => {
-          this.files = [];
-          this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-          this.$store.dispatch("loadUser");
-          Vue.toasted.global.save_success();
+          files.value = [];
+          fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+          store.loadUser();
+          // Vue.toasted.global.save_success();
           return Promise.resolve(true);
         })
         .catch((err: unknown) => {
-          this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-          Vue.toasted.global.save_failed();
+          fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+          // Vue.toasted.global.save_failed();
           return Promise.reject(err);
         })
         .finally(() => {
-          loader.hide();
+          // loader.hide();
         });
     }
 
-    Array.from(Array(this.files.length).keys()).map((x) => {
-      const f: File = this.files[x].file || new File([], "");
-      formData.append(`${fieldName}[${x}]`, f, this.files[x].name);
+    Array.from(Array(files.value.length).keys()).map((x) => {
+      const f: File = files.value[x].file || new File([], "");
+      formData.append(`${fieldName}[${x}]`, f, files.value[x].name);
     });
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
     return RegisterService.saveCorporationIdentification(formData)
       .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        this.$store.dispatch("loadUser");
-        Vue.toasted.global.save_success();
+        files.value = [];
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        store.loadUser();
+        // Vue.toasted.global.save_success();
         return Promise.resolve(true);
       })
       .catch((err: unknown) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        Vue.toasted.global.save_failed();
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+        // Vue.toasted.global.save_failed();
         return Promise.reject(err);
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  remove(file: DfFile) {
+  function remove(file: DfFile) {
     if (file.id) {
       RegisterService.deleteFile(file.id);
-      this.guarantorIdentificationLegalPersonDocument().files =
-        this.guarantorIdentificationLegalPersonDocument()?.files?.filter(
-          (f) => file.id != f.id
-        );
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && f.size === file.size;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  listFiles() {
-    const newFiles = this.files.map((f) => {
+  function listFiles() {
+    const newFiles = files.value.map((f) => {
       return {
         id: f.id,
         name: f.name,
@@ -252,20 +228,19 @@ export default class CorporationIdentification extends Vue {
       };
     });
     const existingFiles =
-      this.guarantorIdentificationLegalPersonDocument()?.files || [];
+      guarantorIdentificationLegalPersonDocument()?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    this.save().then(() => {
-      this.$emit("on-next");
+  function goNext() {
+    save().then(() => {
+      emit("on-next");
     });
   }
-}
 </script>
 
 <style scoped lang="scss">
