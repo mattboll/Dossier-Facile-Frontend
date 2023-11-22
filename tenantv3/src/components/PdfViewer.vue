@@ -49,9 +49,9 @@
 import { ref } from "vue";
 import pdf from "vue-pdf";
 
-  const props = defineProps({
+  const props = defineProps<{
     src: String
-  });
+  }>();
 
   const loadedRatio = ref(0);
   const page = ref(1);

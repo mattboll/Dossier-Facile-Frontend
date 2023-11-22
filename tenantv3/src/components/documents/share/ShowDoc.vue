@@ -33,7 +33,7 @@ import { ImageService } from "../../../services/ImageService";
 import axios from "axios";
 import { onMounted, ref } from "vue";
 
-  const props = defineProps({ file: DfFile });
+  const props = defineProps<{ file: DfFile }>();
 
   const isLoaded = ref(false);
   const pdfContent = ref({});

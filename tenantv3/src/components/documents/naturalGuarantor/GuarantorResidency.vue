@@ -134,17 +134,13 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
 
-    // ...mapState({
-      // selectedGuarantor: "selectedGuarantor",
-
 const store = useTenantStore();
 const selectedGuarantor = computed(() => store.selectedGuarantor);
 
 
-  // @Prop() tenantId?: string;
-const props = defineProps({
-  tenantId: String
-});
+const props = defineProps<{
+  tenantId: string
+}>();
 
   const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
   const files = ref([] as DfFile[]);
@@ -242,26 +238,6 @@ const uploadProgress = ref({} as {
         }
       }
     }
-  }
-
-  function isNewDocument() {
-    if (selectedGuarantor.value?.documents !== null) {
-      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
-        return d.documentCategory === "RESIDENCY";
-      });
-      if (doc !== undefined) {
-        if (
-          (doc.subCategory === "GUEST" &&
-            residencyDocument.value.value === "GUEST_PARENTS") ||
-          (doc.subCategory === "GUEST_PARENTS" &&
-            residencyDocument.value.value === "GUEST")
-        ) {
-          return false;
-        }
-        return doc.subCategory !== residencyDocument.value.value;
-      }
-    }
-    return false;
   }
 
   async function goNext() {

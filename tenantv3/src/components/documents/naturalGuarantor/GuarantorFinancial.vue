@@ -79,9 +79,9 @@ const financialDocuments = computed(() => store.guarantorFinancialDocuments);
 
 const emit = defineEmits(["on-back", "on-next"]);
 
-const props = defineProps({
+const props = defineProps<{
   tenantId: String
-});
+}>();
 
 onBeforeMount(() => {
   initialize();

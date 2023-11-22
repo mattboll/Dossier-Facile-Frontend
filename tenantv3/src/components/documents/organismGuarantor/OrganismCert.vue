@@ -42,8 +42,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
@@ -58,23 +57,13 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    VGouvFrModal,
-    NakedCard,
-    TroubleshootingModal,
-  },
-})
-export default class OrganismCert extends Vue {
-  @Prop() tenantId?: number;
-  @Prop() isCotenant?: boolean;
-  @Prop() guarantor?: Guarantor;
+  const props = defineProps<{
+    tenantId?: number,
+    isCotenant?: boolean,
+    guarantor?: Guarantor,
+  }>();
 
-  MAX_FILE_COUNT = 5;
+  const MAX_FILE_COUNT = 5;
   acceptedProofs = ["Certificat de garantie valide d'un organisme"];
   refusedProofs = ["Tout autre document"];
 
@@ -116,7 +105,7 @@ export default class OrganismCert extends Vue {
   }
 
   addFiles(newFiles: File[]) {
-    if (this.files.length >= this.MAX_FILE_COUNT) {
+    if (this.files.length >= MAX_FILE_COUNT) {
       this.displayTooManyFilesToast();
       return;
     }
@@ -185,7 +174,7 @@ export default class OrganismCert extends Vue {
     Vue.toasted.global.max_file({
       message: this.$i18n.t("max-file", [
         this.files.length,
-        this.MAX_FILE_COUNT,
+        MAX_FILE_COUNT,
       ]),
     });
   }

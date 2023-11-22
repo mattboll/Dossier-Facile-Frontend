@@ -19,9 +19,9 @@
 import LeftEditMenu from "./editmenu/LeftEditMenu.vue";
 import TopEditMenu from "./editmenu/TopEditMenu.vue";
 
-  const props = defineProps({
-    step: Number
-  });
+  const props = defineProps<{
+    step: number
+  }>();
 
 </script>
 
