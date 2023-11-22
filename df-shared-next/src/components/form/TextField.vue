@@ -12,8 +12,8 @@
           v-if="!textarea"
           :id="name"
           type="text"
-          v-bind:value="value"
-          v-on:input="emit('input', $event.target.value)"
+          v-bind:value="modelValue"
+          v-on:input="emit('update:modelValue', $event)"
           :name="name"
           class="validate-required form-control fr-input"
           :class="{
@@ -26,8 +26,8 @@
           v-else
           :id="name"
           type="text"
-          v-bind:value="value"
-          v-on:input="emit('input', $event.target.value)"
+          :value="modelValue"
+          v-on:input="emit('update:modelValue', $event)"
           :name="name"
           class="validate-required form-control fr-input"
           :class="{
@@ -57,11 +57,11 @@ import FieldLabel from "./FieldLabel.vue";
 
 const { t } = useI18n();
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue"]);
 
 const props = withDefaults(
   defineProps<{
-    value: string;
+    modelValue: string;
     fieldLabel: string;
     name: string;
     validationRules?: string;
