@@ -160,7 +160,6 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import RoommatesInformationHelp from "./helps/RoommatesInformationHelp.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { UtilsService } from "../services/UtilsService";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
 extend("is", {
   ...is,
@@ -176,7 +175,6 @@ extend("is", {
     RoommatesInformationHelp,
     VGouvFrModal,
     NakedCard,
-    TroubleshootingModal,
   },
   computed: {
     ...mapState({

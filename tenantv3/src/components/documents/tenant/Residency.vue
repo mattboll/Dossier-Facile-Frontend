@@ -7,15 +7,6 @@
             {{ t("residency-page.select-label") }}
           </h1>
 
-          <TroubleshootingModal>
-            <DocumentHelp></DocumentHelp>
-            <DocumentInsert
-              :allow-list="residencyDocument.acceptedProofs"
-              :block-list="residencyDocument.refusedProofs"
-              v-if="residencyDocument.key"
-            ></DocumentInsert>
-          </TroubleshootingModal>
-
           <div class="fr-mt-3w">
             <select
               v-model="residencyDocument"
@@ -130,13 +121,11 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 // import { ValidationObserver } from "vee-validate";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";

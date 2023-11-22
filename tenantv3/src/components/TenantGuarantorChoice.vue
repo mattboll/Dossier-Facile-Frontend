@@ -8,9 +8,6 @@
               {{ $t("guarantorchoice.add-guarantor") }}
             </h1>
           </div>
-          <TroubleshootingModal>
-            <GuarantorChoiceHelp></GuarantorChoiceHelp>
-          </TroubleshootingModal>
           <div class="fr-mt-3w">
             <p v-html="$t('tenantguarantorchoice.optional-guarantor')"></p>
             <div class="fr-alert fr-alert--info">
@@ -71,13 +68,11 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 
 @Component({
   components: {
     GuarantorTypeSelector,
-    TroubleshootingModal,
     VGouvFrModal,
     DfButton,
     NakedCard,

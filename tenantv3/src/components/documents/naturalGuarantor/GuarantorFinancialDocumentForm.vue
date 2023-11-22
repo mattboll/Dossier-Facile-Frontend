@@ -226,7 +226,6 @@ import cloneDeep from "lodash/cloneDeep";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 
@@ -251,7 +250,6 @@ extend("regex", {
     VGouvFrModal,
     ProfileFooter,
     NakedCard,
-    TroubleshootingModal,
     SimpleRadioButtons,
   },
   computed: {

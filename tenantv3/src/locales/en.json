@@ -1264,9 +1264,6 @@
     "i-add": "I Add {0}",
     "my-guarantor": "My Guarantor"
   },
-  "troubleshootingmodal": {
-    "more-information": "Having trouble answering the question?"
-  },
   "uploaddocuments": {
     "warning-need-residency-documents": "Are you sure you have submitted all the necessary documents here?<ul><li>Proof of residence</li><li>Copy of your host's identity document</li><li>Proof of address (less than 3 months old) of your host</li></ul>",
     "accept-warning": "Add new documents",

@@ -65,12 +65,6 @@
           </div>
         </validation-provider>
         <div v-if="identificationDocument && identificationDocument.key">
-          <TroubleshootingModal>
-            <DocumentInsert
-              :allow-list="identificationDocument.acceptedProofs"
-              :block-list="identificationDocument.refusedProofs"
-            ></DocumentInsert>
-          </TroubleshootingModal>
           <AllDeclinedMessages
             class="fr-mb-3w"
             :documentDeniedReasons="documentDeniedReasons"
@@ -123,7 +117,6 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { cloneDeep } from "lodash";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
 @Component({
   components: {
@@ -136,7 +129,6 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
     VGouvFrModal,
     NakedCard,
     GuarantorFooter,
-    TroubleshootingModal,
   },
 })
 export default class RepresentativeIdentification extends Vue {

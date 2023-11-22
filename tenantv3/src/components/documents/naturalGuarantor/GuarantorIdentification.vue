@@ -88,7 +88,6 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import { User } from "df-shared-next/src/models/User";
@@ -106,7 +105,6 @@ import { User } from "df-shared-next/src/models/User";
     GuarantorChoiceHelp,
     VGouvFrModal,
     NakedCard,
-    TroubleshootingModal,
     SimpleRadioButtons,
   },
   computed: {

@@ -4,9 +4,6 @@
       <h1 class="fr-h5">
         {{ $t("guarantorlistpage.my-guarantor") }}
       </h1>
-      <TroubleshootingModal>
-        <GuarantorChoiceHelp></GuarantorChoiceHelp>
-      </TroubleshootingModal>
       <div v-for="g in user.guarantors" :key="g.id">
         <CardRow @edit="editGuarantor(g)" @remove="isRemoveGuarantor = true">
           <template v-slot:tag>
@@ -41,7 +38,6 @@
 <script setup lang="ts">
 import { User } from "df-shared-next/src/models/User";
 import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
-import GuarantorChoiceHelp from "../components/helps/GuarantorChoiceHelp.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
@@ -49,7 +45,6 @@ import ProfileContainer from "../components/ProfileContainer.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";

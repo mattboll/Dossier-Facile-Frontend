@@ -6,14 +6,6 @@
           {{ t("guarantorprofessional.title-cotenant") }}
         </h1>
         <h1 class="fr-h6" v-else>{{ t("guarantorprofessional.title") }}</h1>
-        <TroubleshootingModal>
-          <GuarantorChoiceHelp></GuarantorChoiceHelp>
-          <DocumentInsert
-            :allow-list="professionalDocument.acceptedProofs"
-            :block-list="professionalDocument.refusedProofs"
-            v-if="professionalDocument.key"
-          ></DocumentInsert>
-        </TroubleshootingModal>
         <div class="fr-mt-3w">
           <validation-provider
             rules="select"
@@ -110,7 +102,6 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 // import { ValidationProvider } from "vee-validate";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";

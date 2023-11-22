@@ -234,7 +234,6 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import Modal from "df-shared-next/src/components/Modal.vue";
 import DocumentHelp from "../../helps/DocumentHelp.vue";
 import { UtilsService } from "@/services/UtilsService";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
 import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
@@ -255,7 +254,6 @@ import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue
     VGouvFrModal,
     NakedCard,
     DocumentHelp,
-    TroubleshootingModal,
     SimpleRadioButtons,
   },
 })

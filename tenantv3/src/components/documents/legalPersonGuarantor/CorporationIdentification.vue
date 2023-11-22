@@ -36,12 +36,6 @@
           <h1 class="fr-label">
             {{ $t("corporationidentification.kbis-label") }}
           </h1>
-          <TroubleshootingModal>
-            <DocumentInsert
-              :allow-list="acceptedProofs"
-              :block-list="refusedProofs"
-            ></DocumentInsert>
-          </TroubleshootingModal>
           <AllDeclinedMessages
             class="fr-mb-3w"
             :documentDeniedReasons="documentDeniedReasons"
@@ -92,7 +86,6 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 
 @Component({
   components: {
@@ -105,7 +98,6 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
     VGouvFrModal,
     NakedCard,
     GuarantorFooter,
-    TroubleshootingModal,
   },
 })
 export default class CorporationIdentification extends Vue {

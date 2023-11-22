@@ -1318,9 +1318,6 @@
     "i-add": "J'ajoute {0}",
     "my-guarantor": "Mon garant"
   },
-  "troubleshootingmodal": {
-    "more-information": "En difficulté pour répondre à la question ?"
-  },
   "uploaddocuments": {
     "warning-need-residency-documents": "Êtes-vous sûr·e d'avoir bien transmis l'ensemble des documents nécessaires ici ?<ul><li>attestation d'hébergement</li><li>copie de la pièce d'identité de votre hébergeur</li><li>justificatif de domicile de moins de 3 mois de votre hébergeur</li></ul><p>Les dossiers incomplets (qui ne présentent pas ces 3 documents) ne seront pas validés.</p>",
     "accept-warning": "Ajouter de nouveaux documents",

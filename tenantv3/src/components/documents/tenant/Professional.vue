@@ -10,14 +10,6 @@
           <h1 class="fr-h6">
             {{ t("professional-page.select-label") }}
           </h1>
-          <TroubleshootingModal>
-            <DocumentHelp></DocumentHelp>
-            <DocumentInsert
-              :allow-list="professionalDocument.acceptedProofs"
-              :block-list="professionalDocument.refusedProofs"
-              v-if="professionalDocument.key"
-            ></DocumentInsert>
-          </TroubleshootingModal>
           <!-- TODO -->
             <!-- :class="{
               'fr-select--valid': valid,
@@ -87,7 +79,6 @@
 </template>
 
 <script setup lang="ts">
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
@@ -97,7 +88,6 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
@@ -105,7 +95,6 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { cloneDeep } from "lodash";
 // import { ValidationProvider } from "vee-validate";
 // import { extend } from "vee-validate";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";

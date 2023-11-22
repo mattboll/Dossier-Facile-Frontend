@@ -8,9 +8,6 @@
               {{ $t("guarantorchoice.add-guarantor") }}
             </h1>
           </div>
-          <TroubleshootingModal>
-            <GuarantorChoiceHelp></GuarantorChoiceHelp>
-          </TroubleshootingModal>
           <div class="fr-mt-3w">
             <p v-html="$t('guarantorchoice.optional-guarantor')"></p>
             <div class="fr-alert fr-alert--info">
@@ -80,12 +77,10 @@ import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ProfileContainer from "./ProfileContainer.vue";
-import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 
 @Component({
   components: {
-    TroubleshootingModal,
     DfButton,
     GuarantorTax,
     GuarantorFinancial,
