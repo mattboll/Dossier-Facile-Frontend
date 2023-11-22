@@ -136,8 +136,8 @@
           <div class="fr-mb-3w">
             <FileUpload
               :current-status="financialDocument.fileUploadStatus"
-              @add-files="addFiles(financialDocument, ...arguments)"
-              @reset-files="resetFiles(financialDocument, ...arguments)"
+              @add-files="addFiles(financialDocument, $event)"
+              @reset-files="resetFiles(financialDocument)"
             ></FileUpload>
           </div>
           <div class="fr-col-12 fr-mb-3w bg-purple fr-checkbox-group">
@@ -207,7 +207,7 @@ import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 // import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import { regex } from "vee-validate/dist/rules";
+// import { regex } from "vee-validate/dist/rules";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";

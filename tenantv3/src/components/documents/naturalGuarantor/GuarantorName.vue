@@ -1,7 +1,8 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ handleSubmit }">
-      <form name="guarantorNameForm" @submit.prevent="handleSubmit(save)">
+    <!-- <ValidationObserver v-slot="{ handleSubmit }"> -->
+      <!-- <form name="guarantorNameForm" @submit.prevent="handleSubmit(save)"> -->
+      <form name="guarantorNameForm" @submit.prevent="save">
         <NakedCard class="fr-p-md-5w">
           <h1 class="fr-h6">{{ t("guarantorname.title") }}</h1>
           <div class="fr-alert fr-alert--info">
@@ -9,48 +10,52 @@
           </div>
           <div class="fr-grid-row fr-grid-row--center fr-mt-4w">
             <div class="fr-col-12 fr-mb-3w">
-              <validation-provider
+              <!-- <validation-provider
                 rules="required|only-alpha"
                 v-slot="{ errors, valid }"
-              >
+              > -->
+                  <!-- :class="errors[0] ? 'fr-input-group--error' : ''" -->
                 <div
                   class="fr-input-group"
-                  :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label class="fr-label" for="lastname"
                     >{{ t("guarantorname.lastname") }} :</label
                   >
+                    <!-- :class="{
+                      'fr-input--valid': valid,
+                      'fr-input--error': errors[0],
+                    }" -->
                   <input
                     v-model="lastName"
                     class="form-control fr-input validate-required"
-                    :class="{
-                      'fr-input--valid': valid,
-                      'fr-input--error': errors[0],
-                    }"
                     id="lastname"
                     name="lastname"
                     :placeholder="t('guarantorname.lastname-placeholder')"
                     type="text"
                     required
                   />
-                  <span class="fr-error-text" v-if="errors[0]">{{
+                  <!-- <span class="fr-error-text" v-if="errors[0]">{{
                     t(errors[0])
-                  }}</span>
+                  }}</span> -->
                 </div>
-              </validation-provider>
+              <!-- </validation-provider> -->
             </div>
             <div class="fr-col-12 fr-mb-3w">
-              <validation-provider
+              <!-- <validation-provider
                 rules="required|only-alpha"
                 v-slot="{ errors, valid }"
-              >
+              > -->
+                  <!-- :class="errors[0] ? 'fr-input-group--error' : ''" -->
                 <div
                   class="fr-input-group"
-                  :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label for="firstname" class="fr-label"
                     >{{ t("guarantorname.firstname") }} :</label
                   >
+                    <!-- :class="{
+                      'fr-input--valid': valid,
+                      'fr-input--error': errors[0],
+                    }" -->
                   <input
                     id="firstname"
                     :placeholder="t('guarantorname.firstname-placeholder')"
@@ -58,30 +63,24 @@
                     v-model="firstName"
                     name="firstname"
                     class="validate-required form-control fr-input"
-                    :class="{
-                      'fr-input--valid': valid,
-                      'fr-input--error': errors[0],
-                    }"
                     required
                   />
-                  <span class="fr-error-text" v-if="errors[0]">{{
+                  <!-- <span class="fr-error-text" v-if="errors[0]">{{
                     t(errors[0])
-                  }}</span>
+                  }}</span> -->
                 </div>
-              </validation-provider>
+              <!-- </validation-provider> -->
             </div>
           </div>
         </NakedCard>
         <GuarantorFooter @on-back="goBack"></GuarantorFooter>
       </form>
-    </ValidationObserver>
+    <!-- </ValidationObserver> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
-import { DfFile } from "df-shared-next/src/models/DfFile";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "../../../services/UtilsService";
@@ -96,11 +95,8 @@ const selectedGuarantor = computed(() => store.selectedGuarantor);
 const { t } = useI18n();
 
   const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
-  const files = ref([] as DfFile[]);
-  const identificationDocument = ref(new DocumentType());
   const firstName = ref("");
   const lastName = ref("");
-  const isDocDeleteVisible = ref(false);
 
   const emit = defineEmits(["on-next", "on-back"]);
 

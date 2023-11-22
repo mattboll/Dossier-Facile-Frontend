@@ -65,9 +65,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { mapGetters, mapState } from "vuex";
+<script setup lang="ts">
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
@@ -81,187 +79,166 @@ import { RegisterService } from "../../../services/RegisterService";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
-import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
-import { User } from "df-shared-next/src/models/User";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted, ref } from "vue";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    WarningMessage,
-    ConfirmModal,
-    DfButton,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    SimpleRadioButtons,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-    }),
-    ...mapGetters({
-      user: "userToEdit",
-    }),
-  },
-})
-export default class GuarantorIdentification extends Vue {
-  documents = DocumentTypeConstants.GUARANTOR_IDENTIFICATION_DOCS;
-  @Prop() tenantId?: string;
-  @Prop({ default: false }) isCotenant?: boolean;
-  user!: User;
+  const store = useTenantStore();
+  const user = computed(() => store.userToEdit);
+  const selectedGuarantor = computed(() => store.selectedGuarantor);
 
-  documentDeniedReasons = new DocumentDeniedReasons();
-  selectedGuarantor!: Guarantor;
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  identificationDocument = new DocumentType();
-  isDocDeleteVisible = false;
+  const documents = DocumentTypeConstants.GUARANTOR_IDENTIFICATION_DOCS;
+  const props = withDefaults(defineProps<{
+    tenantId?: string;
+    isCotenant?: boolean;
+  }>(), {
+    isCotenant: false
+  });
 
-  getLocalStorageKey() {
-    return "identification_guarantor_" + this.user.email;
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+  const identificationDocument = ref(new DocumentType());
+  const isDocDeleteVisible = ref(false);
+
+  function getLocalStorageKey() {
+    return "identification_guarantor_" + user.value?.email;
   }
 
-  onSelectChange() {
+  function onSelectChange() {
     localStorage.setItem(
-      this.getLocalStorageKey(),
-      this.identificationDocument.key
+      getLocalStorageKey(),
+      identificationDocument.value.key
     );
-    if (this.user.documents !== null) {
-      const doc = this.guarantorIdentificationDocument();
+    if (user.value?.documents !== null) {
+      const doc = guarantorIdentificationDocument();
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc?.files?.length || 0) > 0 &&
-          doc?.subCategory !== this.identificationDocument.value;
+          doc?.subCategory !== identificationDocument.value.value;
       }
     }
     return false;
   }
 
-  get documentStatus() {
-    return this.guarantorIdentificationDocument()?.documentStatus;
-  }
+  const documentStatus = computed(() => {
+    return guarantorIdentificationDocument()?.documentStatus;
+  })
 
-  guarantorIdentificationDocument(): DfDocument {
-    return this.selectedGuarantor?.documents?.find((d: DfDocument) => {
+  function guarantorIdentificationDocument(): DfDocument {
+    return selectedGuarantor.value?.documents?.find((d: DfDocument) => {
       return d.documentCategory === "IDENTIFICATION";
     }) as DfDocument;
   }
 
-  undoSelect() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function undoSelect() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.identificationDocument = localDoc;
+          identificationDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "IDENTIFICATION";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  updateGuarantorData() {
-    if (this.selectedGuarantor.documents !== null) {
-      if (this.guarantorIdentificationDocument() !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+  function updateGuarantorData() {
+    if (selectedGuarantor.value?.documents !== null) {
+      if (guarantorIdentificationDocument() !== undefined) {
+        const localDoc = documents.find((d: DocumentType) => {
           return (
-            d.value === this.guarantorIdentificationDocument()?.subCategory
+            d.value === guarantorIdentificationDocument()?.subCategory
           );
         });
         if (localDoc !== undefined) {
-          this.identificationDocument = localDoc;
+          identificationDocument.value = localDoc;
           localStorage.setItem(
-            this.getLocalStorageKey(),
-            this.identificationDocument.key || ""
+            getLocalStorageKey(),
+            identificationDocument.value.key || ""
           );
         }
         const docDeniedReasons =
-          this.guarantorIdentificationDocument()?.documentDeniedReasons;
+          guarantorIdentificationDocument()?.documentDeniedReasons;
         if (docDeniedReasons !== undefined) {
-          this.documentDeniedReasons = cloneDeep(docDeniedReasons);
+          documentDeniedReasons.value = cloneDeep(docDeniedReasons);
         }
       } else {
-        const key = localStorage.getItem(this.getLocalStorageKey());
+        const key = localStorage.getItem(getLocalStorageKey());
         if (key) {
-          const localDoc = this.documents.find((d: DocumentType) => {
+          const localDoc = documents.find((d: DocumentType) => {
             return d.key === key;
           });
           if (localDoc !== undefined) {
-            this.identificationDocument = localDoc;
+            identificationDocument.value = localDoc;
           }
         }
       }
     }
   }
 
-  mounted() {
-    this.updateGuarantorData();
-  }
+  onMounted(() => {
+    updateGuarantorData();
+  })
 
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  save() {
+  function save() {
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
     if (!newFiles.length) return;
 
     if (
-      this.identificationDocument.maxFileCount &&
-      this.identificationFiles().length >
-        this.identificationDocument.maxFileCount
+      identificationDocument.value.maxFileCount &&
+      identificationFiles().length >
+        identificationDocument.value.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.identificationFiles().length,
-          this.identificationDocument.maxFileCount,
-        ]),
-      });
-      this.files = [];
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     this.identificationFiles().length,
+      //     this.identificationDocument.maxFileCount,
+      //   ]),
+      // });
+      files.value = [];
       return;
     }
 
@@ -272,71 +249,70 @@ export default class GuarantorIdentification extends Vue {
 
     formData.append(
       "typeDocumentIdentification",
-      this.identificationDocument.value
+      identificationDocument.value.value
     );
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId);
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId);
     }
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    if (!this.selectedGuarantor?.id) {
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    if (!selectedGuarantor.value?.id) {
       throw new Error("selectedGuarantor id cannot be empty !");
     }
-    formData.append("guarantorId", this.selectedGuarantor.id?.toString());
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("saveGuarantorIdentification", formData)
+    formData.append("guarantorId", selectedGuarantor.value.id?.toString());
+    // const loader = this.$loading.show();
+    store
+      .saveGuarantorIdentification(formData)
       .then(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        this.files = [];
-        Vue.toasted.global.save_success();
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        files.value = [];
+        // Vue.toasted.global.save_success();
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  identificationFiles() {
-    const newFiles = this.files.map((f) => {
+  function identificationFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.identificationDocument.value,
+        subCategory: identificationDocument.value.value,
         id: f.id,
         name: f.name,
         file: f.file,
         size: f.file?.size,
       };
     });
-    const existingFiles = this.guarantorIdentificationDocument()?.files || [];
+    const existingFiles = guarantorIdentificationDocument()?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  guarantorKey() {
-    if (this.tenantId != null) {
+  function guarantorKey() {
+    if (props.tenantId != null) {
       return "cotenant-guarantor";
     }
     return "guarantor";
   }
 
-  mapDocuments() {
-    return this.documents.map((d) => {
+  function mapDocuments() {
+    return documents.map((d) => {
       return { id: d.key, labelKey: d.key, value: d };
     });
   }
-}
 </script>
 
 <style scoped lang="scss">
