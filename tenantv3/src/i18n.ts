@@ -6,6 +6,7 @@ import fr from './locales/fr.json';
 const i18n = createI18n({
   legacy: false,
   locale: 'fr',
+  globalInjection: true,
   messages: {
     en,
     fr,

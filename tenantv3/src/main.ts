@@ -71,6 +71,7 @@ const TENANT_API_URL = import.meta.env.VITE_API_URL;
 
   app.use(Vue3Toastify, {
     autoClose: 6000,
+    theme: "colored"
   } as ToastContainerOptions);
 	app.mount('#app')
     })

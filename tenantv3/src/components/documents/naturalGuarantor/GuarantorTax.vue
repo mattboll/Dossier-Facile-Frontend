@@ -132,22 +132,15 @@ v-if="isWarningTaxSituationModalVisible"
 
 <script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import { extend } from "vee-validate";
-import { is } from "vee-validate/dist/rules";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import TaxHelp from "../../helps/TaxHelp.vue";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
@@ -157,10 +150,8 @@ import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import Modal from "df-shared-next/src/components/Modal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import { UtilsService } from "@/services/UtilsService";
-import { User } from "df-shared-next/src/models/User";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";

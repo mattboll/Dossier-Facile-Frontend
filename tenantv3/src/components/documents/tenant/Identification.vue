@@ -76,11 +76,14 @@ import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 const user = computed(() => {
   return store.userToEdit;
 });
+const { t } = useI18n();
 
 const documents = DocumentTypeConstants.IDENTIFICATION_DOCS;
 const tenantIdentificationDocument = computed(() => {
@@ -207,6 +210,7 @@ function save() {
   identificationDocument.value.maxFileCount
   ) {
     // TODO
+    ToastService.maxFileError(identificationFiles().length, identificationDocument.value.maxFileCount)
     // Vue.toasted.global.max_file({
       //   message: this.$i18n.t("max-file", [
       //     identificationFiles().length,

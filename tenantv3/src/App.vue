@@ -57,6 +57,7 @@ const store = useTenantStore();
 
 <style lang="scss">
 @import "df-shared-next/src/scss/_main.scss";
+@import 'vue3-toastify/dist/index.css';
 
 #app {
   min-height: 100vh;
