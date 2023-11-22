@@ -1,5 +1,10 @@
 {
-  "compilerOptions": { "module": "esnext" },
+  "compilerOptions": {
+    "module": "esnext",
+    "types": [
+      "vue3-toastify/global"
+    ] 
+  },
   "files": [],
   "references": [
     {

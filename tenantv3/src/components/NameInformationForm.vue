@@ -99,77 +99,65 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { User } from "df-shared-next/src/models/User";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import SubmitButton from "df-shared-next/src/Button/SubmitButton.vue";
+<script setup lang="ts">
+// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import NameInformationHelp from "./helps/NameInformationHelp.vue";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import ProfileFooter from "./footer/ProfileFooter.vue";
-import { mapGetters } from "vuex";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "@/services/UtilsService";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
 
-extend("zipcode", {
-  validate: (field) => new RegExp(/^[0-9]{5}$/).test(field),
-  message: "nameinformationform.zipcode-not-valid",
-});
+// extend("zipcode", {
+//   validate: (field) => new RegExp(/^[0-9]{5}$/).test(field),
+//   message: "nameinformationform.zipcode-not-valid",
+// });
 
-@Component({
-  components: {
-    ValidationProvider,
-    ValidationObserver,
-    SubmitButton,
-    NameInformationHelp,
-    ConfirmModal,
-    ProfileFooter,
-    NakedCard,
-    RequiredFieldsInstruction,
-    TextField,
-  },
-  computed: {
-    ...mapGetters({
-      user: "userToEdit",
-    }),
-  },
-})
-export default class NameInformationForm extends Vue {
-  public user!: User;
-  public openUnlinkModal = false;
-  public displayPreferredNameField = false;
+  const store = useTenantStore();
+  const user = computed(() => store.userToEdit);
 
-  firstname = "";
-  lastname = "";
-  preferredname = "";
-  zipcode = "";
+const router = useRouter();
 
-  beforeMount() {
-    this.firstname = this.user.firstName || "";
-    this.lastname = this.user.lastName || "";
-    this.preferredname = UtilsService.capitalize(this.user.preferredName || "");
-    this.zipcode = this.user.zipCode || "";
-    this.displayPreferredNameField = this.preferredname !== "";
+  const openUnlinkModal = ref(false);
+  const displayPreferredNameField = ref(false);
+
+  const firstname = ref("");
+  const lastname = ref("");
+  const preferredname = ref("");
+  const zipcode = ref("");
+
+  onBeforeMount(() => {
+    firstname.value = user.value?.firstName || "";
+    lastname.value = user.value?.lastName || "";
+    preferredname.value = UtilsService.capitalize(user.value?.preferredName || "");
+    zipcode.value = user.value?.zipCode || "";
+    displayPreferredNameField.value = preferredname.value !== "";
+  })
+
+  function deletePreferredName() {
+    preferredname.value = "";
+    displayPreferredNameField.value = false;
   }
 
-  deletePreferredName() {
-    this.preferredname = "";
-    this.displayPreferredNameField = false;
-  }
-
-  unlinkFranceConnect() {
-    this.openUnlinkModal = false;
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("unlinkFranceConnect", this.user)
+  function unlinkFranceConnect() {
+    openUnlinkModal.value = false;
+    // TODO
+    // const loader = this.$loading.show();
+    if (!user.value) {
+      return;
+    }
+    store
+      .unlinkFranceConnect(user.value)
       .then(
         () => {
           // if user has not password redirect to resetpassword
-          if (!this.user.passwordEnabled) {
-            this.$router.push("/reset-password/null");
+          if (!user.value?.passwordEnabled) {
+            router.push("/reset-password/null");
           }
         },
         (error) => {
@@ -177,41 +165,43 @@ export default class NameInformationForm extends Vue {
         }
       )
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
-  handleNameInformation() {
-    if (
-      this.user.firstName === this.firstname &&
-      this.user.lastName === this.lastname &&
-      this.user.preferredName === this.preferredname &&
-      this.user.zipCode === this.zipcode
-    ) {
-      this.$router.push({ name: "TenantType" });
+  function handleNameInformation() {
+    if (!user.value) {
       return;
     }
-    const loader = this.$loading.show();
-    this.$store.commit("updateUserFirstname", this.firstname);
-    this.$store.commit("updateUserLastname", this.lastname);
-    this.$store.commit("updateUserPreferredname", this.preferredname);
-    this.$store.commit("updateUserZipcode", this.zipcode);
+    if (
+      user.value.firstName === firstname.value &&
+      user.value.lastName === lastname.value &&
+      user.value.preferredName === preferredname.value &&
+      user.value.zipCode === zipcode.value
+    ) {
+      router.push({ name: "TenantType" });
+      return;
+    }
+    // const loader = this.$loading.show();
+    store.updateUserFirstname(firstname.value);
+    store.updateUserLastname(lastname.value);
+    store.updateUserPreferredname(preferredname.value);
+    store.updateUserZipcode(zipcode.value);
 
-    this.$store
-      .dispatch("setNames", this.user)
+    store
+      .setNames(user.value)
       .then(
         () => {
           AnalyticsService.confirmName();
-          this.$router.push({ name: "TenantType" });
+          router.push({ name: "TenantType" });
         },
         (error) => {
           console.dir(error);
         }
       )
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
-}
 </script>
 
 <style scoped lang="scss">

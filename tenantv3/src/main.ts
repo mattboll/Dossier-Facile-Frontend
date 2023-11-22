@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+  import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
 
 import App from './App.vue'
 import router from './router'
@@ -67,6 +68,10 @@ const TENANT_API_URL = import.meta.env.VITE_API_URL;
 	app.use(createPinia())
 	app.use(router)
 	app.use(i18n)
+
+  app.use(Vue3Toastify, {
+    autoClose: 6000,
+  } as ToastContainerOptions);
 	app.mount('#app')
     })
     .catch(() => {
