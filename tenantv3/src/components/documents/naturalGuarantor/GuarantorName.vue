@@ -3,9 +3,9 @@
     <ValidationObserver v-slot="{ handleSubmit }">
       <form name="guarantorNameForm" @submit.prevent="handleSubmit(save)">
         <NakedCard class="fr-p-md-5w">
-          <h1 class="fr-h6">{{ $t("guarantorname.title") }}</h1>
+          <h1 class="fr-h6">{{ t("guarantorname.title") }}</h1>
           <div class="fr-alert fr-alert--info">
-            <p v-html="$t('guarantorchoice.two-guarantors-warning')"></p>
+            <p v-html="t('guarantorchoice.two-guarantors-warning')"></p>
           </div>
           <div class="fr-grid-row fr-grid-row--center fr-mt-4w">
             <div class="fr-col-12 fr-mb-3w">
@@ -18,7 +18,7 @@
                   :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label class="fr-label" for="lastname"
-                    >{{ $t("guarantorname.lastname") }} :</label
+                    >{{ t("guarantorname.lastname") }} :</label
                   >
                   <input
                     v-model="lastName"
@@ -29,12 +29,12 @@
                     }"
                     id="lastname"
                     name="lastname"
-                    :placeholder="$t('guarantorname.lastname-placeholder')"
+                    :placeholder="t('guarantorname.lastname-placeholder')"
                     type="text"
                     required
                   />
                   <span class="fr-error-text" v-if="errors[0]">{{
-                    $t(errors[0])
+                    t(errors[0])
                   }}</span>
                 </div>
               </validation-provider>
@@ -49,11 +49,11 @@
                   :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label for="firstname" class="fr-label"
-                    >{{ $t("guarantorname.firstname") }} :</label
+                    >{{ t("guarantorname.firstname") }} :</label
                   >
                   <input
                     id="firstname"
-                    :placeholder="$t('guarantorname.firstname-placeholder')"
+                    :placeholder="t('guarantorname.firstname-placeholder')"
                     type="text"
                     v-model="firstName"
                     name="firstname"
@@ -65,7 +65,7 @@
                     required
                   />
                   <span class="fr-error-text" v-if="errors[0]">{{
-                    $t(errors[0])
+                    t(errors[0])
                   }}</span>
                 </div>
               </validation-provider>
@@ -78,100 +78,72 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapState } from "vuex";
-import DocumentInsert from "../share/DocumentInsert.vue";
-import FileUpload from "../../uploads/FileUpload.vue";
+<script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
-import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
-import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
-import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "../../../services/UtilsService";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
+import { computed, onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    ValidationObserver,
-    WarningMessage,
-    ConfirmModal,
-    DfButton,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    GuarantorFooter,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-    }),
-  },
-})
-export default class GuarantorName extends Vue {
-  documents = DocumentTypeConstants.GUARANTOR_IDENTIFICATION_DOCS;
+const store = useTenantStore();
+const selectedGuarantor = computed(() => store.selectedGuarantor);
 
-  selectedGuarantor!: Guarantor;
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  identificationDocument = new DocumentType();
-  firstName = "";
-  lastName = "";
-  isDocDeleteVisible = false;
+const { t } = useI18n();
 
-  beforeMount() {
-    this.firstName = this.selectedGuarantor.firstName || "";
-    this.lastName = this.selectedGuarantor.lastName || "";
-  }
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+  const identificationDocument = ref(new DocumentType());
+  const firstName = ref("");
+  const lastName = ref("");
+  const isDocDeleteVisible = ref(false);
 
-  save() {
+  const emit = defineEmits(["on-next", "on-back"]);
+
+  onBeforeMount(() => {
+    firstName.value = selectedGuarantor.value?.firstName || "";
+    lastName.value = selectedGuarantor.value?.lastName || "";
+  })
+
+  function save() {
     if (
-      this.firstName === this.selectedGuarantor.firstName &&
-      this.lastName === this.selectedGuarantor.lastName
+      firstName.value === selectedGuarantor.value?.firstName &&
+      lastName.value === selectedGuarantor.value?.lastName
     ) {
-      this.$emit("on-next");
+      emit("on-next");
       return;
     }
     const formData = new FormData();
-    if (this.firstName) {
-      formData.append("firstName", UtilsService.capitalize(this.firstName));
+    if (firstName.value) {
+      formData.append("firstName", UtilsService.capitalize(firstName.value));
     }
-    if (this.lastName) {
-      formData.append("lastName", UtilsService.capitalize(this.lastName));
+    if (lastName.value) {
+      formData.append("lastName", UtilsService.capitalize(lastName.value));
     }
-    formData.append("guarantorId", this.$store.getters.guarantor.id);
-    const loader = this.$loading.show();
-    this.$store
-      .dispatch("saveGuarantorName", formData)
+    formData.append("guarantorId", store.guarantor.id?.toString() || "");
+    // const loader = this.$loading.show();
+    store
+      .saveGuarantorName(formData)
       .then(() => {
-        Vue.toasted.global.save_success();
-        this.$emit("on-next");
+        // Vue.toasted.global.save_success();
+        emit("on-next");
       })
       .catch(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        Vue.toasted.global.save_failed();
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
+        // Vue.toasted.global.save_failed();
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
-}
 </script>
 
 <style scoped lang="scss"></style>
