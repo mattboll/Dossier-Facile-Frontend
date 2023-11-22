@@ -118,6 +118,7 @@ import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ApplicationTypeSelector from "../components/ApplicationTypeSelector.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   computed: {
@@ -213,28 +214,20 @@ export default class TenantInformationForm extends Vue {
             params: { substep: "1" },
           });
           if (this.applicationType === "COUPLE") {
-            Vue.toasted.global.info_toast({
-              message: "tenantinformationform.couple-saved",
-            });
+            ToastService.info("tenantinformationform.couple-saved");
             return;
           }
           if (this.applicationType === "GROUP") {
-            Vue.toasted.global.info_toast({
-              message: "tenantinformationform.roommates-saved",
-            });
+            ToastService.info("tenantinformationform.roommates-saved");
             return;
           }
         },
         (error) => {
           if (error.response.data.message.includes("are already being used")) {
-            Vue.toasted.global.error_toast({
-              message: "tenantinformationform.email-exists",
-            });
+            ToastService.error("tenantinformationform.email-exists")
             return;
           } else {
-            Vue.toasted.global.error_toast({
-              message: "tenantinformationform.error",
-            });
+            ToastService.error("tenantinformationform.error")
             return;
           }
         }
@@ -277,7 +270,7 @@ export default class TenantInformationForm extends Vue {
           .dispatch("deleteCoTenant", t)
           .then()
           .catch(() => {
-            this.$toasted.global.error();
+            ToastService.error();
             return;
           });
       }

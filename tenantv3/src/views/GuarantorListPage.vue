@@ -49,6 +49,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { ToastService } from "@/services/ToastService";
 
 const { t } = useI18n();
     const store = useTenantStore();
@@ -149,8 +150,7 @@ const router = useRouter();
         isRemoveGuarantor.value = false;
       },
       () => {
-        // TODO
-        // Vue.toasted.global.error();
+        ToastService.error();
       }
     );
   }

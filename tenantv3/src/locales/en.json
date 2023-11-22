@@ -36,6 +36,7 @@
   "max-file-default": "Maximum number of files reached, please delete some",
   "max-file": "Maximum number of files reached (currently: {0} / maximum: {1}), please delete some",
   "error": "An error occurred",
+  "unable-to-copy": "unable to copy",
   "email-not-valid": "Invalid email",
   "same-email-not-valid": "The email cannot be the same as your address",
   "field-required": "This field is required",

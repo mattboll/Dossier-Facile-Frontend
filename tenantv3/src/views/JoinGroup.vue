@@ -16,6 +16,7 @@ import { Component, Vue } from "vue-property-decorator";
 import InitPassword from "df-shared-next/src/Authentification/InitPassword.vue";
 import { mapGetters } from "vuex";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -35,9 +36,7 @@ export default class JoinCouple extends Vue {
     user.token = this.$route.params.token;
     this.$store.dispatch("createPasswordGroup", user).then(
       () => {
-        Vue.toasted.global.success_toast({
-          message: "joingroup.password-update",
-        });
+        ToastService.success("joingroup.password-update");
         this.$router.push({ name: "TenantName" });
       },
       (error: any) => {
@@ -46,13 +45,9 @@ export default class JoinCouple extends Vue {
             "password recovery token or is expired"
           )
         ) {
-          Vue.toasted.global.error_toast({
-            message: "joingroup.token-expired",
-          });
+          ToastService.error("joingroup.token-expired");
         } else {
-          Vue.toasted.global.error_toast({
-            message: "joingroup.error",
-          });
+          ToastService.error("joingroup.error");
         }
       }
     );

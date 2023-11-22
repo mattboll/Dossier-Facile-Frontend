@@ -107,6 +107,7 @@ import { AnalyticsService } from "@/services/AnalyticsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 const guarantor = computed(() => {
@@ -155,8 +156,7 @@ function validSelect() {
     }
   },
   () => {
-    // TODO
-    // Vue.toasted.global.error();
+    ToastService.error();
   }
   );
 }

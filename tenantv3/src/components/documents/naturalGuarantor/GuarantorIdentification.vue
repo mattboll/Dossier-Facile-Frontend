@@ -84,6 +84,7 @@ import { UtilsService } from "@/services/UtilsService";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
+import { ToastService } from "@/services/ToastService";
 
   const store = useTenantStore();
   const user = computed(() => store.userToEdit);
@@ -230,12 +231,7 @@ import { computed, onMounted, ref } from "vue";
       identificationFiles().length >
         identificationDocument.value.maxFileCount
     ) {
-      // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     this.identificationFiles().length,
-      //     this.identificationDocument.maxFileCount,
-      //   ]),
-      // });
+      ToastService.maxFileError(identificationFiles().length, identificationDocument.value.maxFileCount)
       files.value = [];
       return;
     }
@@ -263,7 +259,7 @@ import { computed, onMounted, ref } from "vue";
       .then(() => {
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
         files.value = [];
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
       })
       .catch((err) => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;

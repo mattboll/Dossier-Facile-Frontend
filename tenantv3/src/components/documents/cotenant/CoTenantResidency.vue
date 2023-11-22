@@ -70,6 +70,7 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import FooterContainer from "@/components/footer/FooterContainer.vue";
 import BackNext from "@/components/footer/BackNext.vue";
 import { DocumentService } from "@/services/DocumentService";
+import { ToastService } from "@/services/ToastService";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
 
 @Component({
@@ -138,11 +139,11 @@ export default class CoTenantResidency extends Vue {
     this.$store
       .dispatch("saveTenantResidency", formData)
       .then(() => {
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         this.$emit("on-next");
       })
       .catch((err) => {
-        Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       })
       .finally(() => {
         loader.hide();

@@ -22,6 +22,7 @@ import { ApartmentSharingLinkService } from '@/services/ApartmentSharingLinkServ
 import { useRouter } from 'vue-router';
 import { RegisterService } from '@/services/RegisterService';
 import axios from 'axios';
+import { ToastService } from '@/services/ToastService';
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
@@ -1108,13 +1109,11 @@ const useTenantStore = defineStore('tenant', {
       .delete(url)
       .then(() => {
         if (!silent) {
-    // TODO
-          // Vue.toasted.global.delete_success();
+          ToastService.deleteSuccess();
         }
       })
       .catch(() => {
-    // TODO
-        // Vue.toasted.global.delete_failed();
+        ToastService.deleteFailed();
       })
       .finally(() => {
     // TODO

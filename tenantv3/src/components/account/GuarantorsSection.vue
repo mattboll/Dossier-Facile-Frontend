@@ -153,6 +153,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 const router = useRouter();
@@ -295,16 +296,14 @@ const router = useRouter();
     }
     store.deleteGuarantor(selectedGuarantor).then(
       () => {
-        // TODO
-        // Vue.toasted.global.delete_success();
+        ToastService.deleteSuccess();
         guarantors.value = guarantors.value.filter(
           (g) => g.id != selectedGuarantor?.id
         );
         closeConfirmModal();
       },
       () => {
-        // TODO
-        // Vue.toasted.global.delete_failed();
+        ToastService.deleteFailed();
         closeConfirmModal();
       }
     );

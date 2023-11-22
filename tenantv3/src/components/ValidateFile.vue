@@ -176,7 +176,7 @@ export default class ValidateFile extends Vue {
     this.$store
       .dispatch("validateFile", params)
       .catch(() => {
-        Vue.toasted.global.error();
+        ToastService.error();
       })
       .finally(() => {
         loader.hide();

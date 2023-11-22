@@ -72,6 +72,7 @@ import SimulationCaf from "../share/SimulationCaf.vue";
 import { computed, onBeforeMount } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const { t } = useI18n();
 const store = useTenantStore();
@@ -120,8 +121,7 @@ const store = useTenantStore();
     // const loader = Vue.$loading.show();
     store.deleteDocument(f.id)
       .then(null, () => {
-        // TODO
-        // Vue.toasted.global.error();
+        ToastService.error();
       })
       .finally(() => {
         // TODO

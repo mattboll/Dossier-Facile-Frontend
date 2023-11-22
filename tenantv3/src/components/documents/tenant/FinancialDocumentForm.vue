@@ -270,6 +270,7 @@ import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
+import { ToastService } from "@/services/ToastService";
 
 // TODO
 // extend("regex", {
@@ -412,10 +413,7 @@ onBeforeMount(() => {
         !financialFiles().length &&
         financialDocument.value.documentType.key !== "no-income"
       ) {
-        // TODO
-        // Vue.toasted.global.max_file({
-        //   message: this.$i18n.t("financialdocumentform.missing-file"),
-        // });
+        ToastService.error("financialdocumentform.missing-file")
         financialDocument.value.files = [];
         return Promise.reject(new Error("missing-file"));
       }
@@ -425,13 +423,7 @@ onBeforeMount(() => {
         financialFiles().length >
           financialDocument.value.documentType.maxFileCount
       ) {
-        // TODO
-        // Vue.toasted.global.max_file({
-        //   message: this.$i18n.t("max-file", [
-        //     this.financialFiles().length,
-        //     this.financialDocument.documentType.maxFileCount,
-        //   ]),
-        // });
+        ToastService.maxFileError(financialFiles().length, financialDocument.value.documentType.maxFileCount)
         return Promise.reject(new Error("max-file"));
       }
 
@@ -495,8 +487,7 @@ onBeforeMount(() => {
         financialDocument.value = {
           ...cloneDeep(financialDocumentSelected.value),
         };
-        // TODO
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         return Promise.resolve(true);
       })
       .catch((err) => {

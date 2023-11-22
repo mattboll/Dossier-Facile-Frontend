@@ -1,5 +1,6 @@
 import useTenantStore from "@/stores/tenant-store";
 import axios from "axios";
+import { ToastService } from "./ToastService";
 
 export const RegisterService = {
   deleteFile(id: number | string, silent = false) {
@@ -10,11 +11,11 @@ export const RegisterService = {
       .delete(url)
       .then(() => {
         if (!silent) {
-          // Vue.toasted.global.delete_success();
+          ToastService.deleteSuccess();
         }
       })
       .catch(() => {
-        // Vue.toasted.global.delete_failed();
+        ToastService.deleteFailed();
       })
       .finally(() => {
         // loader.hide();

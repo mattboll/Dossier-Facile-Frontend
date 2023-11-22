@@ -118,6 +118,7 @@ import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 const selectedGuarantor = computed(() => store.selectedGuarantor);
@@ -264,12 +265,7 @@ const uploadProgress = ref({} as {
       residencyDocument.value.maxFileCount &&
       residencyFiles().length > residencyDocument.value.maxFileCount
     ) {
-      // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     this.residencyFiles().length,
-      //     this.residencyDocument.maxFileCount,
-      //   ]),
-      // });
+      ToastService.maxFileError(residencyFiles().length, residencyDocument.value.maxFileCount);
       files.value = [];
       return false;
     }
@@ -295,8 +291,7 @@ const uploadProgress = ref({} as {
       .then(() => {
         files.value = [];
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
-        // TODO
-        // Vue.toasted.global.save_success();
+        ToastService.success();
         return true;
       })
       .catch((err) => {

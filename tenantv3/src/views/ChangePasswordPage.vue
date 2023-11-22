@@ -8,6 +8,7 @@
 import { User } from "df-shared-next/src/models/User";
 import { Component, Vue } from "vue-property-decorator";
 import ChangePassword from "df-shared-next/src/Authentification/ChangePassword.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -20,9 +21,7 @@ export default class ChangePasswordPage extends Vue {
       this.$route.params.token != "null" ? this.$route.params.token : "";
     this.$store.dispatch("changePassword", user).then(
       () => {
-        Vue.toasted.global.success_toast({
-          message: "changepasswordpage.password-update",
-        });
+        ToastService.success("changepasswordpage.password-update");
         this.$router.push({ name: "Account" });
       },
       (error: any) => {
@@ -31,13 +30,9 @@ export default class ChangePasswordPage extends Vue {
             "password recovery token or is expired"
           )
         ) {
-          Vue.toasted.global.error_toast({
-            message: "changepasswordpage.token-expired",
-          });
+          ToastService.error("changepasswordpage.token-expired");
         } else {
-          Vue.toasted.global.error_toast({
-            message: "changepasswordpage.error",
-          });
+          ToastService.error("changepasswordpage.error");
         }
       }
     );

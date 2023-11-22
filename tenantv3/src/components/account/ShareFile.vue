@@ -97,6 +97,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { ValidationProvider } from "vee-validate";
 import { mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -129,17 +130,12 @@ export default class ShareFile extends Vue {
     AnalyticsService.shareByMail(this.shareType === "full" ? "full" : "resume");
     OwnerService.sendFileByMail(this.email, this.shareType)
       .then(() => {
-        Vue.toasted.global.success_toast({
-          message: "sharefile.sent-success",
-        });
+        ToastService.success("sharefile.sent-success");
         this.email = "";
         this.$store.dispatch("loadApartmentSharingLinks");
       })
-      .catch((res) => {
-        Vue.toasted.global.error_toast({
-          message: "error",
-        });
-        console.dir(res);
+      .catch(() => {
+        ToastService.error();
       });
   }
 
@@ -155,11 +151,10 @@ export default class ShareFile extends Vue {
 
     try {
       navigator.clipboard.writeText(url);
-      Vue.toasted.global.success_toast({
-        message: "account.copied",
-      });
+      ToastService.success("account.copied")
       AnalyticsService.copyLink(this.shareType === "full" ? "full" : "resume");
     } catch (err) {
+      ToastService.error("unable-to-coy")
       alert("Oops, unable to copy");
       return Promise.reject("error");
     }

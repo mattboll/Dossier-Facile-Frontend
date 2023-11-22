@@ -238,6 +238,7 @@ import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
 import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -444,12 +445,7 @@ export default class DocumentDownloader extends Vue {
       this.document.maxFileCount &&
       futurLength > this.document.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          futurLength,
-          this.document.maxFileCount,
-        ]),
-      });
+      ToastService.maxFileError(futurLength, this.document.maxFileCount);
       return;
     }
     const formData = this._buildFormData(filesToAdd, avisDetected);
@@ -462,7 +458,7 @@ export default class DocumentDownloader extends Vue {
       .then(() => {
         this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
         this.loadDocument(true);
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
       })
       .catch((err) => {
         this.fileUploadStatus = UploadStatus.STATUS_FAILED;
@@ -510,11 +506,11 @@ export default class DocumentDownloader extends Vue {
             (f) => file.id != f.id
           );
 
-          Vue.toasted.global.save_success();
+          ToastService.saveSuccess();
         })
         .catch((err) => {
           console.log("Unable to delete last element?", err);
-          Vue.toasted.global.save_failed();
+          ToastService.saveFailed();
         })
         .finally(() => {
           this.hideLoader();

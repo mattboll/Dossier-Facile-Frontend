@@ -101,6 +101,8 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "../../../services/UtilsService";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
+import { ToastService } from "@/services/ToastService";
+import { ValidationProvider } from "vee-validate/dist/types/components/Provider";
 
 @Component({
   components: {
@@ -160,12 +162,12 @@ export default class TenantGuarantorName extends Vue {
     this.$store
       .dispatch("saveGuarantorName", formData)
       .then(() => {
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         this.$emit("on-next");
       })
       .catch(() => {
         this.fileUploadStatus = UploadStatus.STATUS_FAILED;
-        Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       })
       .finally(() => {
         loader.hide();

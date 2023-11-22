@@ -43,6 +43,7 @@
   "max-file-default": "Nombre de fichier maximum atteint, veuillez en supprimer",
   "max-file": "Nombre de fichiers maximum atteint (actuellement : {0} / maximum : {1}), veuillez en supprimer",
   "error": "Une erreur est survenue",
+  "unable-to-copy": "Impossible de copier",
   "email-not-valid": "Email non valide",
   "same-email-not-valid": "L'email ne peut pas être la même que votre adresse",
   "field-required": "Ce champ est requis",

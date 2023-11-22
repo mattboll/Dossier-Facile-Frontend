@@ -83,6 +83,7 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import SimulationCaf from "../share/SimulationCaf.vue";
 import { Ref, ref } from "@vue/reactivity";
 import { UtilsService } from "@/services/UtilsService";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -235,7 +236,7 @@ export default class CoTenantFinancialList extends Vue {
             this.tenantFinancialDocuments.value?.filter((d) => d.id != f?.id);
         },
         () => {
-          Vue.toasted.global.error();
+          ToastService.error();
         }
       )
       .finally(() => {

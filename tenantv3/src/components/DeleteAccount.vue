@@ -30,6 +30,7 @@ import { AnalyticsService } from "../services/AnalyticsService";
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 
@@ -41,10 +42,7 @@ const { t } = useI18n();
         AnalyticsService.deleteAccount();
       },
       () => {
-        // TODO
-        // Vue.toasted.global.error_toast({
-        //   message: "deleteaccount.try-again",
-        // });
+        ToastService.error("deleteaccount.try-again");
       }
     );
   }

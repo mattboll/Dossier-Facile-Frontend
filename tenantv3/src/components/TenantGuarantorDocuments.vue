@@ -139,6 +139,7 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ProfileContainer from "./ProfileContainer.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { AnalyticsService } from "@/services/AnalyticsService";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -188,7 +189,7 @@ export default class TenantGuarantorDocuments extends Vue {
         }
       },
       () => {
-        Vue.toasted.global.error();
+        ToastService.error();
       }
     );
   }

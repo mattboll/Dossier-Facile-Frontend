@@ -70,6 +70,7 @@ import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const { t } = useI18n();
 
@@ -121,7 +122,7 @@ function removeFinancial(f: DfDocument) {
   store
   .deleteDocument(f.id)
   .then(null, () => {
-    // Vue.toasted.global.error();
+    ToastService.error();
   })
   .finally(() => {
     // loader.hide();

@@ -247,7 +247,7 @@ export default class CoTenantFinancialForm extends Vue {
       this.$store
         .dispatch("saveTenantFinancial", formData)
         .then(() => {
-          Vue.toasted.global.save_success();
+          ToastService.success();
         })
         .catch((err) => {
           UtilsService.handleCommonSaveError(err);

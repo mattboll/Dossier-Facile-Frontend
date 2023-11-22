@@ -23,6 +23,7 @@ import { mapGetters, mapState } from "vuex";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { User } from "df-shared-next/src/models/User";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   computed: {
@@ -108,7 +109,7 @@ export default class GuarantorTypeSelector extends Vue {
         this.selectType(this.checkedGuarantorType);
       },
       () => {
-        Vue.toasted.global.error();
+        ToastService.error();
       }
     );
   }

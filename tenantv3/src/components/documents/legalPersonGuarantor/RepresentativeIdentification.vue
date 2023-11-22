@@ -117,6 +117,7 @@ import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import { ToastService } from "@/services/ToastService";
 
   const documents = DocumentTypeConstants.REPRESENTATIVE_IDENTIFICATION;
   const props = defineProps<{
@@ -208,12 +209,12 @@ const uploadProgress = ref({} as {
           files.value = [];
           fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
           store.loadUser();
-          // Vue.toasted.global.save_success();
+          ToastService.saveSuccess();
           return Promise.resolve(true);
         })
         .catch((err: unknown) => {
           fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-          // Vue.toasted.global.save_failed();
+          ToastService.saveFailed();
           return Promise.reject(err);
         })
         .finally(() => {
@@ -222,12 +223,7 @@ const uploadProgress = ref({} as {
     }
 
     if (listFiles().length > MAX_FILE_COUNT) {
-      // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     this.listFiles().length,
-      //     this.MAX_FILE_COUNT,
-      //   ]),
-      // });
+      ToastService.maxFileError(listFiles().length, MAX_FILE_COUNT);
       return Promise.reject();
     }
     Array.from(Array(files.value.length).keys()).forEach((x) => {
@@ -245,12 +241,12 @@ const uploadProgress = ref({} as {
       .then(() => {
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
         store.loadUser();
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         return Promise.resolve(true);
       })
       .catch(() => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-        // Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
         return Promise.reject();
       })
       .finally(() => {

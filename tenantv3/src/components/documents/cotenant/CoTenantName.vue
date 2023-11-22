@@ -80,6 +80,7 @@ import BackNext from "../../footer/BackNext.vue";
 import { UtilsService } from "@/services/UtilsService";
 import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -139,11 +140,11 @@ export default class CoTenantName extends Vue {
     this.$store
       .dispatch("setNames", this.selectedCoTenant)
       .then(() => {
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         this.$emit("on-next");
       })
       .catch(() => {
-        Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       })
       .finally(() => {
         loader.hide();

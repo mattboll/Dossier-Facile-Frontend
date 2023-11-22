@@ -209,14 +209,7 @@ function save() {
   identificationFiles().length >
   identificationDocument.value.maxFileCount
   ) {
-    // TODO
     ToastService.maxFileError(identificationFiles().length, identificationDocument.value.maxFileCount)
-    // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     identificationFiles().length,
-      //     identificationDocument.value.maxFileCount,
-      //   ]),
-      // });
       files.value = [];
       return;
     }
@@ -240,8 +233,7 @@ function save() {
     .then(() => {
       fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
       files.value = [];
-      // TODO
-      // Vue.toasted.global.save_success();
+      ToastService.saveSuccess();
     })
     .catch((err) => {
       fileUploadStatus.value = UploadStatus.STATUS_FAILED;

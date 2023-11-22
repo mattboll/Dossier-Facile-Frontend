@@ -79,6 +79,7 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import { OwnerService } from "../services/OwnerService";
 import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
+import { ToastService } from "@/services/ToastService";
 
 extend("is", {
   ...is,
@@ -140,15 +141,11 @@ export default class OwnerShare extends Vue {
     }
     OwnerService.registerToOwner(this.token).then(
       () => {
-        Vue.toasted.global.success_toast({
-          message: "ownershare.connection-success",
-        });
+        ToastService.success("ownershare.connection-success");
         this.$router.push("/account");
       },
       () => {
-        Vue.toasted.global.error_toast({
-          message: "ownershare.login-error",
-        });
+        ToastService.error("ownershare.connection-error");
       }
     );
   }

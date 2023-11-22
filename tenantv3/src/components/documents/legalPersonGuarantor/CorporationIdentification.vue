@@ -85,6 +85,7 @@ import { cloneDeep } from "lodash";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 
@@ -166,12 +167,12 @@ const gId = getGuarantor().id
           files.value = [];
           fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
           store.loadUser();
-          // Vue.toasted.global.save_success();
+          ToastService.saveSuccess();
           return Promise.resolve(true);
         })
         .catch((err: unknown) => {
           fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-          // Vue.toasted.global.save_failed();
+          ToastService.saveFailed();
           return Promise.reject(err);
         })
         .finally(() => {
@@ -190,12 +191,12 @@ const gId = getGuarantor().id
         files.value = [];
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
         store.loadUser();
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         return Promise.resolve(true);
       })
       .catch((err: unknown) => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-        // Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
         return Promise.reject(err);
       })
       .finally(() => {

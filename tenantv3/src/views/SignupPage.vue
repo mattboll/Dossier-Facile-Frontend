@@ -69,6 +69,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { User } from "df-shared-next/src/models/User";
 import Register from "df-shared-next/src/Authentification/Register.vue";
 import Modal from "df-shared-next/src/components/Modal.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -100,13 +101,9 @@ export default class SignupPage extends Vue {
               "email: the emails are already being used"
             ) || -1) >= 0
           ) {
-            Vue.toasted.global.error_toast({
-              message: "signuppage.duplicate-email",
-            });
+            ToastService.error("signuppage.duplicate-email");
           } else {
-            Vue.toasted.global.error_toast({
-              message: "signuppage.register-error",
-            });
+            ToastService.error("signuppage.register-error");
           }
         }
       );

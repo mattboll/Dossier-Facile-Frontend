@@ -78,6 +78,7 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ProfileContainer from "./ProfileContainer.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -138,9 +139,7 @@ export default class GuarantorDocuments extends Vue {
 
   setGuarantorType() {
     if (!this.tmpGuarantorType) {
-      Vue.toasted.global.error_toast({
-        message: "guarantorchoice.type-required",
-      });
+      ToastService.error("guarantorchoice.type-required");
       return;
     }
     AnalyticsService.addGuarantor(this.tmpGuarantorType || "");

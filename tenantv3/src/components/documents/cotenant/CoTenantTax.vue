@@ -60,6 +60,7 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";
 import { UtilsService } from "@/services/UtilsService";
+import { ToastService } from "@/services/ToastService";
 
 extend("is", {
   ...is,
@@ -122,9 +123,7 @@ export default class CoTenantTax extends Vue {
         formData.append("customText", this.document.customText);
       } else {
         // TODO : replace by form and validation
-        Vue.toasted.global.error_toast({
-          message: "cotenanttax.custom-text-required",
-        });
+        ToastService.error("cotenanttax.custom-text-required");
         return;
       }
     }
@@ -150,7 +149,7 @@ export default class CoTenantTax extends Vue {
     this.$store
       .dispatch("saveTenantTax", formData)
       .then(() => {
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         this.$emit("on-next");
       })
       .catch((err) => {

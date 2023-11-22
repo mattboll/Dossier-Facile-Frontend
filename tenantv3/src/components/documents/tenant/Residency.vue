@@ -133,6 +133,7 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const { t } = useI18n();
 const emit = defineEmits(["on-next", "on-back"]);
@@ -306,13 +307,10 @@ const emit = defineEmits(["on-next", "on-back"]);
       residencyDocument.value.maxFileCount &&
       residencyFiles().length > residencyDocument.value.maxFileCount
     ) {
-      // TODO
-      // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     this.residencyFiles().length,
-      //     this.residencyDocument.maxFileCount,
-      //   ]),
-      // });
+      ToastService.maxFileError(
+        residencyFiles().length,
+        residencyDocument.value.maxFileCount
+      );
       files.value = [];
       return false;
     }
@@ -332,8 +330,7 @@ const emit = defineEmits(["on-next", "on-back"]);
       .then(() => {
         files.value = [];
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
-        // TODO
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         return true;
       })
       .catch((err) => {

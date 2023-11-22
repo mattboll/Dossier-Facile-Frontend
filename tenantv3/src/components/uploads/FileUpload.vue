@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { ToastService } from "@/services/ToastService";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import { useI18n } from "vue-i18n";
 
@@ -47,10 +48,7 @@ const props = withDefaults(defineProps<{ currentStatus: number, page: number, si
   function filesChange(e: any) {
     [...e.target.files].forEach((f: File) => {
       if (f.size > props.size * 1024 * 1024) {
-        // TODO
-        // Vue.toasted.global.error_toast({
-        //   message: this.$i18n.t("fileupload.file-too-big", [this.size]),
-        // });
+        ToastService.errorf(t("fileupload.file-too-big", [props.size]))
         return false;
       }
       return true;

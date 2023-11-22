@@ -50,6 +50,7 @@ import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
+import { ToastService } from "@/services/ToastService";
 
   const props = defineProps<{
     tenantId?: number,
@@ -132,13 +133,13 @@ const uploadProgress = ref({} as {
     RegisterService.saveOrganismIdentification(formData)
       .then(async (response: any) => {
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         await store.loadUserCommit(response.data);
         loadDocument();
       })
       .catch(() => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-        // Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       })
       .finally(() => {
         // loader.hide();
@@ -171,13 +172,7 @@ const uploadProgress = ref({} as {
   }
 
   function displayTooManyFilesToast() {
-    // TODO
-    // Vue.toasted.global.max_file({
-    //   message: this.$i18n.t("max-file", [
-    //     this.files.length,
-    //     MAX_FILE_COUNT,
-    //   ]),
-    // });
+    ToastService.maxFileError(files.value.length, MAX_FILE_COUNT);
   }
 </script>
 

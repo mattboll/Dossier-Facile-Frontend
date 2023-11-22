@@ -130,6 +130,7 @@ import moment from "moment";
 import { mapState } from "vuex";
 import store from "@/store";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: { NakedCard, Button, ColoredTag, Toggle },
@@ -150,10 +151,10 @@ export default class SharedLinks extends Vue {
     store
       .dispatch("updateApartmentSharingLinkStatus", { link, enabled })
       .then(() => {
-        Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
       })
       .catch(() => {
-        Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       });
   }
 

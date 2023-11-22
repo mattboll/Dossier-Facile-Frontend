@@ -2,6 +2,7 @@ import { User } from "df-shared-next/src/models/User";
 import { DfDocument } from "../../../df-shared-next/src/models/DfDocument";
 import { Guarantor } from "../../../df-shared-next/src/models/Guarantor";
 import moment from "moment";
+import { ToastService } from "./ToastService";
 
 export const UtilsService = {
   getLastAddedGuarantor(user: User) {
@@ -67,11 +68,9 @@ export const UtilsService = {
       return;
     }
     if (err.response.data.message.includes("NumberOfPages")) {
-      // TODO
-      // Vue.toasted.global.save_failed_num_pages();
+      ToastService.saveFailedNumPages();
     } else {
-      // TODO
-      // Vue.toasted.global.save_failed();
+      ToastService.saveFailed();
     }
   },
   tenantFullName(user: User) {

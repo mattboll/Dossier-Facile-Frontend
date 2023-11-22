@@ -159,6 +159,7 @@ import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 // TODO
 // extend("is", {
@@ -360,13 +361,7 @@ const uploadProgress = ref({} as {
         taxDocument.value.maxFileCount &&
         taxFiles().length > taxDocument.value.maxFileCount
       ) {
-        // TODO
-        // Vue.toasted.global.max_file({
-        //   message: this.$i18n.t("max-file", [
-        //     this.taxFiles().length,
-        //     this.taxDocument.maxFileCount,
-        //   ]),
-        // });
+        ToastService.maxFileError(taxFiles().length, taxDocument.value.maxFileCount);
         files.value = [];
         return false;
       }
@@ -419,8 +414,7 @@ const uploadProgress = ref({} as {
       .then(() => {
         files.value = [];
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
-        // TODO
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         return true;
       })
       .catch((err) => {

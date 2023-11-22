@@ -106,6 +106,7 @@ import { UtilsService } from "@/services/UtilsService";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
+import { ToastService } from "@/services/ToastService";
 
 const { t } = useI18n();
     const store = useTenantStore();
@@ -236,13 +237,7 @@ const { t } = useI18n();
       professionalDocument.value.maxFileCount &&
       professionalFiles().length > professionalDocument.value.maxFileCount
     ) {
-      // TODO
-      // Vue.toasted.global.max_file({
-      //   message: this.$i18n.t("max-file", [
-      //     this.professionalFiles().length,
-      //     this.professionalDocument.maxFileCount,
-      //   ]),
-      // });
+      ToastService.maxFileError(professionalFiles().length, professionalDocument.value.maxFileCount)
       files.value = [];
       return;
     }
@@ -271,8 +266,7 @@ const { t } = useI18n();
       .then(() => {
         files.value = [];
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
-        // TODO
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
       })
       .catch((err) => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;

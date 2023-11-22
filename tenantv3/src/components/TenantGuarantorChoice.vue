@@ -69,6 +69,7 @@ import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -105,9 +106,7 @@ export default class TenantGuarantorChoice extends Vue {
 
   setGuarantorType() {
     if (!this.tmpGuarantorType) {
-      Vue.toasted.global.error_toast({
-        message: "tenantguarantorchoice.type-required",
-      });
+      ToastService.error("tenantguarantorchoice.type-required");
       return;
     }
     AnalyticsService.addGuarantor(this.tmpGuarantorType);
@@ -124,9 +123,7 @@ export default class TenantGuarantorChoice extends Vue {
             this.$emit("on-select", this.tmpGuarantorType);
           },
           () => {
-            Vue.toasted.global.error_toast({
-              message: "try-again",
-            });
+            ToastService.error("try-again");
           }
         );
     }

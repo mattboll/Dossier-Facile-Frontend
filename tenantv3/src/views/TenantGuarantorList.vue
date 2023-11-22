@@ -46,6 +46,7 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -126,7 +127,7 @@ export default class TenantGuarantorList extends Vue {
         this.$emit("on-delete", g);
       })
       .catch(() => {
-        Vue.toasted.global.error();
+        ToastService.error();
       })
       .finally(() => {
         this.isRemoveGuarantor = false;

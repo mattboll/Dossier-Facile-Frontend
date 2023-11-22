@@ -236,6 +236,7 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FileHeader from "../components/FileHeader.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileNotFound from "@/views/FileNotFound.vue";
+import { ToastService } from "@/services/ToastService";
 
 @Component({
   components: {
@@ -347,9 +348,7 @@ export default class File extends Vue {
         this.retryDownload(remainingCount - 1);
       } else {
         this.showProgressBar = false;
-        Vue.toasted.global.error_toast({
-          message: "file.download-failed",
-        });
+        ToastService.error("file.download-failed");
       }
     }, 15000);
   }
@@ -364,8 +363,7 @@ export default class File extends Vue {
         link.click();
       })
       .catch((error) => {
-        console.error(error);
-        Vue.toasted.global.error();
+        ToastService.error();
       })
       .finally(() => (this.showProgressBar = false));
   }
@@ -382,10 +380,9 @@ export default class File extends Vue {
         .then(() => {
           this.retryDownload(6);
         })
-        .catch((error) => {
+        .catch(() => {
           this.showProgressBar = false;
-          console.error(error);
-          Vue.toasted.global.error();
+          ToastService.error();
         });
     }
   }

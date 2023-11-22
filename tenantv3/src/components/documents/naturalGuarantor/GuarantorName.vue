@@ -88,6 +88,7 @@ import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
+import { ToastService } from "@/services/ToastService";
 
 const store = useTenantStore();
 const selectedGuarantor = computed(() => store.selectedGuarantor);
@@ -125,12 +126,12 @@ const { t } = useI18n();
     store
       .saveGuarantorName(formData)
       .then(() => {
-        // Vue.toasted.global.save_success();
+        ToastService.saveSuccess();
         emit("on-next");
       })
       .catch(() => {
         fileUploadStatus.value = UploadStatus.STATUS_FAILED;
-        // Vue.toasted.global.save_failed();
+        ToastService.saveFailed();
       })
       .finally(() => {
         // loader.hide();
