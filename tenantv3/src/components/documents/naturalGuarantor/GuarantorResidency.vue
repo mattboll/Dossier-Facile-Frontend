@@ -107,9 +107,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { mapState } from "vuex";
+<script setup lang="ts">
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
@@ -133,199 +131,185 @@ import TroubleshootingModal from "@/components/helps/TroubleshootingModal.vue";
 import { UtilsService } from "@/services/UtilsService";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted, ref } from "vue";
 
-@Component({
-  components: {
-    TextField,
-    ValidationObserver,
-    ProfileFooter,
-    ValidationProvider,
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    WarningMessage,
-    ConfirmModal,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    TroubleshootingModal,
-  },
-  computed: {
-    ...mapState({
-      selectedGuarantor: "selectedGuarantor",
-    }),
-  },
-})
-export default class GuarantorResidency extends Vue {
-  @Prop() tenantId?: string;
+    // ...mapState({
+      // selectedGuarantor: "selectedGuarantor",
 
-  selectedGuarantor!: Guarantor;
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  uploadProgress: {
+const store = useTenantStore();
+const selectedGuarantor = computed(() => store.selectedGuarantor);
+
+
+  // @Prop() tenantId?: string;
+const props = defineProps({
+  tenantId: String
+});
+
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const files = ref([] as DfFile[]);
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
-  residencyDocument = new DocumentType();
-  documentDeniedReasons = new DocumentDeniedReasons();
-  customText = "";
+  });
+  const residencyDocument = ref(new DocumentType());
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  const customText = ref("");
 
-  documents: any[] = [];
-  isDocDeleteVisible = false;
+  const documents = ref([] as any);
+  const isDocDeleteVisible = ref(false);
+  const emit = defineEmits(["on-back", "on-next"]);
 
-  mounted() {
-    this.documents = DocumentTypeConstants.GUARANTOR_RESIDENCY_DOCS.filter(
+  onMounted(() => {
+    documents.value = DocumentTypeConstants.GUARANTOR_RESIDENCY_DOCS.filter(
       (type: any) =>
         type.key !== "other-residency" ||
         UtilsService.useNewOtherResidencyCategory()
     );
-    this.updateGuarantorData();
+    updateGuarantorData();
+  })
+
+  const documentStatus = computed(() => {
+    return guarantorResidencyDocument()?.documentStatus;
+  })
+
+  function guarantorResidencyDocument() {
+    return store.getGuarantorResidencyDocument;
   }
 
-  get documentStatus() {
-    return this.guarantorResidencyDocument()?.documentStatus;
-  }
-
-  guarantorResidencyDocument() {
-    return this.$store.getters.getGuarantorResidencyDocument;
-  }
-
-  updateGuarantorData() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function updateGuarantorData() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
       if (doc !== undefined) {
-        this.customText = doc.customText || "";
-        const localDoc = this.documents.find((d: DocumentType) => {
+        customText.value = doc.customText || "";
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.residencyDocument = localDoc;
+          residencyDocument.value = localDoc;
         }
       }
-      if (this.guarantorResidencyDocument()?.documentDeniedReasons) {
-        this.documentDeniedReasons = cloneDeep(
-          this.guarantorResidencyDocument()?.documentDeniedReasons
-        );
+      const ddr = guarantorResidencyDocument()?.documentDeniedReasons
+      if (ddr) {
+        documentDeniedReasons.value = cloneDeep(ddr);
       }
     }
   }
 
-  onSelectChange() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function onSelectChange() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc.files?.length || 0) > 0 &&
-          doc.subCategory !== this.residencyDocument.value;
+          doc.subCategory !== residencyDocument.value.value;
       }
     }
     return false;
   }
 
-  undoSelect() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function undoSelect() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
       if (doc !== undefined) {
-        const localDoc = this.documents.find((d: DocumentType) => {
+        const localDoc = documents.value.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.residencyDocument = localDoc;
+          residencyDocument.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  async validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  async function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            await this.remove(f, true);
+            await remove(f, true);
           }
         }
       }
     }
   }
 
-  isNewDocument() {
-    if (this.selectedGuarantor.documents !== null) {
-      const doc = this.selectedGuarantor.documents?.find((d: DfDocument) => {
+  function isNewDocument() {
+    if (selectedGuarantor.value?.documents !== null) {
+      const doc = selectedGuarantor.value?.documents?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       });
       if (doc !== undefined) {
         if (
           (doc.subCategory === "GUEST" &&
-            this.residencyDocument.value === "GUEST_PARENTS") ||
+            residencyDocument.value.value === "GUEST_PARENTS") ||
           (doc.subCategory === "GUEST_PARENTS" &&
-            this.residencyDocument.value === "GUEST")
+            residencyDocument.value.value === "GUEST")
         ) {
           return false;
         }
-        return doc.subCategory !== this.residencyDocument.value;
+        return doc.subCategory !== residencyDocument.value.value;
       }
     }
     return false;
   }
 
-  async goNext() {
-    const saved = await this.save();
+  async function goNext() {
+    const saved = await save();
     if (saved) {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
 
-  addFiles(fileList: File[]) {
+  function addFiles(fileList: File[]) {
     const nf = Array.from(fileList).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
-    this.files = [...this.files, ...nf];
-    this.save();
+    files.value = [...files.value, ...nf];
+    save();
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  async save(): Promise<boolean> {
-    this.uploadProgress = {};
+  async function save(): Promise<boolean> {
+    uploadProgress.value = {};
     const fieldName = "documents";
     const formData = new FormData();
-    const newFiles = this.files.filter((f) => {
+    const newFiles = files.value.filter((f) => {
       return !f.id;
     });
 
     if (!newFiles.length) {
-      if (this.residencyDocument.key === "other-residency") {
-        console.log(this.customText);
-        formData.append("customText", this.customText);
+      if (residencyDocument.value.key === "other-residency") {
+        formData.append("customText", customText.value);
       } else {
         return true;
       }
     }
 
     if (
-      this.residencyDocument.maxFileCount &&
-      this.residencyFiles().length > this.residencyDocument.maxFileCount
+      residencyDocument.value.maxFileCount &&
+      residencyFiles().length > residencyDocument.value.maxFileCount
     ) {
-      Vue.toasted.global.max_file({
-        message: this.$i18n.t("max-file", [
-          this.residencyFiles().length,
-          this.residencyDocument.maxFileCount,
-        ]),
-      });
-      this.files = [];
+      // Vue.toasted.global.max_file({
+      //   message: this.$i18n.t("max-file", [
+      //     this.residencyFiles().length,
+      //     this.residencyDocument.maxFileCount,
+      //   ]),
+      // });
+      files.value = [];
       return false;
     }
 
@@ -334,68 +318,69 @@ export default class GuarantorResidency extends Vue {
       formData.append(`${fieldName}[${x}]`, f, newFiles[x].name);
     });
 
-    formData.append("typeDocumentResidency", this.residencyDocument.value);
+    formData.append("typeDocumentResidency", residencyDocument.value.value);
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    if (this.$store.getters.guarantor.id) {
-      formData.append("guarantorId", this.$store.getters.guarantor.id);
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
+    if (store.guarantor.id) {
+      formData.append("guarantorId", store.guarantor.id.toString());
     }
-    if (this.tenantId) {
-      formData.append("tenantId", this.tenantId);
+    if (props.tenantId) {
+      formData.append("tenantId", props.tenantId);
     }
-    const loader = this.$loading.show();
-    return await this.$store
-      .dispatch("saveGuarantorResidency", formData)
+    // TODO
+    // const loader = this.$loading.show();
+    return await store
+      .saveGuarantorResidency(formData)
       .then(() => {
-        this.files = [];
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        Vue.toasted.global.save_success();
+        files.value = [];
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        // TODO
+        // Vue.toasted.global.save_success();
         return true;
       })
       .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
         return false;
       })
       .finally(() => {
-        loader.hide();
+        // loader.hide();
       });
   }
 
-  residencyFiles() {
-    const newFiles = this.files.map((f) => {
+  function residencyFiles() {
+    const newFiles = files.value.map((f) => {
       return {
-        subCategory: this.residencyDocument.value,
+        subCategory: residencyDocument.value.value,
         id: f.id,
         name: f.name,
         size: f.size,
       };
     });
     const existingFiles =
-      this.$store.getters.getGuarantorDocuments?.find((d: DfDocument) => {
+      store.getGuarantorDocuments?.find((d: DfDocument) => {
         return d.documentCategory === "RESIDENCY";
       })?.files || [];
     return [...newFiles, ...existingFiles];
   }
 
-  async remove(file: DfFile, silent = false) {
+  async function remove(file: DfFile, silent = false) {
     if (file.id) {
       await RegisterService.deleteFile(file.id, silent);
     } else {
-      const firstIndex = this.files.findIndex((f) => {
+      const firstIndex = files.value.findIndex((f) => {
         return f.name === file.name && !f.path;
       });
-      this.files.splice(firstIndex, 1);
+      files.value.splice(firstIndex, 1);
     }
   }
 
-  guarantorKey() {
-    if (this.tenantId != null) {
+  function guarantorKey() {
+    if (props.tenantId != null) {
       return "cotenant-guarantor";
     }
     return "guarantor";
   }
-}
 </script>
 
 <style scoped lang="scss"></style>
