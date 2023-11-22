@@ -10,8 +10,8 @@
         <div class="fr-mt-3w">
           <SimpleRadioButtons
             name="application-type-selector"
-            v-model="identificationDocument"
-            @input="onSelectChange"
+            :value="identificationDocument"
+            @input="onSelectChange($event)"
             :elements="mapDocuments()"
           ></SimpleRadioButtons>
         </div>
@@ -66,17 +66,14 @@
 </template>
 
 <script setup lang="ts">
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import { ValidationProvider } from "vee-validate";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
+// import { ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
@@ -110,7 +107,8 @@ import { computed, onMounted, ref } from "vue";
     return "identification_guarantor_" + user.value?.email;
   }
 
-  function onSelectChange() {
+  function onSelectChange($event: any) {
+    identificationDocument.value = $event
     localStorage.setItem(
       getLocalStorageKey(),
       identificationDocument.value.key
