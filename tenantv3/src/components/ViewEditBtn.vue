@@ -18,20 +18,24 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+const emit = defineEmits(["view", "edit"]);
 
-@Component
-export default class ViewEditBtn extends Vue {
-  @Prop({ default: true }) canView!: boolean;
+  const props = withDefaults(
+    defineProps<{
+      canView?: boolean;
+    }>(),
+    {
+      canView: true,
+    }
+  );
 
-  view() {
-    this.$emit("view");
+  function view() {
+    emit("view");
   }
-  edit() {
-    this.$emit("edit");
+  function edit() {
+    emit("edit");
   }
-}
 </script>
 
 <style scoped lang="scss">

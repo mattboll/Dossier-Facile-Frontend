@@ -262,16 +262,16 @@ const router = createRouter({
     component: () =>
       import(/* webpackChunkName: "account" */ "../views/SharingPage.vue"),
   },
-  // {
-  //   path: "/messaging",
-  //   name: "Messages",
-  //   meta: {
-  //     title: "Messages - DossierFacile",
-  //     requiresAuth: true,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "messages" */ "../views/Messages.vue"),
-  // },
+  {
+    path: "/messaging",
+    name: "Messages",
+    meta: {
+      title: "Messages - DossierFacile",
+      requiresAuth: true,
+    },
+    component: () =>
+      import(/* webpackChunkName: "messages" */ "../views/Messages.vue"),
+  },
   // {
   //   path: "/confirmAccount/:token",
   //   name: "Confirm",

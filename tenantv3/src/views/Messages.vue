@@ -17,7 +17,7 @@
               :aria-controls="`tabpanel-${k}-panel`"
               @click="markMessagesAsRead(tenant.id)"
             >
-              {{ tenant | fullName }}
+              {{ UtilsServices.tenantFullName(tenant) }}
             </button>
           </li>
         </ul>
@@ -38,47 +38,37 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapGetters, mapState } from "vuex";
+<script setup lang="ts">
 import { User } from "df-shared-next/src/models/User";
 
 import MessagesPanel from "../components/MessagesPanel.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted, ref } from "vue";
+import UtilsServices from "../services/UtilsService";
 
-@Component({
-  components: {
-    MessagesPanel,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class Messages extends Vue {
-  user!: User;
+    const store = useTenantStore();
+    const user = computed(() => store.user);
 
-  tabIndex = 0;
+  const tabIndex = ref(0);
 
-  mounted() {
-    this.markMessagesAsRead(this.user.id);
+  onMounted(() => {
+    markMessagesAsRead(user.value.id);
+  })
+
+  function markMessagesAsRead(tenantId: number) {
+    store.readMessages(tenantId);
   }
 
-  markMessagesAsRead(tenantId: number) {
-    this.$store.dispatch("readMessages", tenantId);
-  }
-
-  getTenants() {
+  function getTenants() {
     const tenants: User[] = [];
-    tenants.push(this.user);
+    tenants.push(user.value);
 
-    this.user?.apartmentSharing?.tenants?.forEach((t) => {
-      if (t.id != this.user.id) {
+    user.value?.apartmentSharing?.tenants?.forEach((t) => {
+      if (t.id != user.value.id) {
         tenants.push(t);
       }
     });
 
     return tenants;
   }
-}
 </script>

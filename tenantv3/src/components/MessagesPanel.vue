@@ -333,156 +333,133 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+<script setup lang="ts">
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FileStatusIcon from "df-shared-next/src/components/FileStatusIcon.vue";
 import { DocumentService } from "../services/DocumentService";
 import { DfFile } from "df-shared-next/src/models/DfFile";
-import { DfMessage } from "df-shared-next/src/models/DfMessage";
 import Modal from "df-shared-next/src/components/Modal.vue";
-import PdfViewer from "../components/PdfViewer.vue";
 import ShowDoc from "../components/documents/share/ShowDoc.vue";
-import { mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ViewEditBtn from "../components/ViewEditBtn.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
-@Component({
-  components: {
-    NakedCard,
-    Modal,
-    PdfViewer,
-    ShowDoc,
-    FileStatusIcon,
-    ViewEditBtn,
-  },
-  computed: {
-    ...mapState({
-      messageList: "messageList",
-    }),
-  },
-})
-export default class MessagesPanel extends Vue {
-  messageList!: DfMessage[][];
-  sendMessage = "";
-  files: DfFile[] = [];
-  isDocModalVisible = false;
-  tenantMessages: DfMessage[] = [];
+    const router = useRouter();
+    const store = useTenantStore();
+    const messageList = computed(() => store.messageList);
 
-  @Prop() tenant!: User;
-  @Prop({ default: false }) isCotenant!: boolean;
+  const sendMessage = ref("");
+  const files = ref([] as DfFile[] );
+  const isDocModalVisible = ref(false);
+const tenantMessages = computed(() => messageList.value[props.tenant.id]);
 
-  mounted() {
-    this.tenantMessages = this.messageList[this.tenant.id];
+  const props = withDefaults(defineProps<{
+    tenant: User;
+    isCotenant?: boolean;
+  }>(), {
+    isCotenant: false,
+  });
 
-    this.$store.subscribe((mutation) => {
-      if (mutation.type == "updateMessages") {
-        this.tenantMessages = this.messageList[this.tenant.id];
-      }
-    });
-  }
-
-  isNotValidated() {
+  function isNotValidated() {
     // TODO
     return true;
   }
 
-  setTenantStep(n: number) {
+  function setTenantStep(n: number) {
     AnalyticsService.editFromAccount(n);
-    if (this.isCotenant) {
-      this.$router.push({
+    if (props.isCotenant) {
+      router.push({
         name: "CoTenantDocuments",
         params: {
-          tenantId: this.tenant?.id.toString(),
+          tenantId: props.tenant?.id.toString(),
           step: "4",
           substep: n.toString(),
         },
       });
     } else {
-      this.$router.push({
+      router.push({
         name: "TenantDocuments",
         params: { substep: n.toString() },
       });
     }
   }
-  setGuarantorSubStep(n: number, g: Guarantor) {
+  function setGuarantorSubStep(n: number, g: Guarantor) {
     AnalyticsService.editFromAccount(n);
-    this.$store.dispatch("setGuarantorPage", {
-      guarantor: g,
-      substep: n,
-      tenantId: this.tenant.id,
-    });
+    store.setGuarantorPage(
+       g,
+       n,
+       props.tenant.id,
+    );
   }
 
-  guarantors() {
-    return this.tenant.guarantors;
+  function guarantors() {
+    return props.tenant.guarantors;
   }
 
-  hasDocument() {
-    return DocumentService.hasDocument();
+  function hasDoc(docType: string) {
+    return DocumentService.hasDoc(docType, props.tenant);
   }
-  hasDoc(docType: string) {
-    return DocumentService.hasDoc(docType, this.tenant);
-  }
-  hasFile(docType: string) {
+  function hasFile(docType: string) {
     // TODO change to aggregate financial
-    return DocumentService.hasFile(docType, this.tenant);
+    return DocumentService.hasFile(docType, props.tenant);
   }
-  guarantorHasFile(g: Guarantor, docType: string) {
+  function guarantorHasFile(g: Guarantor, docType: string) {
     return DocumentService.guarantorHasFile(g, docType);
   }
-  guarantorHasDoc(g: Guarantor, docType: string) {
+  function guarantorHasDoc(g: Guarantor, docType: string) {
     return DocumentService.guarantorHasDoc(g, docType);
   }
 
-  openDoc(documentCategory: string) {
+  function openDoc(documentCategory: string) {
     AnalyticsService.viewFromMessage(documentCategory);
-    this.files = DocumentService.getFiles(documentCategory);
-    if (this.files.length > 0) {
-      this.isDocModalVisible = true;
+    files.value = DocumentService.getFiles(documentCategory);
+    if (files.value.length > 0) {
+      isDocModalVisible.value = true;
     }
   }
-  openGuarantorDoc(g: Guarantor, documentCategory: string) {
+  function openGuarantorDoc(g: Guarantor, documentCategory: string) {
     AnalyticsService.viewFromMessage(documentCategory);
-    this.files = DocumentService.getGuarantorFiles(g, documentCategory);
-    if (this.files.length > 0) {
-      this.isDocModalVisible = true;
+    files.value = DocumentService.getGuarantorFiles(g, documentCategory);
+    if (files.value.length > 0) {
+      isDocModalVisible.value = true;
     }
   }
 
-  handleSubmit() {
-    this.$store
-      .dispatch("sendMessage", {
-        message: this.sendMessage,
-        tenantId: this.tenant.id,
-      })
+  function handleSubmit() {
+    store
+      .sendMessage(
+        sendMessage.value,
+        props.tenant.id,
+      )
       .then(() => {
-        this.sendMessage = "";
+        sendMessage.value = "";
       });
   }
 
-  getStatus(docType: string) {
+  function getStatus(docType: string) {
     if (docType === "FINANCIAL") {
-      const docs = this.tenant.documents?.filter((d) => {
+      const docs = props.tenant.documents?.filter((d) => {
         return d.documentCategory === "FINANCIAL";
       });
-      return this.isFinancialValid(docs || []);
+      return isFinancialValid(docs || []);
     }
-    const doc = this.tenant.documents?.find((d: DfDocument) => {
+    const doc = props.tenant.documents?.find((d: DfDocument) => {
       return d.documentCategory === docType;
     });
     return doc?.documentStatus;
   }
 
-  getGuarantorStatus(g: Guarantor, docType: string) {
+  function getGuarantorStatus(g: Guarantor, docType: string) {
     if (docType === "FINANCIAL") {
       const docs = g.documents?.filter((d) => {
         return d.documentCategory === "FINANCIAL";
       });
-      return this.isFinancialValid(docs || []);
+      return isFinancialValid(docs || []);
     }
     const doc = g.documents?.find((d: DfDocument) => {
       return d.documentCategory === docType;
@@ -490,7 +467,7 @@ export default class MessagesPanel extends Vue {
     return doc?.documentStatus;
   }
 
-  isFinancialValid(docs: any[]) {
+  function isFinancialValid(docs: any[]) {
     if (!docs || docs.length === 0) {
       return "INCOMPLETE";
     }
@@ -515,7 +492,6 @@ export default class MessagesPanel extends Vue {
 
     return "VALIDATED";
   }
-}
 </script>
 
 <style lang="scss" scoped>
