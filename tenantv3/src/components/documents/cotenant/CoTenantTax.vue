@@ -61,6 +61,7 @@ import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 extend("is", {
   ...is,
@@ -144,7 +145,8 @@ export default class CoTenantTax extends Vue {
       formData.append("id", this.document.id.toString());
     }
     formData.append("tenantId", this.coTenantId.toString());
-    const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
 
     this.$store
       .dispatch("saveTenantTax", formData)

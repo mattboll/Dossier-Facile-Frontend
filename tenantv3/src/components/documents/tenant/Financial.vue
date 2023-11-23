@@ -73,6 +73,7 @@ import { computed, onBeforeMount } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import {useLoading} from 'vue-loading-overlay'
 
 const { t } = useI18n();
 const store = useTenantStore();
@@ -117,15 +118,14 @@ const store = useTenantStore();
     if (f.id === undefined) {
       return;
     }
-    // TODO
-    // const loader = Vue.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store.deleteDocument(f.id)
       .then(null, () => {
         ToastService.error();
       })
       .finally(() => {
-        // TODO
-        // loader.hide();
+        loader.hide();
         initialize();
       });
     store.selectDocumentFinancial(undefined);

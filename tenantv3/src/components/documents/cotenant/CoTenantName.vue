@@ -81,6 +81,7 @@ import { UtilsService } from "@/services/UtilsService";
 import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   components: {
@@ -136,7 +137,8 @@ export default class CoTenantName extends Vue {
     this.selectedCoTenant.lastName = this.lastName;
     this.selectedCoTenant.preferredName = this.preferredName;
 
-    const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     this.$store
       .dispatch("setNames", this.selectedCoTenant)
       .then(() => {

@@ -71,6 +71,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import {useLoading} from 'vue-loading-overlay'
 
 const { t } = useI18n();
 
@@ -117,15 +118,15 @@ function removeFinancial(f: DfDocument) {
   if (!f.id) {
     return;
   }
-  // TODO
-  // const loader = Vue.$loading.show();
+  const $loading = useLoading({});
+  const loader = $loading.show();
   store
   .deleteDocument(f.id)
   .then(null, () => {
     ToastService.error();
   })
   .finally(() => {
-    // loader.hide();
+    loader.hide();
     initialize();
   });
   store.selectGuarantorDocumentFinancial(undefined);

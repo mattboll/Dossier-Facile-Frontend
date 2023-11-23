@@ -107,6 +107,7 @@ import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const { t } = useI18n();
     const store = useTenantStore();
@@ -259,8 +260,8 @@ const { t } = useI18n();
       formData.append("tenantId", props.tenantId);
     }
 
-    // TODO
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store
       .saveGuarantorProfessional(formData)
       .then(() => {
@@ -273,8 +274,7 @@ const { t } = useI18n();
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        // TODO
-        // loader.hide();
+        loader.hide();
       });
   }
 

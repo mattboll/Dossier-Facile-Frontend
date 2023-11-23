@@ -86,6 +86,7 @@ import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const store = useTenantStore();
 
@@ -160,7 +161,8 @@ const gId = getGuarantor().id
       formData.append("tenantId", props.tenantId.toString());
     }
 
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     if (!files.value.length) {
       return RegisterService.saveCorporationName(formData)
         .then(() => {
@@ -176,7 +178,7 @@ const gId = getGuarantor().id
           return Promise.reject(err);
         })
         .finally(() => {
-          // loader.hide();
+          loader.hide();
         });
     }
 

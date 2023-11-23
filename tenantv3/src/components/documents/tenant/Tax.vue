@@ -160,6 +160,7 @@ import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import {useLoading} from 'vue-loading-overlay'
 
 // TODO
 // extend("is", {
@@ -192,8 +193,8 @@ const uploadProgress = ref({} as {
   const isWarningTaxSituationModalVisible = ref(false);
   const newFiles = ref([] as File[]);
 
-  // todo
-  // const loader?: LoaderComponent;
+  const $loading = useLoading({});
+  let loader: any;
 
   function getTaxLocalStorageKey() {
     return "tax_" + user.value?.email;
@@ -457,16 +458,14 @@ const uploadProgress = ref({} as {
   }
 
   function showLoader() {
-    // todo
-    // if (this.loader === undefined) {
-    //   this.loader = this.$loading.show();
-    // }
+    if (loader === undefined) {
+      loader = $loading.show();
+    }
   }
 
   function hideLoader() {
-    // todo
-    // this.loader?.hide();
-    // this.loader = undefined;
+    loader?.hide();
+    loader = undefined;
   }
 
   function mapDocuments() {

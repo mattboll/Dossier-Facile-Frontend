@@ -1,7 +1,8 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ validate }">
-      <form name="form" @submit.prevent="validate().then(save)">
+    <!-- <ValidationObserver v-slot="{ validate }"> -->
+      <!-- <form name="form" @submit.prevent="validate().then(save)"> -->
+      <form name="form" @submit.prevent="save">
         <NakedCard class="fr-p-md-5w fr-mb-3w">
           <div>
             <h1 class="fr-h6">
@@ -35,19 +36,23 @@
                 "
               >
                 <div>
-                  <validation-provider
+                  <!-- <validation-provider
                     :rules="{ required: true, regex: /^[0-9 ]+$/ }"
                     v-slot="{ errors, valid }"
-                  >
+                  > -->
+                      <!-- :class="{
+                        'fr-input-group--error': errors[0],
+                      }" -->
                     <div
                       class="fr-input-group"
-                      :class="{
-                        'fr-input-group--error': errors[0],
-                      }"
                     >
                       <label for="monthlySum" class="fr-label">
                         {{ getMonthlySumLabel() }} :
                       </label>
+                        <!-- :class="{
+                          'fr-input--valid': valid,
+                          'fr-input--error': errors[0],
+                        }" -->
                       <input
                         id="monthlySum"
                         :placeholder="
@@ -59,18 +64,14 @@
                         v-model="financialDocument.monthlySum"
                         name="monthlySum"
                         class="validate-required form-control fr-input"
-                        :class="{
-                          'fr-input--valid': valid,
-                          'fr-input--error': errors[0],
-                        }"
                         required
                       />
-                      <span class="fr-error-text" v-if="errors[0]">{{
+                      <!-- <span class="fr-error-text" v-if="errors[0]">{{
                         t(errors[0])
-                      }}</span>
+                      }}</span> -->
                       <span
                         class="fr-error-text"
-                        v-if="financialDocument.monthlySum || 0 > 10000"
+                        v-if="(financialDocument.monthlySum || 0) > 10000"
                       >
                         {{ t("financialdocumentform.high-salary") }}
                       </span>
@@ -84,7 +85,7 @@
                         {{ t("financialdocumentform.low-salary") }}
                       </span>
                     </div>
-                  </validation-provider>
+                  <!-- </validation-provider> -->
                 </div>
               </div>
             </div>
@@ -147,10 +148,10 @@
                 </label>
               </div>
               <div class="fr-mb-5w" v-if="financialDocument.noDocument">
-                <validation-provider
+                <!-- <validation-provider
                   :rules="{ required: true }"
                   v-slot="{ errors, valid }"
-                >
+                > -->
                   <div class="fr-input-group">
                     <label class="fr-label" for="customText">
                       {{
@@ -159,13 +160,13 @@
                         )
                       }}
                     </label>
+                      <!-- :class="{
+                        'fr-input--valid': valid,
+                        'fr-input--error': errors[0],
+                      }" -->
                     <textarea
                       v-model="financialDocument.customText"
                       class="form-control fr-input validate-required"
-                      :class="{
-                        'fr-input--valid': valid,
-                        'fr-input--error': errors[0],
-                      }"
                       id="customText"
                       name="customText"
                       placeholder=""
@@ -177,17 +178,17 @@
                     <span
                       >{{ financialDocument.customText.length }} / 2000</span
                     >
-                    <span class="fr-error-text" v-if="errors[0]">{{
+                    <!-- <span class="fr-error-text" v-if="errors[0]">{{
                       t(errors[0])
-                    }}</span>
+                    }}</span> -->
                   </div>
-                </validation-provider>
+                <!-- </validation-provider> -->
               </div>
             </div>
           </div>
         </NakedCard>
       </form>
-    </ValidationObserver>
+    <!-- </ValidationObserver> -->
     <div
       v-if="
         financialDocument.documentType.key &&
@@ -195,20 +196,20 @@
       "
     >
       <NakedCard class="fr-p-md-5w fr-mb-3w">
-        <ValidationObserver v-slot="{ validate, valid }">
-          <form name="customTextForm" @submit.prevent="validate().then(save)">
+        <!-- <ValidationObserver v-slot="{ validate, valid }"> -->
+          <form name="customTextForm" @submit.prevent="save">
             <div class="fr-input-group">
               <label class="fr-label" for="customTextNoDocument">
                 {{ t("financialdocumentform.has-no-income") }}
               </label>
+                <!-- :class="{
+                  'fr-input--valid': valid,
+                }" -->
               <textarea
                 v-model="financialDocument.customText"
                 maxlength="2000"
                 rows="3"
                 class="form-control fr-input validate-required"
-                :class="{
-                  'fr-input--valid': valid,
-                }"
                 id="customTextNoDocument"
                 name="customText"
                 placeholder=""
@@ -217,7 +218,7 @@
               <span>{{ financialDocument.customText.length }} / 2000</span>
             </div>
           </form>
-        </ValidationObserver>
+        <!-- </ValidationObserver> -->
       </NakedCard>
     </div>
     <ProfileFooter @on-back="goBack" @on-next="goNext"></ProfileFooter>
@@ -271,6 +272,7 @@ import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 // TODO
 // extend("regex", {
@@ -479,8 +481,8 @@ onBeforeMount(() => {
     }
 
     financialDocument.value.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    // TODO
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     const res = await store
       .saveTenantFinancial(formData)
       .then(() => {
@@ -496,8 +498,7 @@ onBeforeMount(() => {
         return Promise.reject(new Error("err"));
       })
       .finally(() => {
-        // TODO
-        // loader.hide();
+        loader.hide();
       });
     return res;
   }

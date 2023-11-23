@@ -51,6 +51,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
   const props = defineProps<{
     tenantId?: number,
@@ -129,7 +130,8 @@ const uploadProgress = ref({} as {
     }
 
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     RegisterService.saveOrganismIdentification(formData)
       .then(async (response: any) => {
         fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
@@ -142,7 +144,7 @@ const uploadProgress = ref({} as {
         ToastService.saveFailed();
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 

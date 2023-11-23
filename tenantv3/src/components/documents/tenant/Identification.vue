@@ -78,6 +78,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const store = useTenantStore();
 const user = computed(() => {
@@ -226,8 +227,8 @@ function save() {
     
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
     // TODO : remove loader when upload status is well handled (be carefull with multiple save at the same time)
-    // TODO : use new loader
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store
     .saveTenantIdentification(formData)
     .then(() => {
@@ -240,8 +241,7 @@ function save() {
       UtilsService.handleCommonSaveError(err);
     })
     .finally(() => {
-      // TODs
-      // loader.hide();
+      loader.hide();
     });
   }
   

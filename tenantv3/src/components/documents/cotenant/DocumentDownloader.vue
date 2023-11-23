@@ -239,6 +239,7 @@ import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   components: {
@@ -285,7 +286,7 @@ export default class DocumentDownloader extends Vue {
   newFiles: File[] = [];
   isWarningTaxSituationModalVisible = false;
 
-  loader?: LoaderComponent;
+  var loader: any;
 
   beforeMount() {
     this.loadDocument();
@@ -520,13 +521,14 @@ export default class DocumentDownloader extends Vue {
 
   showLoader() {
     if (this.loader === undefined) {
-      this.loader = this.$loading.show();
+      const $loading = useLoading({});
+      loader = $loading.show();
     }
   }
 
   hideLoader() {
-    this.loader?.hide();
-    this.loader = undefined;
+    loader?.hide();
+    loader = undefined;
   }
 
   mapDocuments() {

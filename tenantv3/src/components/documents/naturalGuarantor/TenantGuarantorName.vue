@@ -103,6 +103,7 @@ import { UtilsService } from "../../../services/UtilsService";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { ToastService } from "@/services/ToastService";
 import { ValidationProvider } from "vee-validate/dist/types/components/Provider";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   components: {
@@ -158,7 +159,8 @@ export default class TenantGuarantorName extends Vue {
     }
     formData.append("tenantId", this.tenantId.toString());
 
-    const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     this.$store
       .dispatch("saveGuarantorName", formData)
       .then(() => {

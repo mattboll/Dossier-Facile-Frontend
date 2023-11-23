@@ -100,6 +100,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const { t } = useI18n();
 
@@ -252,8 +253,8 @@ const uploadProgress = ref({} as {
     );
 
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
-    // TODO
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store.saveTenantProfessional(formData)
       .then(() => {
         files.value = [];
@@ -265,7 +266,7 @@ const uploadProgress = ref({} as {
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 

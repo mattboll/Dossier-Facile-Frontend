@@ -118,6 +118,7 @@ import { is } from "vee-validate/dist/rules";
 import FileErrors from "./FileErrors.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { RegisterService } from "@/services/RegisterService";
+import { useLoading } from 'vue-loading-overlay';
 
 extend("isvalid", {
   ...is,
@@ -166,7 +167,8 @@ export default class ValidateFile extends Vue {
       this.$router.push("/account");
       return;
     }
-    const loader = Vue.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     const params: any = {
       honorDeclaration: true,
     };

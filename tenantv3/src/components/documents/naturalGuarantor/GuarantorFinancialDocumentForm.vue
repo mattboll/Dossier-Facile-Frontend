@@ -224,6 +224,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 // extend("regex", {
 //   ...regex,
@@ -425,7 +426,8 @@ const guarantorFinancialDocumentSelected = computed(() => {
     if (props.tenantId) {
       formData.append("tenantId", props.tenantId);
     }
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     const res = await store
       .saveGuarantorFinancial(formData)
       .then(() => {
@@ -441,7 +443,7 @@ const guarantorFinancialDocumentSelected = computed(() => {
         return Promise.reject(new Error("err"));
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
     return res;
   }

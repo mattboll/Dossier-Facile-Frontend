@@ -112,6 +112,7 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useLoading } from 'vue-loading-overlay';
 
 // extend("zipcode", {
 //   validate: (field) => new RegExp(/^[0-9]{5}$/).test(field),
@@ -146,8 +147,8 @@ const router = useRouter();
 
   function unlinkFranceConnect() {
     openUnlinkModal.value = false;
-    // TODO
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     if (!user.value) {
       return;
     }
@@ -165,7 +166,7 @@ const router = useRouter();
         }
       )
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
   function handleNameInformation() {

@@ -23,6 +23,7 @@ import { useRouter } from 'vue-router';
 import { RegisterService } from '@/services/RegisterService';
 import axios from 'axios';
 import { ToastService } from '@/services/ToastService';
+import {useLoading} from 'vue-loading-overlay'
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
@@ -1102,8 +1103,9 @@ const useTenantStore = defineStore('tenant', {
       this.setApartmentSharingLinks(updatedLinks);
     },
   deleteFile(id: number | string, silent = false) {
-    // TODO
-    // const loader = Vue.$loading.show();
+    console.log("deletenisr")
+    const $loading = useLoading({});
+    const loader = $loading.show();
     const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
     axios
       .delete(url)
@@ -1116,9 +1118,8 @@ const useTenantStore = defineStore('tenant', {
         ToastService.deleteFailed();
       })
       .finally(() => {
-    // TODO
-        // loader.hide();
-          this.loadUser();
+        loader.hide();
+        this.loadUser();
       });
   },
   documentsFilled(user?: User): any {

@@ -118,6 +118,7 @@ import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
   const documents = DocumentTypeConstants.REPRESENTATIVE_IDENTIFICATION;
   const props = defineProps<{
@@ -203,7 +204,8 @@ const uploadProgress = ref({} as {
     }
 
     if (!files.value.length) {
-      // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
       return RegisterService.saveLegalPersonRepresentantName(formData)
         .then(() => {
           files.value = [];
@@ -218,7 +220,7 @@ const uploadProgress = ref({} as {
           return Promise.reject(err);
         })
         .finally(() => {
-          // loader.hide();
+          loader.hide();
         });
     }
 

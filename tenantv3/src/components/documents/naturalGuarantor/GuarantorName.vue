@@ -89,6 +89,7 @@ import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const store = useTenantStore();
 const selectedGuarantor = computed(() => store.selectedGuarantor);
@@ -122,7 +123,8 @@ const { t } = useI18n();
       formData.append("lastName", UtilsService.capitalize(lastName.value));
     }
     formData.append("guarantorId", store.guarantor.id?.toString() || "");
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store
       .saveGuarantorName(formData)
       .then(() => {
@@ -134,7 +136,7 @@ const { t } = useI18n();
         ToastService.saveFailed();
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 

@@ -72,6 +72,7 @@ import BackNext from "@/components/footer/BackNext.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { ToastService } from "@/services/ToastService";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   components: {
@@ -134,7 +135,8 @@ export default class CoTenantResidency extends Vue {
       formData.append("id", this.document.id.toString());
     }
     formData.append("tenantId", this.coTenantId.toString());
-    const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
 
     this.$store
       .dispatch("saveTenantResidency", formData)

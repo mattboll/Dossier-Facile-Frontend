@@ -119,6 +119,7 @@ import ProfileFooter from "./footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ApplicationTypeSelector from "../components/ApplicationTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   computed: {
@@ -203,7 +204,8 @@ export default class TenantInformationForm extends Vue {
             };
             return this.$store.dispatch("setCoTenants", data);
           };
-    const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
 
     dispatchMethod()
       .then(

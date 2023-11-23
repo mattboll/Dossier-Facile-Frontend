@@ -85,6 +85,7 @@ import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
   const store = useTenantStore();
   const user = computed(() => store.userToEdit);
@@ -253,7 +254,8 @@ import { ToastService } from "@/services/ToastService";
       throw new Error("selectedGuarantor id cannot be empty !");
     }
     formData.append("guarantorId", selectedGuarantor.value.id?.toString());
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     store
       .saveGuarantorIdentification(formData)
       .then(() => {
@@ -266,7 +268,7 @@ import { ToastService } from "@/services/ToastService";
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 

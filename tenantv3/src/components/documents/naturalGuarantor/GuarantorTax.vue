@@ -158,6 +158,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
 import { emit } from "process";
+import { useLoading } from 'vue-loading-overlay';
 
 // TODO
 // extend("is", {
@@ -198,8 +199,7 @@ const { t } = useI18n();
   const isWarningTaxSituationModalVisible = ref(false);
   
   
-  // TODO
-  // const loader?: LoaderComponent;
+  var loader: any;
   
   function getRegisteredDoc() {
     if (selectedGuarantor.value?.documents !== null) {
@@ -469,14 +469,14 @@ const { t } = useI18n();
   }
   
   function showLoader() {
-    // if (this.loader === undefined) {
-      //   this.loader = this.$loading.show();
-      // }
+    if (loader === undefined) {
+      const $loading = useLoading({});
+      loader = $loading.show();
     }
     
     function hideLoader() {
-      // this.loader?.hide();
-      // this.loader = undefined;
+      loader?.hide();
+      loader = undefined;
     }
     
     function mapDocuments() {

@@ -11,6 +11,8 @@ import "@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.min.css";
 import keycloak from './plugin/keycloak';
 import axios from 'axios';
+import {LoadingPlugin} from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/css/index.css';
 
 const TENANT_API_URL = import.meta.env.VITE_API_URL;
 
@@ -68,6 +70,7 @@ const TENANT_API_URL = import.meta.env.VITE_API_URL;
 	app.use(createPinia())
 	app.use(router)
 	app.use(i18n)
+  app.use(LoadingPlugin)
 
   app.use(Vue3Toastify, {
     autoClose: 6000,

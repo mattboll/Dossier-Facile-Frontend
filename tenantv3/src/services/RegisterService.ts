@@ -1,11 +1,13 @@
 import useTenantStore from "@/stores/tenant-store";
 import axios from "axios";
 import { ToastService } from "./ToastService";
+import {useLoading} from 'vue-loading-overlay'
+
+const $loading = useLoading({});
 
 export const RegisterService = {
   deleteFile(id: number | string, silent = false) {
-    // TODO
-    // const loader = Vue.$loading.show();
+    const loader = $loading.show();
     const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios
       .delete(url)
@@ -18,7 +20,7 @@ export const RegisterService = {
         ToastService.deleteFailed();
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
         const store = useTenantStore();
         store.loadUser();
       });

@@ -119,6 +119,7 @@ import TextField from "df-shared-next/src/components/form/TextField.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 const store = useTenantStore();
 const selectedGuarantor = computed(() => store.selectedGuarantor);
@@ -284,8 +285,8 @@ const uploadProgress = ref({} as {
     if (props.tenantId) {
       formData.append("tenantId", props.tenantId);
     }
-    // TODO
-    // const loader = this.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     return await store
       .saveGuarantorResidency(formData)
       .then(() => {
@@ -300,7 +301,7 @@ const uploadProgress = ref({} as {
         return false;
       })
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 

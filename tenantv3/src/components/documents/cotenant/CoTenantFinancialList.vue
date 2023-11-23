@@ -84,6 +84,7 @@ import SimulationCaf from "../share/SimulationCaf.vue";
 import { Ref, ref } from "@vue/reactivity";
 import { UtilsService } from "@/services/UtilsService";
 import { ToastService } from "@/services/ToastService";
+import { useLoading } from 'vue-loading-overlay';
 
 @Component({
   components: {
@@ -227,7 +228,8 @@ export default class CoTenantFinancialList extends Vue {
   }
 
   removeFinancial(f?: FinancialDocument) {
-    const loader = Vue.$loading.show();
+    const $loading = useLoading({});
+    const loader = $loading.show();
     this.$store
       .dispatch("deleteDocument", f?.id)
       .then(
