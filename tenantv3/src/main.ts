@@ -13,6 +13,92 @@ import keycloak from './plugin/keycloak';
 import axios from 'axios';
 import {LoadingPlugin} from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
+import { defineRule } from 'vee-validate';
+
+defineRule('only-alpha', (value: any) => {
+  if (!value.match("^[a-zA-Z \\-'’àâäçéèêëîïôöùûüÿæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]*$")) {
+    return 'only-alpha';
+  }
+  return true
+})
+
+defineRule('zipcode', (value: any) => {
+  if (!value.match("^[0-9]{5}$")) {
+    return "zipcode-not-valid"
+  }
+  return true
+})
+
+defineRule('validateEmail', (value: any) => {
+  if (!value) {
+    return 'register.email-not-valid';
+  }
+  return true;
+});
+defineRule('isTrue', (value: any) => {
+  if (!value) {
+    return 'field-required';
+  }
+  return true;
+});
+defineRule('hasValue', (value: any) => {
+  if (!value) {
+    return 'field-required';
+  }
+  return true;
+});
+defineRule('required', (value: any) => {
+  if (typeof value === 'number') {
+    if (!value && value !== 0) {
+      return 'field-required';
+    }
+    return true;
+  }
+  if (!value || !value.length) {
+    return 'field-required';
+  }
+  return true;
+});
+defineRule('email', (value: any) => {
+  if (!value || !value.length) {
+    return true;
+  }
+  if (!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/.test(value)) {
+    return 'register.email-not-valid';
+  }
+  return true;
+});
+defineRule('strength', (_value: any, [score]: number[]) => {
+  if (score < 2) {
+    return 'register.strength-not-valid';
+  }
+  return true;
+});
+defineRule('confirm', (_value: any, [password, confirm]: string[]) => {
+  if (password !== confirm) {
+    return 'register.confirm-not-valid';
+  }
+  return true;
+});
+defineRule('positive', (value: any) => {
+  if (!value || !value.length) {
+    return true;
+  }
+  if (value <= 0) {
+    return 'number-not-positive';
+  }
+  return true;
+});
+defineRule('positiveOrNull', (value: any) => {
+  if (!value || !value.length) {
+    return true;
+  }
+  if (value < 0) {
+    return 'number-not-positive-or-null';
+  }
+  return true;
+});
+
 
 const TENANT_API_URL = import.meta.env.VITE_API_URL;
 

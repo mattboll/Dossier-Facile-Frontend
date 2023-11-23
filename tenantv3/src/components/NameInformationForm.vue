@@ -30,12 +30,10 @@
         </ConfirmModal>
       </div>
 
-      <!-- <ValidationObserver v-slot="{ handleSubmit }"> -->
-        <form
+        <Form
           class="fr-mt-3w"
           name="nameInformationForm"
-          @submit.prevent="handleNameInformation"
-        >
+         @submit="handleNameInformation">
           <div class="fr-grid-row fr-grid-row--center">
             <div class="fr-col-12 fr-mb-3w">
               <TextField
@@ -93,14 +91,13 @@
             </div>
           </div>
           <ProfileFooter :showBack="false"></ProfileFooter>
-        </form>
-      <!-- </ValidationObserver> -->
+        </Form>
     </NakedCard>
   </div>
 </template>
 
 <script setup lang="ts">
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
+import { Form } from "vee-validate";
 import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import NameInformationHelp from "./helps/NameInformationHelp.vue";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
@@ -114,11 +111,6 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useLoading } from 'vue-loading-overlay';
 
-// extend("zipcode", {
-//   validate: (field) => new RegExp(/^[0-9]{5}$/).test(field),
-//   message: "nameinformationform.zipcode-not-valid",
-// });
-
   const store = useTenantStore();
   const user = computed(() => store.userToEdit);
 
@@ -131,6 +123,7 @@ const router = useRouter();
   const lastname = ref("");
   const preferredname = ref("");
   const zipcode = ref("");
+    const $loading = useLoading({});
 
   onBeforeMount(() => {
     firstname.value = user.value?.firstName || "";
@@ -147,7 +140,6 @@ const router = useRouter();
 
   function unlinkFranceConnect() {
     openUnlinkModal.value = false;
-    const $loading = useLoading({});
     const loader = $loading.show();
     if (!user.value) {
       return;
@@ -182,7 +174,7 @@ const router = useRouter();
       router.push({ name: "TenantType" });
       return;
     }
-    // const loader = this.$loading.show();
+    const loader = $loading.show();
     store.updateUserFirstname(firstname.value);
     store.updateUserLastname(lastname.value);
     store.updateUserPreferredname(preferredname.value);
@@ -200,7 +192,7 @@ const router = useRouter();
         }
       )
       .finally(() => {
-        // loader.hide();
+        loader.hide();
       });
   }
 </script>
