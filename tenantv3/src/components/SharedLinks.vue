@@ -44,8 +44,8 @@
               <Toggle
                 :id="link.id"
                 :value="link.enabled"
-                :checkedLabel="t('enabled')"
-                :uncheckedLabel="t('disabled')"
+                :checkedLabel="t('sharing-page.shared-links.enabled')"
+                :uncheckedLabel="t('sharing-page.shared-links.disabled')"
                 @update="updateSharedLinkStatus(link, $event)"
               />
             </td>
