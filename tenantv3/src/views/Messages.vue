@@ -17,7 +17,7 @@
               :aria-controls="`tabpanel-${k}-panel`"
               @click="markMessagesAsRead(tenant.id)"
             >
-              {{ UtilsServices.tenantFullName(tenant) }}
+              {{ UtilsService.tenantFullName(tenant) }}
             </button>
           </li>
         </ul>
@@ -44,7 +44,7 @@ import { User } from "df-shared-next/src/models/User";
 import MessagesPanel from "../components/MessagesPanel.vue";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
-import UtilsServices from "../services/UtilsService";
+import { UtilsService } from "@/services/UtilsService";
 
     const store = useTenantStore();
     const user = computed(() => store.user);
