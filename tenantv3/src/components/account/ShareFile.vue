@@ -89,70 +89,58 @@
     </form>
   </div>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { OwnerService } from "../../services/OwnerService";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import { Component, Vue } from "vue-property-decorator";
-import { ValidationProvider } from "vee-validate";
-import { mapState } from "vuex";
-import { User } from "df-shared-next/src/models/User";
 import { ToastService } from "@/services/ToastService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, ref } from "vue";
 
-@Component({
-  components: {
-    DfButton,
-    ValidationProvider,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class ShareFile extends Vue {
-  TENANT_URL = `https://${process.env.VUE_APP_TENANT_URL}`;
-  shareType = "full";
-  shareMethod = "mail";
-  user!: User;
-  email = "";
+      const store = useTenantStore();
+      const user = computed(() => store.user);
 
-  handleSubmit() {
-    if (this.shareMethod === "mail") {
-      this.sendMail();
+  const TENANT_URL = `https://${import.meta.env.VITE_TENANT_URL}`;
+  const shareType = ref("full");
+  const shareMethod = ref("mail");
+  const email = ref("");
+
+  function handleSubmit() {
+    if (shareMethod.value === "mail") {
+      sendMail();
     } else {
-      this.copyLink();
+      copyLink();
     }
     return true;
   }
 
-  sendMail() {
-    AnalyticsService.shareByMail(this.shareType === "full" ? "full" : "resume");
-    OwnerService.sendFileByMail(this.email, this.shareType)
+  function sendMail() {
+    AnalyticsService.shareByMail(shareType.value === "full" ? "full" : "resume");
+    OwnerService.sendFileByMail(email.value, shareType.value)
       .then(() => {
         ToastService.success("sharefile.sent-success");
-        this.email = "";
-        this.$store.dispatch("loadApartmentSharingLinks");
+        email.value = "";
+        store.loadApartmentSharingLinks();
       })
       .catch(() => {
         ToastService.error();
       });
   }
 
-  getUrl() {
-    if (this.shareType === "full") {
-      return `${this.TENANT_URL}/file/${this.user.apartmentSharing?.token}`;
+  function getUrl() {
+    if (shareType.value === "full") {
+      return `${TENANT_URL}/file/${user.value.apartmentSharing?.token}`;
     }
-    return `${this.TENANT_URL}/public-file/${this.user.apartmentSharing?.tokenPublic}`;
+    return `${TENANT_URL}/public-file/${user.value.apartmentSharing?.tokenPublic}`;
   }
 
-  copyLink() {
-    const url = this.getUrl();
+  function copyLink() {
+    const url = getUrl();
 
     try {
       navigator.clipboard.writeText(url);
       ToastService.success("account.copied")
-      AnalyticsService.copyLink(this.shareType === "full" ? "full" : "resume");
+      AnalyticsService.copyLink(shareType.value === "full" ? "full" : "resume");
     } catch (err) {
       ToastService.error("unable-to-coy")
       alert("Oops, unable to copy");
@@ -160,7 +148,6 @@ export default class ShareFile extends Vue {
     }
     return Promise.resolve(true);
   }
-}
 </script>
 
 <style scoped lang="scss">

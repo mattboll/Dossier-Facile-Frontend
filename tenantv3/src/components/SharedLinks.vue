@@ -8,17 +8,17 @@
       <table>
         <caption>
           {{
-            t("title")
+            t("sharing-page.shared-links.title")
           }}
         </caption>
         <thead>
           <tr>
-            <th scope="col">{{ t("date") }}</th>
-            <th scope="col" colspan="2">{{ t("contact") }}</th>
-            <th scope="col">{{ t("application-type") }}</th>
-            <th scope="col">{{ t("last-visit") }}</th>
-            <th scope="col">{{ t("link-status") }}</th>
-            <th scope="col">{{ t("action") }}</th>
+            <th scope="col">{{ t("sharing-page.shared-links.date") }}</th>
+            <th scope="col" colspan="2">{{ t("sharing-page.shared-links.contact") }}</th>
+            <th scope="col">{{ t("sharing-page.shared-links.application-type") }}</th>
+            <th scope="col">{{ t("sharing-page.shared-links.last-visit") }}</th>
+            <th scope="col">{{ t("sharing-page.shared-links.link-status") }}</th>
+            <th scope="col">{{ t("sharing-page.shared-links.action") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -31,10 +31,10 @@
             <td colspan="2" class="wrap">{{ link.ownerEmail }}</td>
             <td>
               <span v-if="link.fullData">
-                {{ $t("sharefile.full") }}
+                {{ t("sharefile.full") }}
               </span>
               <span v-else class="fr-label--disabled">
-                {{ $t("sharefile.resume") }}
+                {{ t("sharefile.resume") }}
               </span>
             </td>
             <td class="wrap">
@@ -51,13 +51,13 @@
             </td>
             <td>
               <Button @on-click="deleteSharedLink(link)">
-                {{ t("delete") }}
+                {{ t("sharing-page.shared-links.delete") }}
               </Button>
             </td>
           </tr>
           <tr v-if="links.length === 0">
             <td colspan="7" style="text-align: center">
-              {{ t("no-shared-file") }}
+              {{ t("sharing-page.shared-links.no-shared-file") }}
             </td>
           </tr>
         </tbody>
@@ -78,7 +78,7 @@
             <ColoredTag
               :hideIcon="true"
               :text="
-                link.fullData ? $t('sharefile.full') : $t('sharefile.resume')
+                link.fullData ? t('sharefile.full') : $t('sharefile.resume')
               "
               :status="'grey'"
               :active="link.enabled"
@@ -90,13 +90,13 @@
               class="fr-toggle--label-left"
               :id="link.id"
               :value="link.enabled"
-              :checkedLabel="t('enabled')"
-              :uncheckedLabel="t('disabled')"
+              :checkedLabel="t('sharing-page.shared-links.enabled')"
+              :uncheckedLabel="t('sharing-page.shared-links.disabled')"
               @update="updateSharedLinkStatus(link, $event)"
             />
           </div>
           <div class="fr-col-12 small-text">
-            {{ $t("sharefile.lastvisit") }}
+            {{ t("sharefile.lastvisit") }}
             {{ formatDateRelativeToNow(link.lastVisit) }}
           </div>
           <div class="fr-col-12">
@@ -114,42 +114,34 @@
         </li>
       </ul>
       <div v-if="links.length === 0" style="text-align: center">
-        {{ t("no-shared-file") }}
+        {{ t("sharing-page.shared-links.no-shared-file") }}
       </div>
     </div>
   </NakedCard>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import Toggle from "df-shared-next/src/components/Toggle.vue";
 import { ApartmentSharingLink } from "df-shared-next/src/models/ApartmentSharingLink";
 import Button from "df-shared-next/src/Button/Button.vue";
 import moment from "moment";
-import { mapState } from "vuex";
-import store from "@/store";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import { ToastService } from "@/services/ToastService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: { NakedCard, Button, ColoredTag, Toggle },
-  computed: {
-    ...mapState({
-      links: "apartmentSharingLinks",
-    }),
-  },
-})
-export default class SharedLinks extends Vue {
-  links!: ApartmentSharingLink[];
+const store = useTenantStore();
+const links = computed(() => store.apartmentSharingLinks);
+const { t } = useI18n();
 
-  deleteSharedLink(link: ApartmentSharingLink) {
-    store.dispatch("deleteApartmentSharingLink", link);
+  function deleteSharedLink(link: ApartmentSharingLink) {
+    store.deleteApartmentSharingLink(link);
   }
 
-  updateSharedLinkStatus(link: ApartmentSharingLink, enabled: boolean) {
-    store
-      .dispatch("updateApartmentSharingLinkStatus", { link, enabled })
+  function updateSharedLinkStatus(link: ApartmentSharingLink, enabled: boolean) {
+    store.updateApartmentSharingLinkStatus(link, enabled )
       .then(() => {
         ToastService.saveSuccess();
       })
@@ -158,30 +150,25 @@ export default class SharedLinks extends Vue {
       });
   }
 
-  formatDate(date: string | undefined) {
+  function formatDate(date: string | undefined) {
     if (date === undefined) {
       return "";
     }
     return moment(date).format("D MMM YYYY");
   }
 
-  formatDateRelativeToNow(date: string | undefined) {
+  function formatDateRelativeToNow(date: string | undefined) {
     if (date === undefined) {
-      return this.t("never");
+      return t("sharing-page.shared-links.never");
     }
     const relativeDate = moment(date).fromNow();
-    return this.capitalizeFirstLetter(relativeDate);
+    return capitalizeFirstLetter(relativeDate);
   }
 
-  capitalizeFirstLetter(str: string) {
+  function capitalizeFirstLetter(str: string) {
     const firstLetter = str.at(0)?.toUpperCase();
     return firstLetter + str.substring(1);
   }
-
-  t(key: string) {
-    return this.$t(`sharing-page.shared-links.${key}`);
-  }
-}
 </script>
 
 <style scoped lang="scss">

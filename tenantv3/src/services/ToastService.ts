@@ -18,8 +18,8 @@ export const ToastService = {
 	saveFailed() {
 		toast.error(i18n.global.t("save-failed"));
 	},
-	saveSuccess(message: string = "error") {
-		toast.success(i18n.global.t(message));
+	saveSuccess() {
+		toast.success(i18n.global.t("save-success"));
 	},
 
 	maxFileError(value: number, max: number) {
