@@ -1,52 +1,50 @@
 <template>
-  <validation-provider :rules="getValidationRules()" v-slot="{ errors, valid }">
-    <div
-      class="fr-input-group"
-      :class="errors[0] ? 'fr-input-group--error' : ''"
-    >
-      <FieldLabel :required="required" :for-input="name">
-        {{ fieldLabel }}
-      </FieldLabel>
-      <div class="field-with-button fr-input-wrap">
-        <input
-          v-if="!textarea"
-          :id="name"
-          type="text"
-          v-bind:value="modelValue"
-          v-on:input="emit('update:modelValue', $event)"
-          :name="name"
-          class="validate-required form-control fr-input"
-          :class="{
+  <!-- <validation-provider :rules="getValidationRules()" v-slot="{ errors, valid }"> -->
+  <!-- :class="errors[0] ? 'fr-input-group--error' : ''" -->
+  <div class="fr-input-group">
+    <FieldLabel :required="required" :for-input="name">
+      {{ fieldLabel }}
+    </FieldLabel>
+    <div class="field-with-button fr-input-wrap">
+      <!-- :class="{
             'fr-input--valid': valid,
             'fr-input--error': errors[0],
-          }"
-          :disabled="disabled"
-        />
-        <textarea
-          v-else
-          :id="name"
-          type="text"
-          :value="modelValue"
-          v-on:input="emit('update:modelValue', $event)"
-          :name="name"
-          class="validate-required form-control fr-input"
-          :class="{
+          }" -->
+      <input
+        v-if="!textarea"
+        :id="name"
+        type="text"
+        v-bind:value="modelValue"
+        v-on:input="updateModel($event)"
+        :name="name"
+        class="validate-required form-control fr-input"
+        :disabled="disabled"
+      />
+      <!-- :class="{
             'fr-input--valid': valid,
             'fr-input--error': errors[0],
-          }"
-          :disabled="disabled"
-          maxlength="2000"
-          rows="4"
-        />
-        <div class="fr-ml-1w" v-if="$slots.right">
-          <slot name="right"></slot>
-        </div>
+          }" -->
+      <textarea
+        v-else
+        :id="name"
+        type="text"
+        :value="modelValue"
+        v-on:input="emit('update:modelValue', $event)"
+        :name="name"
+        class="validate-required form-control fr-input"
+        :disabled="disabled"
+        maxlength="2000"
+        rows="4"
+      />
+      <div class="fr-ml-1w" v-if="$slots.right">
+        <slot name="right"></slot>
       </div>
-      <span class="fr-error-text" v-if="errors[0]">
-        {{ t(errors[0]) }}
-      </span>
     </div>
-  </validation-provider>
+    <!-- <span class="fr-error-text" v-if="errors[0]">
+        {{ t(errors[0]) }}
+      </span> -->
+  </div>
+  <!-- </validation-provider> -->
 </template>
 
 <script setup lang="ts">
@@ -85,6 +83,10 @@ function getValidationRules(): string {
       .join("|");
   }
   return props.validationRules;
+}
+
+function updateModel(event: Event) {
+  emit("update:modelValue", (event.target as HTMLInputElement).value);
 }
 </script>
 

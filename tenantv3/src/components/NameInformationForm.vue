@@ -30,17 +30,17 @@
         </ConfirmModal>
       </div>
 
-      <ValidationObserver v-slot="{ handleSubmit }">
+      <!-- <ValidationObserver v-slot="{ handleSubmit }"> -->
         <form
           class="fr-mt-3w"
           name="nameInformationForm"
-          @submit.prevent="handleSubmit(handleNameInformation)"
+          @submit.prevent="handleNameInformation"
         >
           <div class="fr-grid-row fr-grid-row--center">
             <div class="fr-col-12 fr-mb-3w">
               <TextField
                 name="lastname"
-                :fieldLabel="$tc('nameinformationform.lastname')"
+                :fieldLabel="$t('nameinformationform.lastname')"
                 validation-rules="only-alpha"
                 v-model.trim="lastname"
                 :required="true"
@@ -58,7 +58,7 @@
             <div class="fr-col-12 fr-mb-3w" v-if="displayPreferredNameField">
               <TextField
                 name="preferredname"
-                :fieldLabel="$tc('nameinformationform.preferredname')"
+                :fieldLabel="$t('nameinformationform.preferredname')"
                 validation-rules="only-alpha"
                 v-model.trim="preferredname"
               >
@@ -76,7 +76,7 @@
             <div class="fr-col-12 fr-mb-3w">
               <TextField
                 name="firstname"
-                :fieldLabel="$tc('nameinformationform.firstname')"
+                :fieldLabel="$t('nameinformationform.firstname')"
                 validation-rules="only-alpha"
                 v-model.trim="firstname"
                 :required="true"
@@ -86,7 +86,7 @@
             <div class="fr-col-12 fr-mb-3w">
               <TextField
                 name="zipcode"
-                :fieldLabel="$tc('nameinformationform.zipcode')"
+                :fieldLabel="$t('nameinformationform.zipcode')"
                 validation-rules="zipcode"
                 v-model="zipcode"
               />
@@ -94,7 +94,7 @@
           </div>
           <ProfileFooter :showBack="false"></ProfileFooter>
         </form>
-      </ValidationObserver>
+      <!-- </ValidationObserver> -->
     </NakedCard>
   </div>
 </template>
