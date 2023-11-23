@@ -41,8 +41,8 @@
           <SimpleRadioButtons
             v-if="listType !== 'dropDownList'"
             name="application-type-selector"
-            v-model="document"
-            @input="onSelectChange"
+            :value="document"
+            @input="onSelectChange($event)"
             :elements="mapDocuments()"
           ></SimpleRadioButtons>
         </div>
@@ -211,7 +211,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { RegisterService } from "@/services/RegisterService";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DfFile } from "df-shared-next/src/models/DfFile";
@@ -220,257 +220,248 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import { User } from "df-shared-next/src/models/User";
 import { cloneDeep } from "lodash";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import ListItem from "../../uploads/ListItem.vue";
 import { ValidationProvider } from "vee-validate";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import Modal from "df-shared-next/src/components/Modal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { PdfAnalysisService } from "../../../services/PdfAnalysisService";
-import { LoaderComponent } from "vue-loading-overlay";
 import WarningTaxDeclaration from "@/components/documents/share/WarningTaxDeclaration.vue";
 import SimpleRadioButtons from "df-shared-next/src/Button/SimpleRadioButtons.vue";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import { computed, onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    WarningTaxDeclaration,
-    AllDeclinedMessages,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    WarningMessage,
-    ConfirmModal,
-    Modal,
-    DfButton,
-    VGouvFrModal,
-    NakedCard,
-    DocumentHelp,
-    SimpleRadioButtons,
-  },
-})
-export default class DocumentDownloader extends Vue {
-  @Prop() coTenantId!: number;
-  @Prop() documentsDefinitions!: any;
-  @Prop() documentCategory!: string;
-  @Prop() editedDocumentId?: number;
-  @Prop() dispatchMethodName!: string;
-  @Prop() typeDocument!: string;
-  @Prop({ default: "default" }) listType!: string;
-  @Prop({ default: true }) showDownloader!: boolean;
-  @Prop({ default: false }) allowNoDocument!: boolean;
-  @Prop({ default: false }) forceShowDownloader!: boolean;
-  @Prop({ default: false }) testAvisSituation!: boolean;
-  @Prop({ default: "documents." }) translationKeyPrefix!: boolean;
+const store = useTenantStore();
 
-  localEditedDocumentId = this.editedDocumentId;
-  documentDeniedReasons = new DocumentDeniedReasons();
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  document = new DocumentType();
-  isDocDeleteVisible = false;
-  selectedCoTenant!: User;
+  const props = withDefaults(defineProps<{
+    coTenantId: number;
+    documentsDefinitions: any;
+    documentCategory: string;
+    editedDocumentId?: number;
+    dispatchMethodName: string;
+    typeDocument: string;
+    listType: string;
+    showDownloader: boolean;
+    allowNoDocument: boolean;
+    forceShowDownloader: boolean;
+    testAvisSituation: boolean;
+    translationKeyPrefix: string;
+  }>(), {
+    listType: "default",
+    showDownloader: true,
+    allowNoDocument: false,
+    forceShowDownloader: false,
+    testAvisSituation: false,
+    translationKeyPrefix: "documents.",
+  })
 
-  dfDocument!: DfDocument;
-  noDocument = false;
-  showIsNoDocumentAndFiles = false;
-  newFiles: File[] = [];
-  isWarningTaxSituationModalVisible = false;
+  const localEditedDocumentId = ref(props.editedDocumentId);
+  const documentDeniedReasons = ref(new DocumentDeniedReasons());
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const document = ref(new DocumentType());
+  const isDocDeleteVisible = ref(false);
+  const selectedCoTenant = ref(new User());
+
+  const dfDocument = ref(new DfDocument());
+  const noDocument = ref(false);
+  const showIsNoDocumentAndFiles = ref(false);
+  const newFiles = ref([] as File[]);
+  const isWarningTaxSituationModalVisible = ref(false);
+
+  const emit = defineEmits(["on-change-document", "enrich-form-data"]);
 
   var loader: any;
 
-  beforeMount() {
-    this.loadDocument();
-    this.noDocument = this.dfDocument?.noDocument == true;
-    this.$emit("on-change-document", this.document, this.dfDocument);
-  }
+  onBeforeMount(() => {
+    loadDocument();
+    noDocument.value = dfDocument.value?.noDocument == true;
+    emit("on-change-document", document.value, dfDocument.value);
+  })
 
-  changeNoDocument(event: Event) {
+  function changeNoDocument(event: Event) {
     event.preventDefault();
     event.stopPropagation();
-    if (!this.noDocument && Number(this.dfDocument?.files?.length) > 0) {
-      this.showIsNoDocumentAndFiles = true;
-      this.dfDocument.noDocument = this.noDocument;
+    if (!noDocument.value && Number(dfDocument.value?.files?.length) > 0) {
+      showIsNoDocumentAndFiles.value = true;
+      dfDocument.value.noDocument = noDocument.value;
       return;
     } else {
-      this.noDocument = !this.noDocument;
-      this.dfDocument.noDocument = this.noDocument;
+      noDocument.value = !noDocument.value;
+      dfDocument.value.noDocument = noDocument.value;
     }
-    this.$emit("on-change-document", this.document, this.dfDocument);
+    emit("on-change-document", document.value, dfDocument.value);
   }
 
-  onSelectChange() {
-    if (this.selectedCoTenant?.documents !== null) {
-      const doc = this.getDocument();
+  function onSelectChange($event: any) {
+    document.value = $event
+    if (selectedCoTenant.value?.documents !== null) {
+      const doc = getDocument();
       if (doc !== undefined) {
-        this.isDocDeleteVisible =
+        isDocDeleteVisible.value =
           (doc.files?.length || 0) > 0 &&
-          doc.subCategory !== this.document.value;
+          doc.subCategory !== document.value.value;
       }
     }
-    this.$emit("on-change-document", this.document, this.dfDocument);
+    emit("on-change-document", document.value, dfDocument.value);
     // why ? no
-    this.noDocument = this.dfDocument?.noDocument == true;
+    noDocument.value = dfDocument.value?.noDocument == true;
     return false;
   }
 
-  get documentStatus() {
-    return this.getDocument()?.documentStatus;
-  }
-  documentFiles(): DfFile[] {
-    return this.getDocument().files
-      ? (this.getDocument().files as DfFile[])
+const documentStatus = computed(() => {
+  return getDocument()?.documentStatus;
+});
+  function documentFiles(): DfFile[] {
+    return getDocument().files
+      ? (getDocument().files as DfFile[])
       : [];
   }
 
-  loadDocument(forceLoadLast?: boolean) {
-    this.selectedCoTenant = UtilsService.getTenant(Number(this.coTenantId));
-    if (this.localEditedDocumentId) {
-      const doc = this.selectedCoTenant.documents
-        ? (this.selectedCoTenant.documents.find((d: DfDocument) => {
+  function loadDocument(forceLoadLast?: boolean) {
+    selectedCoTenant.value = store.getTenant(Number(props.coTenantId));
+    if (localEditedDocumentId.value) {
+      const doc = selectedCoTenant.value.documents
+        ? (selectedCoTenant.value.documents.find((d: DfDocument) => {
             return (
-              d.documentCategory === this.documentCategory &&
-              d.id === this.localEditedDocumentId
+              d.documentCategory === props.documentCategory &&
+              d.id === localEditedDocumentId.value
             );
           }) as DfDocument)
         : undefined;
 
-      this.dfDocument = doc ? doc : new DfDocument();
-      if (this.localEditedDocumentId == -1 && forceLoadLast) {
-        const docs = this.selectedCoTenant.documents?.filter(
+      dfDocument.value = doc ? doc : new DfDocument();
+      if (localEditedDocumentId.value == -1 && forceLoadLast) {
+        const docs = selectedCoTenant.value.documents?.filter(
           (d: DfDocument) => {
-            return d.documentCategory === this.documentCategory;
+            return d.documentCategory === props.documentCategory;
           }
         ) as DfDocument[];
 
-        this.dfDocument = docs[docs.length - 1];
-        this.localEditedDocumentId = this.dfDocument.id;
+        dfDocument.value = docs[docs.length - 1];
+        localEditedDocumentId.value = dfDocument.value.id;
       }
     } else {
-      const doc = this.selectedCoTenant.documents
-        ? (this.selectedCoTenant.documents.find((d: DfDocument) => {
-            return d.documentCategory === this.documentCategory;
+      const doc = selectedCoTenant.value.documents
+        ? (selectedCoTenant.value.documents.find((d: DfDocument) => {
+            return d.documentCategory === props.documentCategory;
           }) as DfDocument)
         : undefined;
 
-      this.dfDocument = doc ? doc : new DfDocument();
+      dfDocument.value = doc ? doc : new DfDocument();
     }
 
     // loadDocType
-    const localDoc = this.documentsDefinitions.find((d: DocumentType) => {
-      return d.value === this.dfDocument.subCategory;
+    const localDoc = props.documentsDefinitions.find((d: DocumentType) => {
+      return d.value === dfDocument.value.subCategory;
     });
     if (localDoc !== undefined) {
-      this.document = localDoc;
+      document.value = localDoc;
     }
 
-    if (this.dfDocument?.documentDeniedReasons) {
-      this.documentDeniedReasons = cloneDeep(
-        this.dfDocument?.documentDeniedReasons
+    if (dfDocument.value?.documentDeniedReasons) {
+      documentDeniedReasons.value = cloneDeep(
+        dfDocument.value?.documentDeniedReasons
       ) as DocumentDeniedReasons;
     }
   }
 
-  getDocument(): DfDocument {
-    return this.dfDocument;
+  function getDocument(): DfDocument {
+    return dfDocument.value;
   }
 
-  undoSelect() {
-    if (this.selectedCoTenant?.documents !== null) {
-      const doc = this.getDocument();
+  function undoSelect() {
+    if (selectedCoTenant.value?.documents !== null) {
+      const doc = getDocument();
       if (doc !== undefined) {
-        const localDoc = this.documentsDefinitions.find((d: DocumentType) => {
+        const localDoc = props.documentsDefinitions.find((d: DocumentType) => {
           return d.value === doc.subCategory;
         });
         if (localDoc !== undefined) {
-          this.document = localDoc;
+          document.value = localDoc;
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
-  validSelect() {
-    this.isDocDeleteVisible = false;
-    if (this.selectedCoTenant.documents !== null) {
-      const doc = this.getDocument();
+  function validSelect() {
+    isDocDeleteVisible.value = false;
+    if (selectedCoTenant.value.documents !== null) {
+      const doc = getDocument();
       if (doc?.files !== undefined) {
         for (const f of doc.files) {
           if (f.id) {
-            this.remove(f);
+            remove(f);
           }
         }
       }
       doc.customText = undefined;
-      this.localEditedDocumentId = -1;
+      localEditedDocumentId.value = -1;
     }
   }
 
-  forceSave() {
-    this.isWarningTaxSituationModalVisible = false;
-    this.saveNewFiles(true);
+  function forceSave() {
+    isWarningTaxSituationModalVisible.value = false;
+    saveNewFiles(true);
   }
 
-  async addFiles(fileList: File[]) {
-    this.newFiles = fileList;
-    this.showLoader();
+  async function addFiles(fileList: File[]) {
+    newFiles.value = fileList;
+    showLoader();
     if (
-      this.testAvisSituation &&
+      props.testAvisSituation &&
       (await PdfAnalysisService.includesRejectedTaxDocuments(fileList))
     ) {
-      this.isWarningTaxSituationModalVisible = true;
-      this.hideLoader();
+      isWarningTaxSituationModalVisible.value = true;
+      hideLoader();
     } else {
-      this.saveNewFiles(false);
+      saveNewFiles(false);
     }
   }
 
-  saveNewFiles(avisDetected: boolean) {
-    const filesToAdd = Array.from(this.newFiles).map((f) => {
+  function saveNewFiles(avisDetected: boolean) {
+    const filesToAdd = Array.from(newFiles.value).map((f) => {
       return { name: f.name, file: f, size: f.size };
     });
     if (!filesToAdd || filesToAdd.length <= 0) {
       return;
     }
-    const futurLength = filesToAdd.length + this.documentFiles().length;
+    const futurLength = filesToAdd.length + documentFiles().length;
     if (
-      this.document.maxFileCount &&
-      futurLength > this.document.maxFileCount
+      document.value.maxFileCount &&
+      futurLength > document.value.maxFileCount
     ) {
-      ToastService.maxFileError(futurLength, this.document.maxFileCount);
+      ToastService.maxFileError(futurLength, document.value.maxFileCount);
       return;
     }
-    const formData = this._buildFormData(filesToAdd, avisDetected);
+    const formData = _buildFormData(filesToAdd, avisDetected);
 
-    this.fileUploadStatus = UploadStatus.STATUS_SAVING;
+    fileUploadStatus.value = UploadStatus.STATUS_SAVING;
 
-    this.showLoader();
-    this.$store
-      .dispatch(this.dispatchMethodName, formData)
+    showLoader();
+    store.dispatchByName(props.dispatchMethodName, formData)
       .then(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        this.loadDocument(true);
+        fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
+        loadDocument(true);
         ToastService.saveSuccess();
       })
-      .catch((err) => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+      .catch((err: any) => {
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         UtilsService.handleCommonSaveError(err);
       })
       .finally(() => {
-        this.hideLoader();
+        hideLoader();
       });
   }
 
-  _buildFormData(filesToAdd: any, avisDetected: boolean): FormData {
+  function _buildFormData(filesToAdd: any, avisDetected: boolean): FormData {
     const formData = new FormData();
     const fieldName = "documents";
     Array.from(Array(filesToAdd.length).keys()).forEach((x) => {
@@ -478,12 +469,12 @@ export default class DocumentDownloader extends Vue {
       formData.append(`${fieldName}[${x}]`, f, filesToAdd[x].name);
     });
 
-    formData.append(this.typeDocument, this.document.value);
-    formData.append("tenantId", this.coTenantId.toString());
-    if (this.localEditedDocumentId && this.localEditedDocumentId > 0) {
-      formData.append("id", this.localEditedDocumentId.toString());
+    formData.append(props.typeDocument, document.value.value);
+    formData.append("tenantId", props.coTenantId.toString());
+    if (localEditedDocumentId.value && localEditedDocumentId.value > 0) {
+      formData.append("id", localEditedDocumentId.value.toString());
     }
-    this.$emit("enrich-form-data", formData);
+    emit("enrich-form-data", formData);
     if (avisDetected) {
       formData.append("avisDetected", "true");
     } else {
@@ -493,17 +484,17 @@ export default class DocumentDownloader extends Vue {
     return formData;
   }
 
-  resetFiles() {
-    this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
+  function resetFiles() {
+    fileUploadStatus.value = UploadStatus.STATUS_INITIAL;
   }
 
-  remove(file: DfFile) {
+  function remove(file: DfFile) {
     if (file.id) {
-      this.showLoader();
+      showLoader();
       RegisterService.deleteFileById(Number(file.id))
         .then(() => {
-          this.dfDocument = this.getDocument();
-          this.dfDocument.files = this.dfDocument.files?.filter(
+          dfDocument.value = getDocument();
+          dfDocument.value.files = dfDocument.value.files?.filter(
             (f) => file.id != f.id
           );
 
@@ -514,33 +505,32 @@ export default class DocumentDownloader extends Vue {
           ToastService.saveFailed();
         })
         .finally(() => {
-          this.hideLoader();
+          hideLoader();
         });
     }
   }
 
-  showLoader() {
-    if (this.loader === undefined) {
+  function showLoader() {
+    if (loader === undefined) {
       const $loading = useLoading({});
       loader = $loading.show();
     }
   }
 
-  hideLoader() {
+  function hideLoader() {
     loader?.hide();
     loader = undefined;
   }
 
-  mapDocuments() {
-    return this.documentsDefinitions.map((d: any) => {
+  function mapDocuments() {
+    return props.documentsDefinitions.map((d: any) => {
       return {
         id: d.key,
-        labelKey: this.translationKeyPrefix + d.key,
+        labelKey: props.translationKeyPrefix + d.key,
         value: d,
       };
     });
   }
-}
 </script>
 
 <style scoped lang="scss">

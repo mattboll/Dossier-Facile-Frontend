@@ -1146,6 +1146,13 @@ const useTenantStore = defineStore('tenant', {
         UtilsService.guarantorHasDoc("IDENTIFICATION", g))
     );
   },
+  dispatchByName(name: string, formData: any): any {
+    const func = this[name];
+    if (func) {
+      return func(formData);
+    }
+    return 
+  }
   },
 });
 
