@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 import useTenantStore from './stores/tenant-store';
 import { computed } from 'vue';
 import TenantSkipLinks from './components/TenantSkipLinks.vue';
-import Menu from './components/Menu.vue';
+import TenantMenu from './components/TenantMenu.vue';
 import MyHeader from "./components/Header.vue";
 import Footer from "df-shared-next/src/Footer/Footer.vue";
 import DeleteAccount from './components/DeleteAccount.vue';
@@ -40,7 +40,7 @@ const store = useTenantStore();
       @on-logout="onLogout"
       :showAccessibility="isFunnel"
     >
-      <Menu />
+      <TenantMenu />
     </MyHeader>
     <div id="content">
       <DeleteAccount></DeleteAccount>
