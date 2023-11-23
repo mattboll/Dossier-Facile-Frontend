@@ -4,7 +4,7 @@
       <a
         href="/messaging"
         class="fr-nav__link"
-        :aria-current="currentPage() === 'Messages' ? 'page' : false"
+        :aria-current="currentPage === '/messaging' ? 'page' : undefined"
       >
         {{ t("menu.messaging") }}
         <span v-if="newMessage > 0" class="badge">{{ newMessage }}</span>
@@ -14,7 +14,7 @@
       <a
         :href="`${MAIN_URL}/information`"
         class="fr-nav__link"
-        :aria-current="currentPage() === 'Information' ? 'page' : false"
+        :aria-current="currentPage === '/information' ? 'page' : undefined"
       >
         {{ t("menu.information") }}
       </a>
@@ -39,7 +39,7 @@
         class="fr-nav__btn"
         aria-expanded="false"
         aria-controls="menu-774"
-        :aria-current="currentPage() === 'Account' ? true : false"
+        :aria-current="currentPage === '/account' ? true : undefined"
       >
         {{ t("menu.account") }}
       </button>
@@ -50,7 +50,7 @@
               class="fr-nav__link"
               href="/account"
               target="_self"
-              :aria-current="currentPage() === 'Account' ? 'page' : false"
+              :aria-current="currentPage === '/account' ? 'page' : undefined"
             >
               {{ t("menu.file") }}
               <br />
@@ -64,7 +64,7 @@
               class="fr-nav__link"
               href="/applications"
               target="_self"
-              :aria-current="currentPage() === 'SharingPage' ? 'page' : false"
+              :aria-current="currentPage === '/applications' ? 'page' : undefined"
             >
               {{ t("menu.applications") }}
             </a>
@@ -85,7 +85,7 @@
     <li class="fr-nav__item" :class="{ break: !isLoggedIn }">
       <a
         href="/contact"
-        :aria-current="currentPage() === 'Contact'"
+        :aria-current="currentPage === '/contact' ? 'page' : undefined"
         class="fr-nav__link"
       >
         <span class="fr-icon-mail-line fr-icon--sm" aria-hidden="true"></span>
@@ -101,7 +101,7 @@ import DfButton from "df-shared-next/src/Button/Button.vue";
 import LanguageSelector from "df-shared-next/src/Header/LanguageSelector.vue";
 
 import { useI18n } from "vue-i18n";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 
   const { t } = useI18n();
@@ -114,11 +114,11 @@ import useTenantStore from "@/stores/tenant-store";
   const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
   const DOCS_URL = `//${import.meta.env.VITE_DOCS_URL}`;
 
-  function currentPage() {
-    // TODO
-    // return this.$route.name;
-    return ""
-  }
+const currentPage = ref("/")
+
+onMounted(() => {
+  currentPage.value = window.location.pathname;
+});
 
   function showMessaging() {
     return (
