@@ -29,7 +29,7 @@
                 :aria-controls="`tabpanel-${k}-panel`"
                 @click="tabIndex = k"
               >
-                {{ tenant | fullName }}
+                {{ UtilsService.tenantFullName(tenant) }}
               </button>
             </li>
           </ul>
@@ -44,26 +44,26 @@
           >
             <div>
               <h2 class="fr-h4">
-                {{ $t("publicfile.personnal-file") }}
+                {{ t("publicfile.personnal-file") }}
               </h2>
               <ul class="without-padding">
                 <RowListItem
                   v-if="tenant.clarification !== undefined"
-                  :label="$tc('tenantpanel.clarification-title')"
+                  :label="t('tenantpanel.clarification-title')"
                   :subLabel="tenant.clarification"
                 />
                 <FileRowListItem
-                  :label="$t('publicfile.identification')"
+                  :label="t('publicfile.identification')"
                   :document="document(tenant, 'IDENTIFICATION')"
                   :enableDownload="false"
                 />
                 <FileRowListItem
-                  :label="$t('publicfile.residency')"
+                  :label="t('publicfile.residency')"
                   :document="document(tenant, 'RESIDENCY')"
                   :enableDownload="false"
                 />
                 <FileRowListItem
-                  :label="$t('publicfile.professional')"
+                  :label="t('publicfile.professional')"
                   :document="document(tenant, 'PROFESSIONAL')"
                   :enableDownload="false"
                 />
@@ -71,13 +71,13 @@
                   v-for="(doc, k) in getDocs(tenant, 'FINANCIAL')"
                   v-bind:key="doc.id"
                   :label="
-                    $t('publicfile.financial') + (k >= 1 ? ' ' + (k + 1) : '')
+                    t('publicfile.financial') + (k >= 1 ? ' ' + (k + 1) : '')
                   "
                   :document="doc"
                   :enableDownload="false"
                 />
                 <FileRowListItem
-                  :label="$t('publicfile.tax')"
+                  :label="t('publicfile.tax')"
                   :document="document(tenant, 'TAX')"
                   :tagLabel="getTaxDocumentBadgeLabel(tenant)"
                   :enableDownload="false"
@@ -95,7 +95,7 @@
               </ul>
               <div v-if="hasGuarantor(tenant)">
                 <h2 class="fr-h4 fr-mt-5w">
-                  {{ $t("publicfile.guarant") }}
+                  {{ t("publicfile.guarant") }}
                 </h2>
                 <div v-if="tenant.guarantors">
                   <div v-for="g in tenant.guarantors" v-bind:key="g.id">
@@ -107,17 +107,17 @@
                         <b>{{ g | fullName }}</b>
                       </div>
                       <FileRowListItem
-                        :label="$t('publicfile.identification')"
+                        :label="t('publicfile.identification')"
                         :document="document(g, 'IDENTIFICATION')"
                         :enableDownload="false"
                       />
                       <FileRowListItem
-                        :label="$t('publicfile.residency')"
+                        :label="t('publicfile.residency')"
                         :document="document(g, 'RESIDENCY')"
                         :enableDownload="false"
                       />
                       <FileRowListItem
-                        :label="$t('publicfile.professional')"
+                        :label="t('publicfile.professional')"
                         :document="document(g, 'PROFESSIONAL')"
                         :enableDownload="false"
                       />
@@ -125,14 +125,14 @@
                         v-for="(doc, k) in getDocs(g, 'FINANCIAL')"
                         v-bind:key="doc.id"
                         :label="
-                          $t('publicfile.financial') +
+                          t('publicfile.financial') +
                           (k >= 1 ? ' ' + (k + 1) : '')
                         "
                         :document="doc"
                         :enableDownload="false"
                       />
                       <FileRowListItem
-                        :label="$t('publicfile.tax')"
+                        :label="t('publicfile.tax')"
                         :document="document(g, 'TAX')"
                         :tagLabel="getTaxDocumentBadgeLabel(g)"
                         :enableDownload="false"
@@ -153,12 +153,12 @@
                       class="without-padding"
                     >
                       <FileRowListItem
-                        :label="$t('publicfile.identification-legal-person')"
+                        :label="t('publicfile.identification-legal-person')"
                         :document="document(g, 'IDENTIFICATION_LEGAL_PERSON')"
                         :enableDownload="false"
                       />
                       <FileRowListItem
-                        :label="$t('publicfile.identification')"
+                        :label="t('publicfile.identification')"
                         :document="document(g, 'IDENTIFICATION')"
                         :enableDownload="false"
                       />
@@ -168,7 +168,7 @@
                       class="without-padding"
                     >
                       <FileRowListItem
-                        :label="$t('publicfile.organism')"
+                        :label="t('publicfile.organism')"
                         :document="document(g, 'IDENTIFICATION')"
                         :enableDownload="false"
                       />
@@ -186,65 +186,58 @@
     </div>
     <section class="fr-container fr-mb-7w">
       <div class="fr-mt-3w fr-text--sm fr-label--disabled">
-        {{ $t("file.disclaimer") }}
+        {{ t("file.disclaimer") }}
       </div>
       <OwnerBanner></OwnerBanner>
     </section>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
 import { FileUser } from "df-shared-next/src/models/FileUser";
-import { Vue, Component } from "vue-property-decorator";
 import { ProfileService } from "../services/ProfileService";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import FileReinsurance from "../components/FileReinsurance.vue";
 import FileRowListItem from "../components/documents/FileRowListItem.vue";
 import FileHeader from "../components/FileHeader.vue";
 import OwnerBanner from "../components/OwnerBanner.vue";
-import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileNotFound from "@/views/FileNotFound.vue";
+import { useI18n } from "vue-i18n";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { UtilsService } from "@/services/UtilsService";
 
-@Component({
-  components: {
-    FileNotFound,
-    RowListItem,
-    FileReinsurance,
-    FileRowListItem,
-    OwnerBanner,
-    NakedCard,
-    FileHeader,
-  },
-})
-export default class File extends Vue {
-  user: FileUser | null = null;
-  tabIndex = 0;
-  fileNotFound = false;
+const { t } = useI18n();
 
-  franceConnectTenantCount() {
-    return this.user?.tenants?.filter((t) => t.franceConnect == true).length;
+  const user = ref(new FileUser());
+  const tabIndex = ref(0);
+  const fileNotFound = ref(false);
+  const route = useRoute();
+
+  function franceConnectTenantCount() {
+    return user.value?.tenants?.filter((t) => t.franceConnect == true).length;
   }
 
-  isTaxChecked() {
+  function isTaxChecked() {
     const hasAuthenticTax = (user: User) =>
       user.documents?.some(
         (document: DfDocument) =>
           document.documentCategory === "TAX" &&
           document.authenticityStatus === "AUTHENTIC"
       );
-    return this.user?.tenants?.some((t) => hasAuthenticTax(t));
+    return user.value?.tenants?.some((t) => hasAuthenticTax(t));
   }
 
-  mounted() {
-    const token = this.$route.params.token;
+  onMounted(() => {
+    const token = Array.isArray(route.params.token) ? route.params.token[0] : route.params.token;
     ProfileService.getPublicUserByToken(token)
       .then((d: any) => {
-        this.user = d.data;
-        if (this.user) {
-          this.user.tenants = this.user?.tenants?.sort((t1, t2) => {
+        user.value = d.data;
+        if (user.value) {
+          user.value.tenants = user.value?.tenants?.sort((t1, t2) => {
             return t1.tenantType === "CREATE" && t2.tenantType !== "CREATE"
               ? -1
               : 1;
@@ -252,17 +245,17 @@ export default class File extends Vue {
         }
       })
       .catch(() => {
-        this.fileNotFound = true;
+        fileNotFound.value = true;
       });
     window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
-  beforeDestroy() {
+  })
+  onBeforeUnmount(() => {
     window.Beacon("destroy");
-  }
+  })
 
-  getTenants() {
+  function getTenants() {
     const users: User[] = [];
-    this.user?.tenants?.forEach((t) => {
+    user.value?.tenants?.forEach((t) => {
       if (
         t.firstName &&
         t.lastName &&
@@ -275,9 +268,9 @@ export default class File extends Vue {
 
     return users;
   }
-  taxDocumentStatus() {
-    const taxStatuses = this.user?.tenants?.map(
-      (tenant) => this.document(tenant, "TAX")?.documentStatus
+  function taxDocumentStatus() {
+    const taxStatuses = user.value?.tenants?.map(
+      (tenant) => document(tenant, "TAX")?.documentStatus
     );
 
     if (taxStatuses?.every((docStatus) => docStatus === "VALIDATED")) {
@@ -292,34 +285,33 @@ export default class File extends Vue {
     return "nok";
   }
 
-  document(u: User | Guarantor, s: string) {
+  function document(u: User | Guarantor, s: string) {
     return u.documents?.find((d) => {
       return d.documentCategory === s;
     });
   }
 
-  hasGuarantor(tenant: User) {
+  function hasGuarantor(tenant: User) {
     return tenant.guarantors && tenant.guarantors.length > 0;
   }
 
-  getDocs(tenant: User, docType: string) {
+  function getDocs(tenant: User, docType: string) {
     return tenant.documents?.filter((d: DfDocument) => {
       return d.documentCategory === docType;
     });
   }
 
-  isTaxAuthentic(user: User | Guarantor) {
-    const document = this.document(user, "TAX") as DfDocument;
-    return document.authenticityStatus === "AUTHENTIC";
+  function isTaxAuthentic(user: User | Guarantor) {
+    const doc = document(user, "TAX") as DfDocument;
+    return doc.authenticityStatus === "AUTHENTIC";
   }
 
-  getTaxDocumentBadgeLabel(user: User | Guarantor): string {
-    const document = this.document(user, "TAX") as DfDocument;
-    return this.isTaxAuthentic(user)
-      ? this.$tc("file.tax-verified")
-      : this.$tc("documents.status." + document.documentStatus);
+  function getTaxDocumentBadgeLabel(user: User | Guarantor): string {
+    const doc = document(user, "TAX") as DfDocument;
+    return isTaxAuthentic(user)
+      ? t("file.tax-verified")
+      : t("documents.status." + doc.documentStatus);
   }
-}
 </script>
 
 <style scoped lang="scss">
