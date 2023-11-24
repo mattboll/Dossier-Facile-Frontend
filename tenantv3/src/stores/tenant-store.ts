@@ -1106,7 +1106,7 @@ const useTenantStore = defineStore('tenant', {
     console.log("deletenisr")
     const $loading = useLoading({});
     const loader = $loading.show();
-    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
+    const url = `${import.meta.env.VITE_API_URL}/api/file/${id}`;
     axios
       .delete(url)
       .then(() => {

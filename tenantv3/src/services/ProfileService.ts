@@ -5,12 +5,12 @@ import { Guarantor } from "df-shared-next/src/models/Guarantor";
 export const ProfileService = {
   unlinkFranceConnect(): Promise<boolean> {
     return axios.delete(
-      `https://${import.meta.env.VITE_API_URL}/api/user/franceConnect`
+      `${import.meta.env.VITE_API_URL}/api/user/franceConnect`
     );
   },
   saveNames(user: User) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/names`,
+      `${import.meta.env.VITE_API_URL}/api/register/names`,
       {
         tenantId: user.id,
         firstName: user.firstName,
@@ -26,7 +26,7 @@ export const ProfileService = {
     acceptAccess: boolean;
   }) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/application`,
+      `${import.meta.env.VITE_API_URL}/api/register/application`,
       data
     );
   },
@@ -36,55 +36,55 @@ export const ProfileService = {
     acceptAccess: boolean;
   }) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/application/v2`,
+      `${import.meta.env.VITE_API_URL}/api/register/application/v2`,
       data
     );
   },
   getCoTenant(id: number) {
     return axios.delete(
-      `https://${import.meta.env.VITE_API_URL}/api/tenant/coTenant/${id}/profile`
+      `${import.meta.env.VITE_API_URL}/api/tenant/coTenant/${id}/profile`
     );
   },
   async deleteCoTenant(id: number) {
     await axios.delete(
-      `https://${import.meta.env.VITE_API_URL}/api/tenant/deleteCoTenant/${id}`
+      `${import.meta.env.VITE_API_URL}/api/tenant/deleteCoTenant/${id}`
     );
   },
   validateFile(honorDeclaration: boolean, clarification: string) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/honorDeclaration`,
+      `${import.meta.env.VITE_API_URL}/api/register/honorDeclaration`,
       { honorDeclaration, clarification }
     );
   },
   setGuarantorType(typeGuarantorData: any) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorType`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorType`,
       typeGuarantorData
     );
   },
   deleteGuarantor(g: Guarantor) {
     return axios.delete(
-      `https://${import.meta.env.VITE_API_URL}/api/guarantor/${g.id}`
+      `${import.meta.env.VITE_API_URL}/api/guarantor/${g.id}`
     );
   },
   deleteDocument(id: number) {
     return axios.delete(
-      `https://${import.meta.env.VITE_API_URL}/api/document/${id}`
+      `${import.meta.env.VITE_API_URL}/api/document/${id}`
     );
   },
   getUserByToken(token: string) {
     return axios.get(
-      `https://${import.meta.env.VITE_API_URL}/api/application/full/${token}/`
+      `${import.meta.env.VITE_API_URL}/api/application/full/${token}/`
     );
   },
   getPublicUserByToken(token: string) {
     return axios.get(
-      `https://${import.meta.env.VITE_API_URL}/api/application/light/${token}/`
+      `${import.meta.env.VITE_API_URL}/api/application/light/${token}/`
     );
   },
   postCreateFullPdf(token: string): Promise<VoidFunction> {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/application/fullPdf/${token}`,
+      `${import.meta.env.VITE_API_URL}/api/application/fullPdf/${token}`,
       {}
     );
   },

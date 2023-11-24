@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DfMessage } from "df-shared-next/src/models/DfMessage";
 
-const MESSAGE_ENDPOINT = `https://${import.meta.env.VITE_API_URL}/api/message`;
+const MESSAGE_ENDPOINT = `${import.meta.env.VITE_API_URL}/api/message`;
 
 export const MessageService = {
   updateMessages(tenantId?: number) {

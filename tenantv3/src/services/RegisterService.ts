@@ -8,7 +8,7 @@ const $loading = useLoading({});
 export const RegisterService = {
   deleteFile(id: number | string, silent = false) {
     const loader = $loading.show();
-    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
+    const url = `${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios
       .delete(url)
       .then(() => {
@@ -26,19 +26,19 @@ export const RegisterService = {
       });
   },
   deleteFileById(id: number) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/file/${id}`;
+    const url = `${import.meta.env.VITE_API_URL}/api/file/${id}`;
     return axios.delete(url);
   },
   saveTenantIdentification(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/documentIdentification`,
+      `${import.meta.env.VITE_API_URL}/api/register/documentIdentification`,
       formData
     );
   },
 
   saveCoTenantIdentification(formData: FormData) {
     return axios.post(
-      `https://${
+      `${
         import.meta.env.VITE_API_URL
       }/api/tenant/coTenant/${formData.get(
         "coTenantId"
@@ -49,95 +49,95 @@ export const RegisterService = {
 
   saveGuarantorName(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/name`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/name`,
       formData
     );
   },
 
   saveGuarantorIdentification(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentIdentification/v2`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentIdentification/v2`,
       formData
     );
   },
 
   saveTenantResidency(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/documentResidency`,
+      `${import.meta.env.VITE_API_URL}/api/register/documentResidency`,
       formData
     );
   },
 
   saveGuarantorResidency(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentResidency`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentResidency`,
       formData
     );
   },
 
   saveTenantProfessional(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/documentProfessional`,
+      `${import.meta.env.VITE_API_URL}/api/register/documentProfessional`,
       formData
     );
   },
 
   saveGuarantorProfessional(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentProfessional`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentProfessional`,
       formData
     );
   },
 
   saveTenantFinancial(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/documentFinancial`,
+      `${import.meta.env.VITE_API_URL}/api/register/documentFinancial`,
       formData
     );
   },
 
   saveGuarantorFinancial(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentFinancial`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentFinancial`,
       formData
     );
   },
 
   saveTenantTax(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/documentTax`,
+      `${import.meta.env.VITE_API_URL}/api/register/documentTax`,
       formData
     );
   },
   saveGuarantorTax(formData: FormData) {
     return axios.post(
-      `https://${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentTax`,
+      `${import.meta.env.VITE_API_URL}/api/register/guarantorNaturalPerson/documentTax`,
       formData
     );
   },
 
   saveRepresentativeIdentification(formData: FormData) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentRepresentantIdentification`;
+    const url = `${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentRepresentantIdentification`;
     return axios.post(url, formData);
   },
 
   saveCorporationName(formData: FormData) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/name`;
+    const url = `${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/name`;
     return axios.post(url, formData);
   },
 
   saveLegalPersonRepresentantName(formData: FormData) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/representing-name`;
+    const url = `${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/representing-name`;
     return axios.post(url, formData);
   },
 
   saveCorporationIdentification(formData: FormData) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentIdentification`;
+    const url = `${import.meta.env.VITE_API_URL}/api/register/guarantorLegalPerson/documentIdentification`;
     return axios.post(url, formData);
   },
 
   saveOrganismIdentification(formData: FormData) {
-    const url = `https://${import.meta.env.VITE_API_URL}/api/register/guarantorOrganism/documentIdentification`;
+    const url = `${import.meta.env.VITE_API_URL}/api/register/guarantorOrganism/documentIdentification`;
     return axios.post(url, formData);
   },
   async getFranceConnectToken() {
