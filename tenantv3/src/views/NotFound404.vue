@@ -34,14 +34,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import Artwork from "df-shared-next/src/components/Artwork.vue";
-import { Component, Vue } from "vue-property-decorator";
 
-@Component({
-  components: {
-    Artwork,
-  },
-})
-export default class NotFound404 extends Vue {}
 </script>

@@ -358,15 +358,15 @@ const router = createRouter({
   //   component: () =>
   //     import(/* webpackChunkName: "contact" */ "../views/Contact.vue"),
   // },
-  // {
-  //   path: "*",
-  //   name: "404",
-  //   meta: {
-  //     title: "404 - DossierFacile",
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "404" */ "../views/NotFound404.vue"),
-  // },
+  {
+    path: '/:pathMatch(.*)',
+    name: "catchall",
+    meta: {
+      title: "404 - DossierFacile",
+    },
+    component: () =>
+      import(/* webpackChunkName: "404" */ "../views/NotFound404.vue"),
+  },
   ],
   scrollBehavior() {
     document.getElementById("app")?.scrollIntoView();
