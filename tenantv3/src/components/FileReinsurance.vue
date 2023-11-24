@@ -1,10 +1,10 @@
 <template>
   <div>
     <span class="fr-h5 fr-mr-3w">{{
-      $t("filereinsurance.title-dossier-" + dossierStatus)
+      t("filereinsurance.title-dossier-" + dossierStatus)
     }}</span
     ><a href="https://www.dossierfacile.fr" target="_blank" rel="noreferrer">{{
-      $t("filereinsurance.know-more")
+      t("filereinsurance.know-more")
     }}</a>
     <div class="fr-grid-row fr-grid-row--gutters fr-mt-3w">
       <div class="fr-col-12 fr-col-md-3">
@@ -22,7 +22,7 @@
             class="ri-close-circle-fill fs-24 fr-mb-2w bloc-warning-icon status-incomplete"
           ></i>
 
-          <p>{{ $t("filereinsurance.documents-" + dossierStatus) }}</p>
+          <p>{{ t("filereinsurance.documents-" + dossierStatus) }}</p>
         </NakedCard>
       </div>
       <div class="fr-col-12 fr-col-md-3">
@@ -39,7 +39,7 @@
             v-else
             class="ri-close-circle-fill fs-24 fr-mb-2w bloc-warning-icon status-incomplete"
           ></i>
-          <p>{{ $t("filereinsurance.file-" + dossierStatus) }}</p>
+          <p>{{ t("filereinsurance.file-" + dossierStatus) }}</p>
         </NakedCard>
       </div>
       <div v-if="taxChecked" class="fr-col-12 fr-col-md-3">
@@ -52,7 +52,7 @@
             />
           </div>
           <p>
-            {{ $t("filereinsurance.tax-checked") }}
+            {{ t("filereinsurance.tax-checked") }}
           </p>
         </NakedCard>
       </div>
@@ -60,14 +60,14 @@
         <NakedCard class="h-100 fc">
           <div class="fr-mb-0-5w icon-fc text-fc blue-text">FranceConnect</div>
           <p v-if="tenantCount === 1">
-            {{ $t("filereinsurance.france-connect-user") }}
+            {{ t("filereinsurance.france-connect-user") }}
           </p>
           <p v-else-if="franceConnectTenantCount === tenantCount">
-            {{ $t("filereinsurance.france-connect-user-all") }}
+            {{ t("filereinsurance.france-connect-user-all") }}
           </p>
           <p v-else>
             {{
-              $t("filereinsurance.france-connect-user-partial", [
+              t("filereinsurance.france-connect-user-partial", [
                 franceConnectTenantCount,
               ])
             }}
@@ -78,22 +78,28 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    NakedCard,
-  },
-})
-export default class FileReinsurance extends Vue {
-  @Prop() dossierStatus!: string;
-  @Prop() taxDocumentStatus!: string;
-  @Prop({ default: 0 }) franceConnectTenantCount?: number;
-  @Prop({ default: 0 }) tenantCount?: number;
-  @Prop({ default: false }) taxChecked?: boolean;
-}
+const { t } = useI18n();
+
+  const props = withDefaults(
+    defineProps<{
+      dossierStatus: string;
+      taxDocumentStatus: string;
+      franceConnectTenantCount: number;
+      tenantCount: number;
+      taxChecked: boolean;
+    }>(),
+    {
+      dossierStatus: "VALIDATED",
+      taxDocumentStatus: "VALIDATED",
+      franceConnectTenantCount: 0,
+      tenantCount: 0,
+      taxChecked: false,
+    }
+  );
 </script>
 
 <style scoped lang="scss">

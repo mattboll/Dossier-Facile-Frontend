@@ -4,16 +4,16 @@
       <FileHeader :user="user">
         <div>
           <DfButton v-if="showProgressBar" primary="true"
-            >{{ $t("file.download-all-inprogress")
+            >{{ t("file.download-all-inprogress")
             }}<span><ProgressIndicator diameter="22px" border="3px" /></span>
           </DfButton>
           <DfButton
             :disabled="!user || user.status !== 'VALIDATED'"
             v-else
-            :title="$t('file.download-disabled-title')"
+            :title="t('file.download-disabled-title')"
             primary="true"
             @on-click="download"
-            >{{ $t("file.download-all") }}</DfButton
+            >{{ t("file.download-all") }}</DfButton
           >
         </div>
       </FileHeader>
@@ -22,7 +22,7 @@
         :dossierStatus="user.status"
         :taxDocumentStatus="taxDocumentStatus()"
         :franceConnectTenantCount="franceConnectTenantCount()"
-        :tenantCount="user.tenants.length"
+        :tenantCount="user.tenants?.length"
         :taxChecked="isTaxChecked()"
       ></FileReinsurance>
 
@@ -43,7 +43,7 @@
                 aria-selected="false"
                 :aria-controls="`tabpanel-${k}-panel`"
               >
-                {{ tenant | fullName }}
+                {{ UtilsService.tenantFullName(tenant) }}
               </button>
             </li>
           </ul>
@@ -58,38 +58,38 @@
           >
             <div>
               <h2 class="fr-h4">
-                {{ $t("file.personnal-file") }}
+                {{ t("file.personnal-file") }}
               </h2>
               <ul class="without-padding">
                 <RowListItem
                   v-if="tenant.clarification !== undefined"
-                  :label="$tc('tenantpanel.clarification-title')"
+                  :label="t('tenantpanel.clarification-title')"
                   :subLabel="tenant.clarification"
                 />
                 <FileRowListItem
-                  :label="$t('file.identification')"
+                  :label="t('file.identification')"
                   :document="document(tenant, 'IDENTIFICATION')"
                   :showValidated="true"
                 />
                 <FileRowListItem
-                  :label="$t('file.residency')"
+                  :label="t('file.residency')"
                   :document="document(tenant, 'RESIDENCY')"
                   :showValidated="true"
                 />
                 <FileRowListItem
-                  :label="$t('file.professional')"
+                  :label="t('file.professional')"
                   :document="document(tenant, 'PROFESSIONAL')"
                   :showValidated="true"
                 />
                 <FileRowListItem
                   v-for="(doc, k) in getDocs(tenant, 'FINANCIAL')"
                   v-bind:key="doc.id"
-                  :label="$t('file.financial') + (k >= 1 ? ' ' + (k + 1) : '')"
+                  :label="t('file.financial') + (k >= 1 ? ' ' + (k + 1) : '')"
                   :document="doc"
                   :showValidated="true"
                 />
                 <FileRowListItem
-                  :label="$t('file.tax')"
+                  :label="t('file.tax')"
                   :tagLabel="getTaxDocumentBadgeLabel(tenant)"
                   :document="document(tenant, 'TAX')"
                   :showValidated="true"
@@ -107,7 +107,7 @@
               </ul>
               <div v-if="hasGuarantor(tenant)">
                 <h2 class="fr-h4 fr-mt-5w">
-                  {{ $t("file.guarant") }}
+                  {{ t("file.guarant") }}
                 </h2>
                 <div v-if="tenant.guarantors">
                   <div v-for="g in tenant.guarantors" v-bind:key="g.id">
@@ -116,20 +116,20 @@
                       class="without-padding"
                     >
                       <div>
-                        <b>{{ g | fullName }}</b>
+                        <b>{{ UtilsService.guarantorFullName(g) }}</b>
                       </div>
                       <FileRowListItem
-                        :label="$t('file.identification')"
+                        :label="t('file.identification')"
                         :document="document(g, 'IDENTIFICATION')"
                         :showValidated="true"
                       />
                       <FileRowListItem
-                        :label="$t('file.residency')"
+                        :label="t('file.residency')"
                         :document="document(g, 'RESIDENCY')"
                         :showValidated="true"
                       />
                       <FileRowListItem
-                        :label="$t('file.professional')"
+                        :label="t('file.professional')"
                         :document="document(g, 'PROFESSIONAL')"
                         :showValidated="true"
                       />
@@ -137,13 +137,13 @@
                         v-for="(doc, k) in getDocs(g, 'FINANCIAL')"
                         v-bind:key="doc.id"
                         :label="
-                          $t('file.financial') + (k >= 1 ? ' ' + (k + 1) : '')
+                          t('file.financial') + (k >= 1 ? ' ' + (k + 1) : '')
                         "
                         :document="doc"
                         :showValidated="true"
                       />
                       <FileRowListItem
-                        :label="$t('file.tax')"
+                        :label="t('file.tax')"
                         :tagLabel="getTaxDocumentBadgeLabel(g)"
                         :document="document(g, 'TAX')"
                         :showValidated="true"
@@ -164,12 +164,12 @@
                       class="without-padding"
                     >
                       <FileRowListItem
-                        :label="$t('file.identification-legal-person')"
+                        :label="t('file.identification-legal-person')"
                         :document="document(g, 'IDENTIFICATION_LEGAL_PERSON')"
                         :showValidated="true"
                       />
                       <FileRowListItem
-                        :label="$t('file.identification')"
+                        :label="t('file.identification')"
                         :document="document(g, 'IDENTIFICATION')"
                         :showValidated="true"
                       />
@@ -179,7 +179,7 @@
                       class="without-padding"
                     >
                       <FileRowListItem
-                        :label="$t('file.organism')"
+                        :label="t('file.organism')"
                         :document="document(g, 'IDENTIFICATION')"
                         :showValidated="true"
                       />
@@ -193,17 +193,17 @@
       </section>
       <section class="fr-mb-7w">
         <div class="text-center">
-          <DfButton v-if="showProgressBar" primary="true"
-            >{{ $t("file.download-all-inprogress")
+          <DfButton v-if="showProgressBar" :primary="true"
+            >{{ t("file.download-all-inprogress")
             }}<span><ProgressIndicator diameter="22px" border="3px" /></span>
           </DfButton>
           <DfButton
             :disabled="!user || user.status != 'VALIDATED'"
             v-else
-            :title="$t('file.download-disabled-title')"
-            primary="true"
+            :title="t('file.download-disabled-title')"
+            :primary="true"
             @on-click="download"
-            >{{ $t("file.download-all") }}</DfButton
+            >{{ t("file.download-all") }}</DfButton
           >
         </div>
       </section>
@@ -213,71 +213,62 @@
     </div>
     <section class="fr-mb-7w fr-container">
       <div class="fr-mt-3w fr-text--sm fr-label--disabled">
-        {{ $t("file.disclaimer") }}
+        {{ t("file.disclaimer") }}
       </div>
       <OwnerBanner></OwnerBanner>
     </section>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
 import { FileUser } from "df-shared-next/src/models/FileUser";
-import { Component, Vue } from "vue-property-decorator";
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import { ProfileService } from "../services/ProfileService";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import FileReinsurance from "../components/FileReinsurance.vue";
-import ProgressIndicator from "@/components/ProgressIndicator.vue";
+import ProgressIndicator from "df-shared-next/src/Button/ProgressIndicator.vue";
 import FileRowListItem from "../components/documents/FileRowListItem.vue";
 import OwnerBanner from "../components/OwnerBanner.vue";
-import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FileHeader from "../components/FileHeader.vue";
 import RowListItem from "@/components/documents/RowListItem.vue";
 import FileNotFound from "@/views/FileNotFound.vue";
 import { ToastService } from "@/services/ToastService";
+import { useI18n } from "vue-i18n";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { UtilsService } from "@/services/UtilsService";
 
-@Component({
-  components: {
-    FileNotFound,
-    RowListItem,
-    ProgressIndicator,
-    DfButton,
-    FileReinsurance,
-    FileRowListItem,
-    OwnerBanner,
-    NakedCard,
-    FileHeader,
-  },
-})
-export default class File extends Vue {
-  user: FileUser | null = null;
-  tabIndex = 0;
-  showProgressBar = false;
-  fileNotFound = false;
+const { t } = useI18n();
+const route = useRoute();
 
-  franceConnectTenantCount() {
-    return this.user?.tenants?.filter((t) => t.franceConnect == true).length;
+  const user = ref(new FileUser());
+  const tabIndex = ref(0);
+  const showProgressBar = ref(false);
+  const fileNotFound = ref(false);
+
+  function franceConnectTenantCount() {
+    return user.value?.tenants?.filter((t) => t.franceConnect == true).length;
   }
 
-  isTaxChecked() {
+  function isTaxChecked() {
     const hasAuthenticTax = (user: User) =>
       user.documents?.some(
         (document: DfDocument) =>
           document.documentCategory === "TAX" &&
           document.authenticityStatus === "AUTHENTIC"
       );
-    return this.user?.tenants?.some((t) => hasAuthenticTax(t));
+    return user.value?.tenants?.some((t) => hasAuthenticTax(t));
   }
 
-  private setUser() {
-    const token = this.$route.params.token;
+  function setUser() {
+    const token = Array.isArray(route.params.token) ? route.params.token[0] : route.params.token;
     ProfileService.getUserByToken(token)
       .then((d: any) => {
-        this.user = d.data;
-        if (this.user) {
-          this.user.tenants = this.user?.tenants?.sort((t1, t2) => {
+        user.value = d.data;
+        if (user.value) {
+          user.value.tenants = user.value?.tenants?.sort((t1, t2) => {
             return t1.tenantType === "CREATE" && t2.tenantType !== "CREATE"
               ? -1
               : 1;
@@ -285,21 +276,27 @@ export default class File extends Vue {
         }
       })
       .catch(() => {
-        this.fileNotFound = true;
+        fileNotFound.value = true;
       });
   }
 
-  mounted() {
-    this.setUser();
+  onMounted(() => {
+    setUser();
     window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
-  beforeDestroy() {
+  })
+  onBeforeUnmount(() => {
     window.Beacon("destroy");
+  })
+
+  function document(u: User | Guarantor, s: string) {
+    return u.documents?.find((d) => {
+      return d.documentCategory === s;
+    });
   }
 
-  getTenants() {
+  function getTenants() {
     const users: User[] = [];
-    this.user?.tenants?.forEach((t) => {
+    user.value?.tenants?.forEach((t) => {
       if (
         t.firstName &&
         t.lastName &&
@@ -313,9 +310,9 @@ export default class File extends Vue {
     return users;
   }
 
-  taxDocumentStatus() {
-    const taxStatuses = this.user?.tenants?.map(
-      (tenant) => this.document(tenant, "TAX")?.documentStatus
+  function taxDocumentStatus() {
+    const taxStatuses = user.value?.tenants?.map(
+      (tenant) => document(tenant, "TAX")?.documentStatus
     );
 
     if (taxStatuses?.every((docStatus) => docStatus === "VALIDATED")) {
@@ -330,85 +327,80 @@ export default class File extends Vue {
     return "nok";
   }
 
-  document(u: User | Guarantor, s: string) {
-    return u.documents?.find((d) => {
-      return d.documentCategory === s;
-    });
-  }
-
-  retryDownload(remainingCount: number) {
+  function retryDownload(remainingCount: number) {
     setTimeout(() => {
-      this.setUser();
+      setUser();
       if (
-        this.user?.dossierPdfDocumentStatus === "COMPLETED" &&
-        this.user?.dossierPdfUrl
+        user.value?.dossierPdfDocumentStatus === "COMPLETED" &&
+        user.value?.dossierPdfUrl
       ) {
-        this.downloadFile(this.user?.dossierPdfUrl);
+        downloadFile(user.value?.dossierPdfUrl);
       } else if (remainingCount > 0) {
-        this.retryDownload(remainingCount - 1);
+        retryDownload(remainingCount - 1);
       } else {
-        this.showProgressBar = false;
+        showProgressBar.value = false;
         ToastService.error("file.download-failed");
       }
     }, 15000);
   }
 
-  private downloadFile(url: string) {
+  function downloadFile(url: string) {
     ProfileService.getFile(url)
       .then((response) => {
         const blob = new Blob([response.data], { type: "application/pdf" });
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = "dossierFacile-" + this.$route.params.token + ".pdf";
+        const token = Array.isArray(route.params.token) ? route.params.token[0] : route.params.token;
+        link.download = "dossierFacile-" + token + ".pdf";
         link.click();
       })
       .catch((error) => {
         ToastService.error();
       })
-      .finally(() => (this.showProgressBar = false));
+      .finally(() => (showProgressBar.value = false));
   }
 
-  download() {
-    this.showProgressBar = true;
+  function download() {
+    showProgressBar.value = true;
     if (
-      this.user?.dossierPdfDocumentStatus === "COMPLETED" &&
-      this.user?.dossierPdfUrl
+      user.value?.dossierPdfDocumentStatus === "COMPLETED" &&
+      user.value?.dossierPdfUrl
     ) {
-      this.downloadFile(this.user?.dossierPdfUrl);
+      downloadFile(user.value?.dossierPdfUrl);
     } else {
-      ProfileService.postCreateFullPdf(this.$route.params.token)
+      const token = Array.isArray(route.params.token) ? route.params.token[0] : route.params.token;
+      ProfileService.postCreateFullPdf(token)
         .then(() => {
-          this.retryDownload(6);
+          retryDownload(6);
         })
         .catch(() => {
-          this.showProgressBar = false;
+          showProgressBar.value = false;
           ToastService.error();
         });
     }
   }
 
-  hasGuarantor(tenant: User) {
+  function hasGuarantor(tenant: User) {
     return tenant.guarantors && tenant.guarantors.length > 0;
   }
 
-  getDocs(tenant: User, docType: string) {
+  function getDocs(tenant: User, docType: string) {
     return tenant.documents?.filter((d: DfDocument) => {
       return d.documentCategory === docType;
     });
   }
 
-  isTaxAuthentic(user: User | Guarantor) {
-    const document = this.document(user, "TAX") as DfDocument;
-    return document.authenticityStatus === "AUTHENTIC";
+  function isTaxAuthentic(user: User | Guarantor) {
+    const doc = document(user, "TAX") as DfDocument;
+    return doc.authenticityStatus === "AUTHENTIC";
   }
 
-  getTaxDocumentBadgeLabel(user: User | Guarantor): string {
-    const document = this.document(user, "TAX") as DfDocument;
-    return this.isTaxAuthentic(user)
-      ? this.$tc("file.tax-verified")
-      : this.$tc("documents.status." + document.documentStatus);
+  function getTaxDocumentBadgeLabel(user: User | Guarantor): string {
+    const doc = document(user, "TAX") as DfDocument;
+    return isTaxAuthentic(user)
+      ? t("file.tax-verified")
+      : t("documents.status." + doc.documentStatus);
   }
-}
 </script>
 
 <style scoped lang="scss">

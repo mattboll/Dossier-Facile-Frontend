@@ -225,23 +225,23 @@ const router = createRouter({
   //       /* webpackChunkName: "profile" */ "../views/TenantGuarantorDocumentsPage.vue"
   //     ),
   // },
-  // {
-  //   path: "/public-file/:token",
-  //   name: "File",
-  //   meta: {
-  //     title: "Dossier - DossierFacile",
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "file" */ "../views/PublicFile.vue"),
-  // },
-  // {
-  //   path: "/file/:token",
-  //   name: "PublicFile",
-  //   meta: {
-  //     title: "Dossier - DossierFacile",
-  //   },
-  //   component: () => import(/* webpackChunkName: "file" */ "../views/File.vue"),
-  // },
+  {
+    path: "/public-file/:token",
+    name: "File",
+    meta: {
+      title: "Dossier - DossierFacile",
+    },
+    component: () =>
+      import(/* webpackChunkName: "file" */ "../views/PublicFile.vue"),
+  },
+  {
+    path: "/file/:token",
+    name: "PublicFile",
+    meta: {
+      title: "Dossier - DossierFacile",
+    },
+    component: () => import(/* webpackChunkName: "file" */ "../views/File.vue"),
+  },
   {
     path: "/account",
     name: "Account",

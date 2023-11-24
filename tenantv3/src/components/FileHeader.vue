@@ -19,58 +19,45 @@
   </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { FileUser } from "df-shared-next/src/models/FileUser";
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DfButton from "df-shared-next/src/Button/Button.vue";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import FileReinsurance from "../components/FileReinsurance.vue";
-import ProgressIndicator from "@/components/ProgressIndicator.vue";
-import FileRowListItem from "../components/documents/FileRowListItem.vue";
-import OwnerBanner from "../components/OwnerBanner.vue";
-import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import moment from "moment";
+import { useI18n } from "vue-i18n";
+import { UtilsService } from "@/services/UtilsService";
 
-@Component({
-  components: {
-    ProgressIndicator,
-    DfButton,
-    FileReinsurance,
-    FileRowListItem,
-    OwnerBanner,
-    NakedCard,
-  },
-})
-export default class File extends Vue {
-  @Prop() user!: FileUser | null;
+  const props = defineProps<{
+    user: FileUser | null;
+  }>();
+const { t } = useI18n();
 
-  getName() {
-    if (this.user?.tenants === undefined) {
+  function getName() {
+    if (props.user?.tenants === undefined) {
       return "";
     }
-    if (this.user?.tenants.length === 2) {
-      const userNames = this.user.tenants
-        .map((o) => this.$options.filters?.fullName(o))
-        .join(this.$i18n.t("file.and").toString());
+    if (props.user?.tenants.length === 2) {
+      const userNames = props.user.tenants
+        .map((o) => UtilsService.tenantFullName(o))
+        .join(t("file.and").toString());
       return userNames;
     }
-    const userNames = this.user.tenants
-      .map((o) => this.$options.filters?.fullName(o))
+    const userNames = props.user.tenants
+      .map((o) => UtilsService.tenantFullName(o))
       .join(", ");
     return userNames;
   }
 
-  getStatus() {
-    if (this.user?.applicationType) {
-      return this.$i18n.t(this.user.applicationType);
+  function getStatus() {
+    if (props.user?.applicationType) {
+      return t(props.user.applicationType);
     }
     return "";
   }
 
-  getIncomeSum() {
-    if (this.user?.tenants) {
+  function getIncomeSum() {
+    if (props.user?.tenants) {
       let sum = 0;
-      for (const t of this.user.tenants) {
+      for (const t of props.user.tenants) {
         const localsum = t.documents
           ?.filter((d: DfDocument) => {
             return d.documentCategory === "FINANCIAL";
@@ -79,16 +66,15 @@ export default class File extends Vue {
         sum += localsum || 0;
       }
       if (sum === 0) {
-        return this.$i18n.t("file.no-income");
+        return t("file.no-income");
       }
-      return this.$i18n.t("file.income", [sum]);
+      return t("file.income", [sum]);
     }
   }
 
-  getLastUpdateDate() {
-    return moment(this.user?.lastUpdateDate).format("D MMMM YYYY");
+  function getLastUpdateDate() {
+    return moment(props.user?.lastUpdateDate).format("D MMMM YYYY");
   }
-}
 </script>
 
 <style scoped lang="scss">

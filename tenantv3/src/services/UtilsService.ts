@@ -81,4 +81,9 @@ export const UtilsService = {
       ? firstName + "\xa0" + lastName
       : firstName + "\xa0" + preferredName;
   },
+  guarantorFullName(user: Guarantor) {
+    const firstName = this.capitalize(user.firstName || "");
+    const lastName = this.capitalize(user.lastName || "");
+    return firstName + "\xa0" + lastName;
+  },
 };

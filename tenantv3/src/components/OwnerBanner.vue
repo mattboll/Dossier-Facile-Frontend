@@ -9,14 +9,14 @@
       />
       <div class="main">
         <h2 class="fr-h6 text--white ">
-          {{ $t("ownerbanner.title1") }}<br />{{ $t("ownerbanner.title2") }}
+          {{ t("ownerbanner.title1") }}<br />{{ t("ownerbanner.title2") }}
         </h2>
         <p class=""><ul>
-        <li>{{ $t("ownerbanner.text1") }}</li>
-        <li>{{ $t("ownerbanner.text2") }}</li>
-        <li>{{ $t("ownerbanner.text3") }}</li>
+        <li>{{ t("ownerbanner.text1") }}</li>
+        <li>{{ t("ownerbanner.text2") }}</li>
+        <li>{{ t("ownerbanner.text3") }}</li>
         </ul></p>
-        <DfButton :dark="true" @on-click="signal">{{ $t("ownerbanner.btn") }}</DfButton>
+        <DfButton :dark="true" @on-click="signal">{{ t("ownerbanner.btn") }}</DfButton>
       </div>
       <img
         class="tenant"
@@ -36,22 +36,18 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { AnalyticsService } from "@/services/AnalyticsService";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import { Component, Vue } from "vue-property-decorator";
-@Component({
-  components: {
-    DfButton
-  }
-})
-export default class OwnerBanner extends Vue {
-  OWNER_URL = `//${process.env.VUE_APP_OWNER_URL}/creation`;
-  signal() {
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
+  const OWNER_URL = `//${import.meta.env.VUE_APP_OWNER_URL}/creation`;
+  function signal() {
     AnalyticsService.openCreateOwnerAccount();
-    window.open(this.OWNER_URL, "_blank", "noopener");
+    window.open(OWNER_URL, "_blank", "noopener");
   }
-}
 </script>
 
 <style scoped lang="scss">
