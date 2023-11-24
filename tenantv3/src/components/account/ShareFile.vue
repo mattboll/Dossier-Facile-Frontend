@@ -13,63 +13,79 @@
     <p class="bold">
       {{ $t("sharefile.desc3") }}
     </p>
-    <form name="form" @submit.prevent="handleSubmit">
+    <Form name="form" @submit="handleSubmit">
       <div class="form-container">
         <div class="fr-mt-md-4w full-mobile">
-          <validation-provider name="shareType" v-slot="{ errors, valid }">
+          <Field
+            id="shareType"
+            name="shareType"
+            v-model="shareType"
+            v-slot="{ field, meta }"
+          >
             <select
-              v-model="shareType"
+              v-bind="field"
               class="fr-select"
               :class="{
-                'fr-select--valid': valid,
-                'fr-select--error': errors[0],
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
               }"
             >
               <option value="full">{{ $t("sharefile.full") }}</option>
               <option value="resume">{{ $t("sharefile.resume") }}</option>
             </select>
-          </validation-provider>
+          </Field>
+          <ErrorMessage name="shareType" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ t(message || "") }}</span>
+          </ErrorMessage>
         </div>
         <div class="full-mobile">
-          <validation-provider name="shareMethod" v-slot="{ errors, valid }">
+          <Field
+            id="shareMethod"
+            name="shareMethod"
+            v-model="shareMethod"
+            v-slot="{ field, meta }"
+          >
             <select
-              v-model="shareMethod"
+              v-bind="field"
               class="fr-select"
               :class="{
-                'fr-select--valid': valid,
-                'fr-select--error': errors[0],
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
               }"
             >
               <option value="mail">{{ $t("sharefile.by-mail") }}</option>
               <option value="link">{{ $t("sharefile.by-link") }}</option>
             </select>
-          </validation-provider>
+          </Field>
+          <ErrorMessage name="shareType" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ t(message || "") }}</span>
+          </ErrorMessage>
         </div>
         <div v-if="shareMethod === 'mail'" class="full-mobile">
-          <validation-provider rules="required" v-slot="{ errors, valid }">
-            <div
-              class="fr-input-group"
-              :class="errors[0] ? 'fr-input-group--error' : ''"
-            >
-              <label class="fr-label" for="email">{{
-                $t("sharefile.email-label")
-              }}</label>
-              <input
-                v-model="email"
-                class="form-control validate-required fr-input"
-                :class="{
-                  'fr-input--valid': valid,
-                  'fr-input--error': errors[0],
-                }"
-                id="email"
-                name="email"
-                :placeholder="`${$t('sharefile.email-placeholder')}`"
-                type="email"
-                autocomplete="email"
-                required
-              />
-            </div>
-          </validation-provider>
+          <label class="fr-label" for="email">{{ $t("sharefile.email-label") }}</label>
+          <Field
+            id="email"
+            name="email"
+            v-model="email"
+            v-slot="{ field, meta }"
+            rules="required"
+          >
+            <input
+              v-bind="field"
+              class="form-control validate-required fr-input"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
+              :placeholder="`${$t('sharefile.email-placeholder')}`"
+              type="email"
+              autocomplete="email"
+              required
+            />
+          </Field>
+          <ErrorMessage name="shareType" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ t(message || "") }}</span>
+          </ErrorMessage>
         </div>
         <div v-if="shareMethod === 'link'" class="full-mobile">
           <input class="fr-input" type="text" read-only :value="getUrl()" />
@@ -86,7 +102,7 @@
           </ul>
         </div>
       </div>
-    </form>
+    </Form>
   </div>
 </template>
 <script setup lang="ts">
@@ -96,58 +112,61 @@ import DfButton from "df-shared-next/src/Button/Button.vue";
 import { ToastService } from "@/services/ToastService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, ref } from "vue";
+import { Form, Field, ErrorMessage } from "vee-validate";
+import { useI18n } from "vue-i18n";
 
-      const store = useTenantStore();
-      const user = computed(() => store.user);
+const store = useTenantStore();
+const user = computed(() => store.user);
+const { t } = useI18n();
 
-  const TENANT_URL = `https://${import.meta.env.VITE_TENANT_URL}`;
-  const shareType = ref("full");
-  const shareMethod = ref("mail");
-  const email = ref("");
+const TENANT_URL = `https://${import.meta.env.VITE_TENANT_URL}`;
+const shareType = ref("full");
+const shareMethod = ref("mail");
+const email = ref("");
 
-  function handleSubmit() {
-    if (shareMethod.value === "mail") {
-      sendMail();
-    } else {
-      copyLink();
-    }
-    return true;
+function handleSubmit() {
+  if (shareMethod.value === "mail") {
+    sendMail();
+  } else {
+    copyLink();
   }
+  return true;
+}
 
-  function sendMail() {
-    AnalyticsService.shareByMail(shareType.value === "full" ? "full" : "resume");
-    OwnerService.sendFileByMail(email.value, shareType.value)
-      .then(() => {
-        ToastService.success("sharefile.sent-success");
-        email.value = "";
-        store.loadApartmentSharingLinks();
-      })
-      .catch(() => {
-        ToastService.error();
-      });
+function sendMail() {
+  AnalyticsService.shareByMail(shareType.value === "full" ? "full" : "resume");
+  OwnerService.sendFileByMail(email.value, shareType.value)
+    .then(() => {
+      ToastService.success("sharefile.sent-success");
+      email.value = "";
+      store.loadApartmentSharingLinks();
+    })
+    .catch(() => {
+      ToastService.error();
+    });
+}
+
+function getUrl() {
+  if (shareType.value === "full") {
+    return `${TENANT_URL}/file/${user.value.apartmentSharing?.token}`;
   }
+  return `${TENANT_URL}/public-file/${user.value.apartmentSharing?.tokenPublic}`;
+}
 
-  function getUrl() {
-    if (shareType.value === "full") {
-      return `${TENANT_URL}/file/${user.value.apartmentSharing?.token}`;
-    }
-    return `${TENANT_URL}/public-file/${user.value.apartmentSharing?.tokenPublic}`;
+function copyLink() {
+  const url = getUrl();
+
+  try {
+    navigator.clipboard.writeText(url);
+    ToastService.success("account.copied");
+    AnalyticsService.copyLink(shareType.value === "full" ? "full" : "resume");
+  } catch (err) {
+    ToastService.error("unable-to-coy");
+    alert("Oops, unable to copy");
+    return Promise.reject("error");
   }
-
-  function copyLink() {
-    const url = getUrl();
-
-    try {
-      navigator.clipboard.writeText(url);
-      ToastService.success("account.copied")
-      AnalyticsService.copyLink(shareType.value === "full" ? "full" : "resume");
-    } catch (err) {
-      ToastService.error("unable-to-coy")
-      alert("Oops, unable to copy");
-      return Promise.reject("error");
-    }
-    return Promise.resolve(true);
-  }
+  return Promise.resolve(true);
+}
 </script>
 
 <style scoped lang="scss">
