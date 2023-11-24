@@ -348,16 +348,16 @@ const router = createRouter({
   //     return "/info-proprietaire";
   //   },
   // },
-  // {
-  //   path: "/contact",
-  //   name: "Contact",
-  //   meta: {
-  //     title: "Contact - DossierFacile",
-  //     requiresAuth: false,
-  //   },
-  //   component: () =>
-  //     import(/* webpackChunkName: "contact" */ "../views/Contact.vue"),
-  // },
+  {
+    path: "/contact",
+    name: "Contact",
+    meta: {
+      title: "Contact - DossierFacile",
+      requiresAuth: false,
+    },
+    component: () =>
+      import(/* webpackChunkName: "contact" */ "../views/Contact.vue"),
+  },
   {
     path: '/:pathMatch(.*)',
     name: "catchall",

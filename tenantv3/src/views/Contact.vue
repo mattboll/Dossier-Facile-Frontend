@@ -1,34 +1,22 @@
 <template>
-  <ContactForm :user="user" />
+  <ContactForm profile="profile-tenant" :user="user" />
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mapState } from "vuex";
-import { User } from "df-shared-next/src/models/User";
+<script setup lang="ts">
 import ContactForm from "df-shared-next/src/components/ContactForm.vue";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeUnmount, onMounted } from "vue";
 
-@Component({
-  components: {
-    ContactForm,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class Contact extends Vue {
-  user!: User;
+const store = useTenantStore();
+const user = computed(() => { return store.user });
 
-  mounted() {
+  onMounted(() => {
     window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-  }
+  })
 
-  beforeDestroy() {
+  onBeforeUnmount(() => {
     window.Beacon("destroy");
-  }
-}
+  })
 </script>
 
 <style scoped lang="scss"></style>
