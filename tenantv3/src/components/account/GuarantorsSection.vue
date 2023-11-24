@@ -222,22 +222,11 @@ const router = useRouter();
       return d.documentCategory === docType;
     }) as DfDocument[];
   }
-  function getGuarantorStatus(g: Guarantor, docType: string) {
-    if (docType === "FINANCIAL") {
-      const docs = g.documents?.filter((d) => {
-        return d.documentCategory === "FINANCIAL";
-      });
-      return isFinancialValid(docs || []);
-    }
-    const doc = g.documents?.find((d: DfDocument) => {
-      return d.documentCategory === docType;
-    });
-    return doc?.documentStatus || "EMPTY";
-  }
 
-  function setGuarantorSubStep(n: number, g: Guarantor) {
+  async function setGuarantorSubStep(n: number, g: Guarantor) {
     AnalyticsService.editFromAccount(n);
-    store.setGuarantorPage( g, n, props.tenant?.id,);
+    const page = await store.setGuarantorPage( g, n, props.tenant?.id,);
+    router.push(page)
   }
 
   function setAddGuarantorStep() {

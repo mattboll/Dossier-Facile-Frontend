@@ -388,13 +388,10 @@ const tenantMessages = computed(() => messageList.value[props.tenant.id]);
       });
     }
   }
-  function setGuarantorSubStep(n: number, g: Guarantor) {
+  async function setGuarantorSubStep(n: number, g: Guarantor) {
     AnalyticsService.editFromAccount(n);
-    store.setGuarantorPage(
-       g,
-       n,
-       props.tenant.id,
-    );
+    const page = await store.setGuarantorPage( g, n, props.tenant.id);
+    router.push(page)
   }
 
   function guarantors() {

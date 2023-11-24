@@ -417,74 +417,70 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
-import { Component, Vue } from "vue-property-decorator";
-import { mapState } from "vuex";
 import { UtilsService } from "../services/UtilsService";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
-@Component({
-  components: { NakedCard, DfButton },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-  },
-})
-export default class FileErrors extends Vue {
-  user!: User;
-  coTenants?: User[];
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
 
-  beforeMount() {
-    this.coTenants = this.user.apartmentSharing?.tenants.filter(
-      (t: User) => t.id != this.user?.id
+const store = useTenantStore();
+const user = computed(() => store.user);
+const router = useRouter();
+
+  const coTenants = ref([] as User[]);
+
+  onBeforeMount(() => {
+    coTenants.value = user.value.apartmentSharing?.tenants.filter(
+      (t: User) => t.id != user.value?.id
     ) as User[];
+  })
+
+  function hasDoc(docType: string, user?: User) {
+    return store.hasDoc(docType, user);
   }
 
-  hasDoc(docType: string, user?: User) {
-    return UtilsService.hasDoc(docType, user);
+  function isResidencyValid(user?: User) {
+    return store.isTenantDocumentValid("RESIDENCY", user);
   }
 
-  isResidencyValid(user?: User) {
-    return UtilsService.isTenantDocumentValid("RESIDENCY", user);
+  function isFinancialValid(user?: User) {
+    return store.isTenantDocumentValid("FINANCIAL", user);
   }
 
-  isFinancialValid(user?: User) {
-    return UtilsService.isTenantDocumentValid("FINANCIAL", user);
+  function isTaxValid(user?: User) {
+    return store.isTenantDocumentValid("TAX", user);
   }
 
-  isTaxValid(user?: User) {
-    return UtilsService.isTenantDocumentValid("TAX", user);
-  }
-
-  guarantorHasDoc(g: Guarantor, docType: string) {
+  function guarantorHasDoc(g: Guarantor, docType: string) {
     return UtilsService.guarantorHasDoc(docType, g);
   }
 
-  isGuarantorResidencyValid(g: Guarantor) {
+  function isGuarantorResidencyValid(g: Guarantor) {
     return UtilsService.isGuarantorDocumentValid("RESIDENCY", g);
   }
 
-  isGuarantorFinancialValid(g: Guarantor) {
+  function isGuarantorFinancialValid(g: Guarantor) {
     return UtilsService.isGuarantorDocumentValid("FINANCIAL", g);
   }
 
-  isGuarantorTaxValid(g: Guarantor) {
+  function isGuarantorTaxValid(g: Guarantor) {
     return UtilsService.isGuarantorDocumentValid("TAX", g);
   }
 
-  namesFilled(user?: User) {
-    const u = user ? user : this.user;
+  function namesFilled(userParam?: User) {
+    const u = userParam ? userParam : user.value;
     return u?.firstName && u?.lastName;
   }
 
-  documentsFilled(user?: User) {
-    return UtilsService.documentsFilled(user);
+  function documentsFilled(user?: User) {
+    return store.documentsFilled(user);
   }
 
-  namesGuarantorFilled(g: Guarantor) {
+  function namesGuarantorFilled(g: Guarantor) {
     return (
       (g.typeGuarantor === "NATURAL_PERSON" && g.firstName && g.lastName) ||
       (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
@@ -492,42 +488,35 @@ export default class FileErrors extends Vue {
     );
   }
 
-  documentsGuarantorFilled(g: Guarantor) {
-    return UtilsService.guarantorDocumentsFilled(g);
+  function documentsGuarantorFilled(g: Guarantor) {
+    return store.guarantorDocumentsFilled(g);
   }
 
-  openTenant(substep: string, user?: User) {
+  function openTenant(substep: string, user?: User) {
     if (user) {
-      this.$router.push({
+      router.push({
         name: "CoTenantDocuments",
         params: { substep: substep, tenantId: user.id.toString(), step: "4" },
       });
       return;
     }
     if (substep == "0") {
-      this.$router.push({
+      router.push({
         name: "Profile",
       });
     } else {
-      this.$router.push({
+      router.push({
         name: "TenantDocuments",
         params: { substep: substep },
       });
     }
   }
 
-  openGuarantor(g: Guarantor, substep: number, tenant?: User) {
-    this.$store.dispatch("setGuarantorPage", {
-      guarantor: g,
-      substep: substep,
-      tenantId: tenant?.id.toString(),
-    });
+  async function openGuarantor(g: Guarantor, substep: number, tenant?: User) {
+    const page = await store.setGuarantorPage( g, substep, tenant?.id);
+    router.push(page)
   }
 
-  isMobile() {
-    return UtilsService.isMobile();
-  }
-}
 </script>
 
 <style scoped lang="scss">

@@ -175,8 +175,13 @@ export default class ValidateFile extends Vue {
     if (this.user.tenantType === "CREATE") {
       params.clarification = this.precision;
     }
-    this.$store
-      .dispatch("validateFile", params)
+    store
+      .validateFile(params)
+      .then(() => {
+          store.loadUser().then(() => {
+            router.push("/account");
+          });
+      })
       .catch(() => {
         ToastService.error();
       })

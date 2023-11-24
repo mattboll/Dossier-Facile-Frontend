@@ -19,7 +19,6 @@ import * as Sentry from "@sentry/vue";
 import moment from 'moment';
 import { MessageService } from '@/services/MessageService';
 import { ApartmentSharingLinkService } from '@/services/ApartmentSharingLinkService';
-import { useRouter } from 'vue-router';
 import { RegisterService } from '@/services/RegisterService';
 import axios from 'axios';
 import { ToastService } from '@/services/ToastService';
@@ -28,7 +27,6 @@ import {useLoading} from 'vue-loading-overlay'
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
 
-const router = useRouter();
 declare const window: Window;
 
 interface State {
@@ -44,7 +42,7 @@ interface State {
   newMessage: number;
   messageList: DfMessage[][];
   skipLinks: SkipLink[];
-  guarantorFinancialDocumentSelected: FinancialDocument | undefined;
+  guarantorFinancialDocumentSelected: FinancialDocument;
   editGuarantorFinancialDocument: boolean;
   apartmentSharingLinks: ApartmentSharingLink[];
 }
@@ -128,9 +126,9 @@ const useTenantStore = defineStore('tenant', {
     },
 
     getGuarantorDocuments(state: State): DfDocument[] {
-      return state.selectedGuarantor.documents || [];
+      return state.selectedGuarantor?.documents || [];
     },
-    guarantor(state: State): Guarantor {
+    guarantor(state: State): Guarantor | undefined {
       return state.selectedGuarantor;
     },
     isLoggedIn: () => keycloak.authenticated,
@@ -202,6 +200,9 @@ const useTenantStore = defineStore('tenant', {
     },
     guarantorFinancialDocuments(state: State): FinancialDocument[] {
       const financialdocuments: FinancialDocument[] = [];
+      if (!state.selectedGuarantor) {
+        return financialdocuments;
+      }
       const g: Guarantor = state.selectedGuarantor;
       const dfDocs: DfDocument[] = g.documents || [];
       if (dfDocs !== null) {
@@ -374,13 +375,13 @@ const useTenantStore = defineStore('tenant', {
       }
       if (this.selectedGuarantor?.id) {
         let guarantor = user.guarantors.find((g: Guarantor) => {
-          return g.id === this.selectedGuarantor.id;
+          return g.id === this.selectedGuarantor?.id;
         });
 
         if (!guarantor) {
           this.coTenants.forEach((t: User) => {
             const tmpGuarantor = t.guarantors?.find((g: Guarantor) => {
-              return g.id === this.selectedGuarantor.id;
+              return g.id === this.selectedGuarantor?.id;
             });
             if (tmpGuarantor !== undefined) {
               guarantor = tmpGuarantor;
@@ -393,12 +394,18 @@ const useTenantStore = defineStore('tenant', {
           return;
         }
       }
+      if (!this.selectedGuarantor) {
+        return;
+      }
       Object.assign(this.selectedGuarantor, new Guarantor());
       Sentry.setContext("user", {
         id: user.id,
       });
     },
     setSelectedGuarantor(guarantor: Guarantor) {
+      if (!this.selectedGuarantor) {
+        return;
+      }
       Object.assign(this.selectedGuarantor, guarantor);
     },
     createCoTenant(mail: string) {
@@ -643,9 +650,7 @@ const useTenantStore = defineStore('tenant', {
       ).then(
         () => {
           AnalyticsService.validateFile();
-          this.loadUser().then(() => {
-            router.push("/account");
-          });
+          return Promise.resolve();
         },
         (error) => {
           return Promise.reject(error);
@@ -785,16 +790,10 @@ const useTenantStore = defineStore('tenant', {
       }
       this.deleteRoommates(tenant.email);
     },
-    async setTenantPage(substep: string) {
-      router.push({
-        name: "TenantDocuments",
-        params: { substep },
-      });
-    },
     async setGuarantorPage(guarantor: Guarantor, substep: number, tenantId: number | undefined = undefined ) {
       await this.setSelectedGuarantor(guarantor);
       if (tenantId && tenantId != this.user.id) {
-        router.push({
+        return {
           name: "TenantGuarantorDocuments",
           params: {
             step: "5",
@@ -802,12 +801,12 @@ const useTenantStore = defineStore('tenant', {
             tenantId: tenantId,
             guarantorId: guarantor.id,
           },
-        });
+        };
       } else {
-        router.push({
+        return {
           name: "GuarantorDocuments",
           params: { substep },
-        });
+        };
       }
     },
     saveTenantIdentification(formData: any) {
@@ -981,64 +980,51 @@ const useTenantStore = defineStore('tenant', {
         !this.user.lastName ||
         (!this.user.zipCode && this.user.documents.length == 0)
       ) {
-        router.push({ name: "TenantName" });
-        return;
+        return { name: "TenantName" };
       }
       if (!this.user.applicationType) {
-        router.push({ name: "TenantType" });
-        return;
+        return { name: "TenantType" };
       }
       if (!this.hasDoc("IDENTIFICATION")) {
-        router.push({ name: "TenantDocuments", params: { substep: "1" } });
-        return;
+        return { name: "TenantDocuments", params: { substep: "1" } };
       }
       if (!this.isTenantDocumentValid("RESIDENCY")) {
-        router.push({ name: "TenantDocuments", params: { substep: "2" } });
-        return;
+        return { name: "TenantDocuments", params: { substep: "2" } };
       }
       if (!this.hasDoc("PROFESSIONAL")) {
-        router.push({ name: "TenantDocuments", params: { substep: "3" } });
-        return;
+        return { name: "TenantDocuments", params: { substep: "3" } };
       }
       if (!this.isTenantDocumentValid("FINANCIAL")) {
-        router.push({ name: "TenantDocuments", params: { substep: "4" } });
-        return;
+        return { name: "TenantDocuments", params: { substep: "4" } };
       }
       if (!this.isTenantDocumentValid("TAX")) {
-        router.push({ name: "TenantDocuments", params: { substep: "5" } });
-        return;
+        return { name: "TenantDocuments", params: { substep: "5" } };
       }
       if (this.user.guarantors) {
         for (const g of this.user.guarantors) {
           if (!UtilsService.guarantorHasDoc("IDENTIFICATION", g)) {
-            this.setGuarantorPage(g, 1);
-            return;
+            return this.setGuarantorPage(g, 1);
           }
           if (!UtilsService.isGuarantorDocumentValid("RESIDENCY", g)) {
-            this.setGuarantorPage(g, 2 );
-            return;
+            return this.setGuarantorPage(g, 2 );
           }
           if (!UtilsService.guarantorHasDoc("PROFESSIONAL", g)) {
-            this.setGuarantorPage(g, 3 );
-            return;
+            return this.setGuarantorPage(g, 3 );
           }
           if (!UtilsService.isGuarantorDocumentValid("FINANCIAL", g)) {
-            this.setGuarantorPage(g, 4 );
-            return;
+            return this.setGuarantorPage(g, 4 );
           }
           if (!UtilsService.isGuarantorDocumentValid("TAX", g)) {
-            this.setGuarantorPage(g, 5 );
-            return;
+            return this.setGuarantorPage(g, 5 );
           }
         }
       }
 
       if (!this.user.honorDeclaration) {
-        router.push({ name: "ValidateFile" });
-        return;
+        return { name: "ValidateFile" };
       }
 
-      router.push({ name: "TenantName" });
+      return { name: "TenantName" };
     },
     updateSelectedGuarantor(tenantId: number) {
       let guarantors;
