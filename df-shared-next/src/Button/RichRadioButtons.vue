@@ -10,7 +10,7 @@
           :id="element.id"
           type="radio"
           :name="name"
-          :checked="value === element.optionName"
+          :checked="modelValue === element.optionName"
           @click="onSelect(element.optionName)"
         />
         <label class="fr-label" :for="element.id">
@@ -52,7 +52,7 @@ const emit = defineEmits(["input"]);
 const props = defineProps<{
   name: string;
   elements: RadioElement[];
-  value: string;
+  modelValue: string;
 }>();
 
 function getIconCount(element: RadioElement) {
