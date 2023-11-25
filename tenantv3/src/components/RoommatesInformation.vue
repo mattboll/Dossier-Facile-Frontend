@@ -1,7 +1,7 @@
 <template>
   <div>
     <NakedCard class="fr-p-md-5w">
-      <ValidationObserver v-slot="{ invalid }">
+      <!-- <ValidationObserver v-slot="{ invalid }"> -->
         <div class="fr-grid-row fr-grid-row--center">
           <div class="fr-col-12">
             <h6>{{ $t("roommatesinformation.title") }}</h6>
@@ -82,30 +82,44 @@
             <label class="fr-label fr-mb-1w">{{
               $t("roommatesinformation.roommateEmail")
             }}</label>
-            <validation-provider
+          <Field
+            id="email"
+            name="email"
+            v-model="newRoommate"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              email: true,
+            }"
+          >
+            <!-- <validation-provider
               :rules="{ email: true, required: value.length == 0 }"
               v-slot="{ errors }"
-            >
-              <div
-                class="fr-input-group"
-                :class="errors[0] ? 'fr-input-group--error' : ''"
-              >
+            > -->
                 <input
-                  v-model="newRoommate"
+                  v-bind="field"
                   class="form-control fr-input"
                   name="email"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                   placeholder="Ex : exemple@exemple.fr"
                   type="email"
                 />
-                <span class="fr-error-text" v-if="errors[0]">{{
-                  $t(errors[0])
-                }}</span>
-              </div>
-            </validation-provider>
+                </Field>
+                <ErrorMessage name="email" v-slot="{ message }">
+                  <span role="alert" class="fr-error-text">{{
+                    $t(message || "")
+                  }}</span>
+                </ErrorMessage>
           </div>
 
           <div class="fr-col-12 fr-col-xl-5 btn-container">
             <div class="fr-grid-row fr-grid-row--right">
+
+<!-- TODO
+                :disabled="invalid" -->
               <v-gouv-fr-button
                 class="full-width-xs"
                 :fullWidth="isMobile()"
@@ -113,37 +127,50 @@
                 :label="$t('roommatesinformation.add-a-roommate')"
                 :btn-type="'button'"
                 @click="addMail"
-                :disabled="invalid"
               ></v-gouv-fr-button>
             </div>
           </div>
         </div>
-      </ValidationObserver>
+      <!-- </ValidationObserver> -->
     </NakedCard>
     <div class="fr-grid-row fr-grid-row--center">
       <div class="fr-col-12 fr-mb-3w fr-mt-3w bg-bf200">
-        <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
+        <!-- <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
           <div
             class="fr-checkbox-group bg-purple"
             :class="errors[0] ? 'fr-input-group--error' : ''"
+          > -->
+          <Field
+            id="authorize"
+            name="authorize"
+            v-model="authorize"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true
+            }"
           >
             <input
               type="checkbox"
-              id="authorize"
-              value="false"
-              v-model="authorize"
+              v-bind="field"
               @change="updateAuthorize()"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
             />
             <label
               for="authorize"
               v-html="$t('roommatesinformation.acceptAuthor')"
             >
             </label>
-            <span class="fr-error-text" v-if="errors[0]">{{
-              $t(errors[0])
-            }}</span>
-          </div>
-        </validation-provider>
+                </Field>
+                <ErrorMessage name="authorize" v-slot="{ message }">
+                  <span role="alert" class="fr-error-text">{{
+                    $t(message || "")
+                  }}</span>
+                </ErrorMessage>
+          <!-- </div>
+        </validation-provider> -->
       </div>
     </div>
   </div>
@@ -159,6 +186,7 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import { UtilsService } from "../services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
+import { Field, ErrorMessage } from "vee-validate";
 
 // extend("is", {
 //   ...is,
@@ -166,7 +194,7 @@ import { computed, onMounted, ref } from "vue";
 //   validate: (value) => !!value,
 // });
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue"]);
 
     const store = useTenantStore();
     const user = computed(() => store.user);
@@ -192,7 +220,7 @@ const emit = defineEmits(["input"]);
         coTenant.email = newRoommate.value;
         store.createCoTenant(newRoommate.value);
         const newCoTenants = [...props.value, coTenant];
-        emit("input", newCoTenants);
+        emit("update:modelValue", newCoTenants);
         newRoommate.value = "";
       } else {
         showEmailExists.value = true;
@@ -204,12 +232,12 @@ const emit = defineEmits(["input"]);
     if (tenant.id) {
       store.deleteCoTenant(tenant)
         emit(
-          "input",
+          "update:modelValue",
           props.value.filter((t) => t.email != tenant.email)
         )
     } else {
       emit(
-        "input",
+          "update:modelValue",
         props.value.filter((t) => t.email != tenant.email)
       );
     }
