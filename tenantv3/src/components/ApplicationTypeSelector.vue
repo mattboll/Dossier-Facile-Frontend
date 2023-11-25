@@ -3,7 +3,7 @@
     <RichRadioButtons
       name="application-type-selector"
       v-model="checkedApplicationType"
-      @input="onChange"
+      @input="onChange($event)"
       :elements="applicationTypeOptions"
     ></RichRadioButtons>
     <ConfirmModal
@@ -61,7 +61,8 @@ onBeforeMount(() => {
   checkedApplicationType.value = applicationType.value;
 });
 
-function onChange() {
+function onChange($event: any) {
+  checkedApplicationType.value = $event;
   if (applicationType.value === checkedApplicationType.value) {
     return;
   }
