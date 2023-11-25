@@ -7,6 +7,7 @@ import router from './router'
 import i18n from './i18n';
 import "@gouvfr/dsfr/dist/dsfr/dsfr.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css";
+import "@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.min.css";
 import keycloak from './plugin/keycloak';
@@ -15,9 +16,9 @@ import {LoadingPlugin} from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import { defineRule } from 'vee-validate';
 
-defineRule('only-alpha', (value: any) => {
+defineRule('onlyAlpha', (value: any) => {
   if (!value.match("^[a-zA-Z \\-'’àâäçéèêëîïôöùûüÿæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]*$")) {
-    return 'only-alpha';
+    return 'onlyAlpha';
   }
   return true
 })

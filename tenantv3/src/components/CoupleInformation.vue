@@ -8,58 +8,78 @@
           </h1>
         </div>
         <div class="fr-col-12 fr-mb-3w">
-          <validation-provider rules="required|only-alpha" v-slot="{ errors }">
+          <!-- <validation-provider rules="required|only-alpha" v-slot="{ errors }">
             <div
               class="fr-input-group"
               :class="errors[0] ? 'fr-input-group--error' : ''"
-            >
+            > -->
               <FieldLabel :required="true">
                 {{ $t("coupleinformation.spouseLastName") }}
               </FieldLabel>
+          <Field
+            id="coTenantLastName"
+            name="coTenantLastName"
+            v-model="coTenant.lastName"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
+          >
               <input
-                v-model="coTenant.lastName"
+                v-bind="field"
                 class="form-control validate-required fr-input"
-                :class="{
-                  'fr-input--error': errors[0],
-                }"
-                name="coTenantLastName"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                 type="text"
                 @input="handleInput"
                 :disabled="disableNameFields"
               />
-              <span
-                class="fr-error-text"
-                v-if="errors[0] && errors[0] !== 'none'"
-                >{{ $t(errors[0]) }}</span
-              >
-            </div>
-          </validation-provider>
+              </Field>
+            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
+            <!-- </div>
+          </validation-provider> -->
         </div>
         <div class="fr-col-12 fr-mb-3w">
-          <validation-provider rules="required|only-alpha" v-slot="{ errors }">
+          <!-- <validation-provider rules="required|only-alpha" v-slot="{ errors }">
             <div
               class="fr-input-group"
               :class="errors[0] ? 'fr-input-group--error' : ''"
-            >
+            > -->
               <FieldLabel :required="true">
                 {{ $t("coupleinformation.spouseFirstName") }}
               </FieldLabel>
+          <Field
+            id="coTenantFirstName"
+            name="coTenantFirstName"
+            v-model="coTenant.lastName"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
+          >
               <input
-                v-model="coTenant.firstName"
+                v-bind="field"
                 class="validate-required form-control fr-input"
-                :class="errors[0] ? 'fr-input--error' : ''"
-                name="firstName"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                 type="text"
                 @input="handleInput"
                 :disabled="disableNameFields"
               />
-              <span
-                class="fr-error-text"
-                v-if="errors[0] && errors[0] !== 'none'"
-                >{{ $t(errors[0]) }}</span
-              >
-            </div>
-          </validation-provider>
+              </Field>
+            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
+            <!-- </div>
+          </validation-provider> -->
         </div>
       </div>
     </NakedCard>
@@ -86,34 +106,47 @@
           </v-gouv-fr-modal>
         </div>
         <div class="fr-col-12 fr-mt-3w fr-mb-3w">
-          <validation-provider
+          <!-- <validation-provider
             v-slot="{ errors }"
             :rules="{ email: true, custom: user.email }"
           >
             <div
               class="fr-input-group"
               :class="errors[0] ? 'fr-input-group--error' : ''"
-            >
+            > -->
               <FieldLabel for-input="email">
                 {{ $t("coupleinformation.spouseEmail") }}
               </FieldLabel>
+          <Field
+            id="coTenantFirstName"
+            name="coTenantFirstName"
+            v-model="coTenant.lastName"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
+          >
               <input
-                v-model="coTenant.email"
+                v-bind="field"
                 class="validate-required form-control fr-input"
-                :class="errors[0] ? 'fr-input--error' : ''"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                 name="email"
                 placeholder="Ex : exemple@exemple.fr"
                 type="email"
                 @input="handleInput"
                 :disabled="disableEmailField"
               />
-              <span
-                class="fr-error-text"
-                v-if="errors[0] && errors[0] !== 'none'"
-                >{{ $t(errors[0]) }}</span
-              >
-            </div>
-          </validation-provider>
+              </Field>
+            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
+
+            <!-- </div> -->
+          <!-- </validation-provider> -->
         </div>
       </div>
     </NakedCard>
@@ -123,28 +156,44 @@
       class="fr-grid-row fr-grid-row--center"
     >
       <div class="fr-col-12 fr-mb-3w fr-mt-3w">
-        <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
+        <!-- <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
           <div
             class="fr-checkbox-group bg-purple"
             :class="errors[0] ? 'fr-input-group--error' : ''"
+          > -->
+          <Field
+            id="authorize"
+            name="authorize"
+            v-model="authorize"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
           >
             <input
               type="checkbox"
-              id="authorize"
-              value="false"
-              v-model="authorize"
+              v-bind="field"
               @change="updateAuthorize()"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
             />
             <label
               for="authorize"
               v-html="$t('coupleinformation.acceptAuthor')"
             >
             </label>
-            <span class="fr-error-text" v-if="errors[0]">{{
+            <!-- <span class="fr-error-text" v-if="errors[0]">{{
               $t(errors[0])
             }}</span>
-          </div>
-        </validation-provider>
+          </div> -->
+              </Field>
+            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
+        <!-- </validation-provider> -->
       </div>
     </div>
   </div>
@@ -161,6 +210,7 @@ import CoupleInformationHelp from "./helps/CoupleInformationHelp.vue";
 import FieldLabel from "df-shared-next/src/components/form/FieldLabel.vue";
 import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import { Field, ErrorMessage } from "vee-validate";
 
 // extend("is", {
 //   ...is,

@@ -79,10 +79,9 @@
           @selected="updateApplicationType"
         ></ApplicationTypeSelector>
       </NakedCard>
-      <ValidationObserver ref="observer" v-slot="{ validate }">
-        <form
+        <Form
           name="form"
-          @submit.prevent="validate().then(handleOthersInformation)"
+          @submit="handleOthersInformation"
         >
           <CoupleInformation
             v-model="coTenants"
@@ -97,8 +96,7 @@
           >
           </RoommatesInformation>
           <ProfileFooter @on-back="goBack"></ProfileFooter>
-        </form>
-      </ValidationObserver>
+        </Form>
     </div>
   </div>
 </template>
@@ -107,11 +105,7 @@
 import { User } from "df-shared-next/src/models/User";
 import RoommatesInformation from "./RoommatesInformation.vue";
 import CoupleInformation from "./CoupleInformation.vue";
-import SubmitButton from "df-shared-next/src/Button/SubmitButton.vue";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import ProfileFooter from "./footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ApplicationTypeSelector from "../components/ApplicationTypeSelector.vue";
@@ -121,6 +115,7 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
 import { useRouter } from "vue-router";
+import { Form } from "vee-validate";
 
 const router = useRouter();
     const store = useTenantStore();
@@ -151,11 +146,13 @@ const router = useRouter();
   })
 
   async function handleOthersInformation() {
-    const isValid = await (
-      this.$refs.observer as Vue & {
-        validate: () => boolean;
-      }
-    ).validate();
+    // const isValid = await (
+      // TODO
+      // this.$refs.observer as Vue & {
+      //   validate: () => boolean;
+      // }
+    // ).validate();
+    const isValid = true;
 
     if (!isValid) return;
 
