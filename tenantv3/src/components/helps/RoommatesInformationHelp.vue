@@ -6,11 +6,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 
-@Component
-export default class RoommatesInformationHelp extends Vue {}
 </script>
 
 <style scoped lang="scss">

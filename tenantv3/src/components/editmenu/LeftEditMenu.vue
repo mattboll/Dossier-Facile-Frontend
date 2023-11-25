@@ -44,32 +44,32 @@
         <div v-if="step === 2">
           <TenantDocumentLink
             class="ml-5"
-            document-type="IDENTITY"
-            substep="1"
+            :document-type="DocumentType.IDENTITY"
+            :substep="1"
             :active="getTenantCurrentStep(1)"
           />
           <TenantDocumentLink
             class="ml-5"
-            document-type="RESIDENCY"
-            substep="2"
+            :document-type="DocumentType.RESIDENCY"
+            :substep="2"
             :active="getTenantCurrentStep(2)"
           />
           <TenantDocumentLink
             class="ml-5"
-            document-type="PROFESSIONAL"
-            substep="3"
+            :document-type="DocumentType.PROFESSIONAL"
+            :substep="3"
             :active="getTenantCurrentStep(3)"
           />
           <TenantDocumentLink
             class="ml-5"
-            document-type="FINANCIAL"
-            substep="4"
+            :document-type="DocumentType.FINANCIAL"
+            :substep="4"
             :active="getTenantCurrentStep(4)"
           />
           <TenantDocumentLink
             class="ml-5"
-            document-type="TAX"
-            substep="5"
+            :document-type="DocumentType.TAX"
+            :substep="5"
             :active="getTenantCurrentStep(5)"
           />
         </div>
@@ -109,36 +109,36 @@
               <GuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
-                document-type="IDENTITY"
-                substep="1"
+                :document-type="DocumentType.IDENTITY"
+                :substep="1"
                 :active="getGuarantorCurrentStep(1, g)"
               />
               <GuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
-                document-type="RESIDENCY"
-                substep="2"
+                :document-type="DocumentType.RESIDENCY"
+                :substep="2"
                 :active="getGuarantorCurrentStep(2, g)"
               />
               <GuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
-                document-type="PROFESSIONAL"
-                substep="3"
+                :document-type="DocumentType.PROFESSIONAL"
+                :substep="3"
                 :active="getGuarantorCurrentStep(3, g)"
               />
               <GuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
-                document-type="FINANCIAL"
-                substep="4"
+                :document-type="DocumentType.FINANCIAL"
+                :substep="4"
                 :active="getGuarantorCurrentStep(4, g)"
               />
               <GuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
-                document-type="TAX"
-                substep="5"
+                :document-type="DocumentType.TAX"
+                :substep="5"
                 :active="getGuarantorCurrentStep(5, g)"
               />
             </div>
@@ -147,15 +147,15 @@
             <GuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
-              document-type="IDENTIFICATION_LEGAL_PERSON"
-              substep="0"
+              :document-type="DocumentType.IDENTIFICATION_LEGAL_PERSON"
+              :substep="0"
               :active="getGuarantorCurrentStep(0, undefined)"
             />
             <GuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
-              document-type="IDENTIFICATION"
-              substep="1"
+              :document-type="DocumentType.IDENTIFICATION"
+              :substep="1"
               :active="getGuarantorCurrentStep(1, undefined)"
             />
           </div>
@@ -163,8 +163,8 @@
             <GuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
-              document-type="IDENTIFICATION_ORGANISM"
-              substep="0"
+              :document-type="DocumentType.IDENTIFICATION_ORGANISM"
+              :substep="0"
               :active="getGuarantorCurrentStep(0, undefined)"
             />
           </div>
@@ -216,36 +216,36 @@
               <CoTenantDocumentLink
                 class="ml-10"
                 :co-tenant="coTenant"
-                document-type="IDENTITY"
-                substep="1"
+                :document-type="DocumentType.IDENTITY"
+                :substep="1"
                 :active="getCurrentSubStep() === 1"
               />
               <CoTenantDocumentLink
                 class="ml-10"
                 :co-tenant="coTenant"
-                document-type="RESIDENCY"
-                substep="2"
+                :document-type="DocumentType.RESIDENCY"
+                :substep="2"
                 :active="getCurrentSubStep() === 2"
               />
               <CoTenantDocumentLink
                 class="ml-10"
                 :co-tenant="coTenant"
-                document-type="PROFESSIONAL"
-                substep="3"
+                :document-type="DocumentType.PROFESSIONAL"
+                :substep="3"
                 :active="getCurrentSubStep() === 3"
               />
               <CoTenantDocumentLink
                 class="ml-10"
                 :co-tenant="coTenant"
-                document-type="FINANCIAL"
-                substep="4"
+                :document-type="DocumentType.FINANCIAL"
+                :substep="4"
                 :active="getCurrentSubStep() === 4"
               />
               <CoTenantDocumentLink
                 class="ml-10"
                 :co-tenant="coTenant"
-                document-type="TAX"
-                substep="5"
+                :document-type="DocumentType.TAX"
+                :substep="5"
                 :active="getCurrentSubStep() === 5"
               />
             </div>
@@ -312,69 +312,69 @@
                 class="ml-10"
                 :guarantor="g"
                 :co-tenant="getCoTenant(0)"
-                document-type="IDENTITY"
-                substep="1"
+                :document-type="DocumentType.IDENTITY"
+                :substep="1"
                 :active="getGuarantorCurrentStep(1, g)"
               />
               <CoTenantGuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
                 :co-tenant="getCoTenant(0)"
-                document-type="RESIDENCY"
-                substep="2"
+                :document-type="DocumentType.RESIDENCY"
+                :substep="2"
                 :active="getGuarantorCurrentStep(2, g)"
               />
               <CoTenantGuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
                 :co-tenant="getCoTenant(0)"
-                document-type="PROFESSIONAL"
-                substep="3"
+                :document-type="DocumentType.PROFESSIONAL"
+                :substep="3"
                 :active="getGuarantorCurrentStep(3, g)"
               />
               <CoTenantGuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
                 :co-tenant="getCoTenant(0)"
-                document-type="FINANCIAL"
-                substep="4"
+                :document-type="DocumentType.FINANCIAL"
+                :substep="4"
                 :active="getGuarantorCurrentStep(4, g)"
               />
               <CoTenantGuarantorDocumentLink
                 class="ml-10"
                 :guarantor="g"
                 :co-tenant="getCoTenant(0)"
-                document-type="TAX"
-                substep="5"
+                :document-type="DocumentType.TAX"
+                :substep="5"
                 :active="getGuarantorCurrentStep(5, g)"
               />
             </div>
           </div>
-          <div v-if="selectedGuarantor.typeGuarantor === 'LEGAL_PERSON'">
+          <div v-if="selectedGuarantor?.typeGuarantor === 'LEGAL_PERSON'">
             <CoTenantGuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
               :co-tenant="getCoTenant(0)"
-              document-type="IDENTIFICATION_LEGAL_PERSON"
-              substep="0"
+              :document-type="DocumentType.IDENTIFICATION_LEGAL_PERSON"
+              :substep="0"
               :active="getGuarantorCurrentStep(0, selectedGuarantor)"
             />
             <CoTenantGuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
               :co-tenant="getCoTenant(0)"
-              document-type="IDENTIFICATION"
-              substep="1"
+              :document-type="DocumentType.IDENTIFICATION"
+              :substep="1"
               :active="getGuarantorCurrentStep(1, selectedGuarantor)"
             />
           </div>
-          <div v-if="selectedGuarantor.typeGuarantor === 'ORGANISM'">
+          <div v-if="selectedGuarantor?.typeGuarantor === 'ORGANISM'">
             <CoTenantGuarantorDocumentLink
               class="ml-5"
               :guarantor="selectedGuarantor"
               :co-tenant="getCoTenant(0)"
-              document-type="IDENTIFICATION_ORGANISM"
-              substep="0"
+              :document-type="DocumentType.IDENTIFICATION_ORGANISM"
+              :substep="0"
               :active="getGuarantorCurrentStep(0, selectedGuarantor)"
             />
           </div>
@@ -412,6 +412,7 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import { UtilsService } from "@/services/UtilsService";
 import { useI18n } from "vue-i18n";
+import { DocumentType } from "./documents/DocumentType";
 
     const store = useTenantStore();
     const route = useRoute();
@@ -462,7 +463,7 @@ const { t } = useI18n();
     return (
       (props.step === 3 || props.step === 5) &&
       s === substep &&
-      (g === undefined || selectedGuarantor.value.id === g.id)
+      (g === undefined || selectedGuarantor.value?.id === g.id)
     );
   }
 

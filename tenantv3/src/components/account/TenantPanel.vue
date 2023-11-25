@@ -16,7 +16,7 @@
         <FileRowListItem
           :label="$t('tenantpanel.identification')"
           :document="document(props.tenant, 'IDENTIFICATION')"
-          enableDownload="force"
+          :enableDownload="true"
           @clickEdit="setTenantStep(1)"
         />
         <FileRowListItem

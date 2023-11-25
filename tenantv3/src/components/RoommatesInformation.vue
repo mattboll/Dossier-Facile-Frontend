@@ -149,96 +149,80 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import { is } from "vee-validate/dist/rules";
+<script setup lang="ts">
+// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { User } from "df-shared-next/src/models/User";
-import { mapGetters, mapState } from "vuex";
 import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import RoommatesInformationHelp from "./helps/RoommatesInformationHelp.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { UtilsService } from "../services/UtilsService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onMounted, ref } from "vue";
 
-extend("is", {
-  ...is,
-  message: "field-required",
-  validate: (value) => !!value,
-});
+// extend("is", {
+//   ...is,
+//   message: "field-required",
+//   validate: (value) => !!value,
+// });
 
-@Component({
-  components: {
-    ValidationProvider,
-    ValidationObserver,
-    VGouvFrButton,
-    RoommatesInformationHelp,
-    VGouvFrModal,
-    NakedCard,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      coTenantAuthorize: "coTenantAuthorize",
-    }),
-  },
-})
-export default class RoommatesInformation extends Vue {
-  @Prop({ default: () => [] }) value!: User[];
+const emit = defineEmits(["input"]);
 
-  user!: User;
-  authorize = false;
-  coTenantAuthorize!: boolean;
-  newRoommate = "";
-  showEmailExists = false;
+    const store = useTenantStore();
+    const user = computed(() => store.user);
+    const coTenantAuthorize = computed(() => store.coTenantAuthorize);
 
-  mounted() {
-    this.authorize = this.coTenantAuthorize;
-  }
+  const props = withDefaults(defineProps<{ value: User[] }>(), {
+    value: () => [],
+  });
 
-  addMail() {
-    this.showEmailExists = false;
-    if (this.newRoommate !== "") {
-      if (this.user.email !== this.newRoommate) {
+  const authorize = ref(false);
+  const newRoommate = ref("");
+  const showEmailExists = ref(false);
+
+  onMounted(() => {
+    authorize.value = coTenantAuthorize.value;
+  })
+
+  function addMail() {
+    showEmailExists.value = false;
+    if (newRoommate.value !== "") {
+      if (user.value.email !== newRoommate.value) {
         const coTenant = new User();
-        coTenant.email = this.newRoommate;
-        this.$store.commit("createCoTenant", this.newRoommate);
-        this.value.push(coTenant);
-        this.$emit("input", this.value);
-        this.newRoommate = "";
+        coTenant.email = newRoommate.value;
+        store.createCoTenant(newRoommate.value);
+        const newCoTenants = [...props.value, coTenant];
+        emit("input", newCoTenants);
+        newRoommate.value = "";
       } else {
-        this.showEmailExists = true;
+        showEmailExists.value = true;
       }
     }
   }
 
-  remove(tenant: User) {
+  function remove(tenant: User) {
     if (tenant.id) {
-      this.$store.dispatch("deleteCoTenant", tenant).then(() =>
-        this.$emit(
+      store.deleteCoTenant(tenant)
+        emit(
           "input",
-          this.value.filter((t) => t.email != tenant.email)
+          props.value.filter((t) => t.email != tenant.email)
         )
-      );
     } else {
-      this.$emit(
+      emit(
         "input",
-        this.value.filter((t) => t.email != tenant.email)
+        props.value.filter((t) => t.email != tenant.email)
       );
     }
     return false;
   }
 
-  updateAuthorize() {
-    this.$store.commit("updateCoTenantAuthorize", this.authorize);
+  function updateAuthorize() {
+    store.updateCoTenantAuthorize(authorize.value);
   }
 
-  isMobile() {
+  function isMobile() {
     return UtilsService.isMobile();
   }
-}
 </script>
 
 <style scoped lang="scss">

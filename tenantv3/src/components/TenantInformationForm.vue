@@ -103,13 +103,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import { User } from "df-shared-next/src/models/User";
 import RoommatesInformation from "./RoommatesInformation.vue";
 import CoupleInformation from "./CoupleInformation.vue";
-import { mapGetters, mapState } from "vuex";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import SubmitButton from "df-shared-next/src/Button/SubmitButton.vue";
 import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
@@ -120,56 +117,40 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ApplicationTypeSelector from "../components/ApplicationTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import useTenantStore from "@/stores/tenant-store";
+import { useRouter } from "vue-router";
 
-@Component({
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      roommates: "getRoommates",
-      coTenantAuthorize: "coTenantAuthorize",
-      spouseAuthorize: "spouseAuthorize",
-    }),
-  },
-  components: {
-    CoupleInformation,
-    RoommatesInformation,
-    ValidationObserver,
-    ValidationProvider,
-    SubmitButton,
-    WarningMessage,
-    DfButton,
-    ConfirmModal,
-    ProfileFooter,
-    NakedCard,
-    ApplicationTypeSelector,
-  },
-})
-export default class TenantInformationForm extends Vue {
-  user!: User;
-  roommates!: User[];
-  coTenants: User[] = [];
-  coTenantAuthorize!: boolean;
-  spouseAuthorize!: boolean;
-  applicationType = "";
+const router = useRouter();
+    const store = useTenantStore();
+    const user = computed(() => store.user);
+    const roommates = computed(() => store.getRoommates);
+    const coTenantAuthorize = computed(() => store.coTenantAuthorize);
+    const spouseAuthorize = computed(() => store.spouseAuthorize);
 
-  localCoTenantAuthorize!: boolean;
-  localSpouseAuthorize!: boolean;
+    const { t } = useI18n();
 
-  beforeMount() {
-    if (this.user.applicationType) {
-      this.applicationType = this.user.applicationType;
+
+  const coTenants = ref([] as User[]);
+  const applicationType = ref("");
+
+  const localCoTenantAuthorize = ref(false);
+  const localSpouseAuthorize = ref(false);
+
+  onBeforeMount(() => {
+    if (user.value.applicationType) {
+      applicationType.value = user.value.applicationType;
     }
-    this.localCoTenantAuthorize = this.coTenantAuthorize;
-    this.localSpouseAuthorize = this.spouseAuthorize;
+    localCoTenantAuthorize.value = coTenantAuthorize.value;
+    localSpouseAuthorize.value = spouseAuthorize.value;
 
-    if (this.applicationType === "GROUP" || this.applicationType === "COUPLE") {
-      this.coTenants = this.roommates;
+    if (applicationType.value === "GROUP" || applicationType.value === "COUPLE") {
+      coTenants.value = roommates.value;
     }
-  }
+  })
 
-  async handleOthersInformation() {
+  async function handleOthersInformation() {
     const isValid = await (
       this.$refs.observer as Vue & {
         validate: () => boolean;
@@ -178,8 +159,8 @@ export default class TenantInformationForm extends Vue {
 
     if (!isValid) return;
 
-    if (this.hasNothingToSave()) {
-      this.$router.push({
+    if (hasNothingToSave()) {
+      router.push({
         name: "TenantDocuments",
         params: { substep: "1" },
       });
@@ -187,22 +168,22 @@ export default class TenantInformationForm extends Vue {
     }
 
     const dispatchMethod =
-      this.applicationType === "GROUP"
+      applicationType.value === "GROUP"
         ? () => {
             const data = {
-              applicationType: this.applicationType,
-              coTenantEmail: this.coTenants.flatMap((t) => t.email),
+              applicationType: applicationType.value,
+              coTenantEmail: coTenants.value.flatMap((t) => t.email),
               acceptAccess: true,
             };
-            return this.$store.dispatch("setRoommates", data);
+            return store.setRoommates(data);
           }
         : () => {
             const data = {
-              applicationType: this.applicationType,
-              coTenants: this.coTenants,
+              applicationType: applicationType.value,
+              coTenants: coTenants.value,
               acceptAccess: true,
             };
-            return this.$store.dispatch("setCoTenants", data);
+            return store.setCoTenants(data);
           };
     const $loading = useLoading({});
     const loader = $loading.show();
@@ -211,15 +192,15 @@ export default class TenantInformationForm extends Vue {
       .then(
         () => {
           AnalyticsService.confirmType();
-          this.$router.push({
+          router.push({
             name: "TenantDocuments",
             params: { substep: "1" },
           });
-          if (this.applicationType === "COUPLE") {
+          if (applicationType.value === "COUPLE") {
             ToastService.info("tenantinformationform.couple-saved");
             return;
           }
-          if (this.applicationType === "GROUP") {
+          if (applicationType.value === "GROUP") {
             ToastService.info("tenantinformationform.roommates-saved");
             return;
           }
@@ -239,23 +220,23 @@ export default class TenantInformationForm extends Vue {
       });
   }
 
-  updateApplicationType(value: string) {
-    this.applicationType = value;
-    this.deleteCoTenants();
+  function updateApplicationType(value: string) {
+    applicationType.value = value;
+    deleteCoTenants();
   }
 
-  hasNothingToSave() {
+  function hasNothingToSave() {
     if (
-      this.applicationType === this.user.applicationType &&
-      this.applicationType === "ALONE"
+      applicationType.value === user.value.applicationType &&
+      applicationType.value === "ALONE"
     ) {
       return true;
     }
     if (
-      this.applicationType === this.user.applicationType &&
-      this.applicationType === "GROUP"
+      applicationType.value === user.value.applicationType &&
+      applicationType.value === "GROUP"
     ) {
-      const unregisteredRoommate = this.coTenants.find((r: any) => {
+      const unregisteredRoommate = coTenants.value.find((r: any) => {
         return r.id === undefined;
       });
       if (unregisteredRoommate === undefined) {
@@ -265,41 +246,35 @@ export default class TenantInformationForm extends Vue {
     return false;
   }
 
-  deleteCoTenants() {
-    this.user.apartmentSharing?.tenants.forEach((t) => {
+  function deleteCoTenants() {
+    user.value.apartmentSharing?.tenants.forEach((t) => {
       if (t.tenantType !== "CREATE") {
-        this.$store
-          .dispatch("deleteCoTenant", t)
-          .then()
-          .catch(() => {
-            ToastService.error();
-            return;
-          });
+        store
+          .deleteCoTenant(t);
       }
     });
-    this.coTenants = [];
+    coTenants.value = [];
   }
 
-  isOwner() {
+  function isOwner() {
     return (
-      this.user.tenantType === undefined || this.user.tenantType === "CREATE"
+      user.value.tenantType === undefined || user.value.tenantType === "CREATE"
     );
   }
 
-  authorize() {
-    if (this.applicationType === "COUPLE" && !this.localSpouseAuthorize) {
+  function authorize() {
+    if (applicationType.value === "COUPLE" && !localSpouseAuthorize.value) {
       return;
     }
-    if (this.applicationType === "GROUP" && !this.localCoTenantAuthorize) {
+    if (applicationType.value === "GROUP" && !localCoTenantAuthorize.value) {
       return;
     }
-    this.$router.push({ name: "TenantDocuments", params: { substep: "1" } });
+    router.push({ name: "TenantDocuments", params: { substep: "1" } });
   }
 
-  goBack() {
-    this.$router.push({ name: "TenantName" });
+  function goBack() {
+    router.push({ name: "TenantName" });
   }
-}
 </script>
 
 <style scoped lang="scss">

@@ -94,7 +94,7 @@
               class="fr-input-group"
               :class="errors[0] ? 'fr-input-group--error' : ''"
             >
-              <FieldLabel>
+              <FieldLabel for-input="email">
                 {{ $t("coupleinformation.spouseEmail") }}
               </FieldLabel>
               <input
@@ -118,7 +118,7 @@
       </div>
     </NakedCard>
     <div
-      ref="checkbox-authorize"
+      ref="checkboxauthorize"
       v-if="showCheckBox"
       class="fr-grid-row fr-grid-row--center"
     >
@@ -150,98 +150,83 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import { is } from "vee-validate/dist/rules";
-import { mapGetters, mapState } from "vuex";
+<script setup lang="ts">
+// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+// import { is } from "vee-validate/dist/rules";
+// import { mapGetters, mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
-import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import CoupleInformationHelp from "./helps/CoupleInformationHelp.vue";
 import FieldLabel from "df-shared-next/src/components/form/FieldLabel.vue";
+import { computed, onMounted, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-extend("is", {
-  ...is,
-  message: "field-required",
-  validate: (value) => !!value,
-});
+// extend("is", {
+//   ...is,
+//   message: "field-required",
+//   validate: (value) => !!value,
+// });
 
-extend("custom", {
-  ...is,
-  message: "same-email-not-valid",
-  validate: (v1, v2: any) => {
-    return v1 !== v2.other;
-  },
-});
+// extend("custom", {
+//   ...is,
+//   message: "same-email-not-valid",
+//   validate: (v1, v2: any) => {
+//     return v1 !== v2.other;
+//   },
+// });
 
-@Component({
-  components: {
-    ValidationProvider,
-    ValidationObserver,
-    VGouvFrButton,
-    VGouvFrModal,
-    CoupleInformationHelp,
-    NakedCard,
-    FieldLabel,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      spouseAuthorize: "spouseAuthorize",
-    }),
-  },
-})
-export default class CoupleInformation extends Vue {
-  coTenant = new User();
-  authorize = false;
-  spouseAuthorize!: boolean;
-  showCheckBox = false;
-  disableNameFields = false;
-  disableEmailField = false;
-  user!: User;
+const emit = defineEmits(["input"]);
 
-  mounted() {
-    if ((this.user.apartmentSharing?.tenants.length || 0) > 1) {
-      const partner = this.user.apartmentSharing?.tenants.find((t) => {
-        return t.email != this.user.email;
+    const store = useTenantStore();
+    const user = computed(() => store.user);
+    const spouseAuthorize = computed(() => store.spouseAuthorize);
+
+  const coTenant = ref(new User());
+  const authorize = ref(false);
+  const showCheckBox = ref(false);
+  const disableNameFields = ref(false);
+  const disableEmailField = ref(false);
+const checkboxauthorize = ref(null);
+
+  onMounted(() => {
+    if ((user.value.apartmentSharing?.tenants.length || 0) > 1) {
+      const partner = user.value.apartmentSharing?.tenants.find((t) => {
+        return t.email != user.value.email;
       });
-      this.coTenant = partner || this.coTenant;
-      if (this.coTenant.firstName || this.coTenant.lastName) {
-        this.disableNameFields = true;
+      coTenant.value = partner || coTenant.value;
+      if (coTenant.value.firstName || coTenant.value.lastName) {
+        disableNameFields.value = true;
       }
-      if (this.coTenant.email?.length > 0) {
-        this.disableEmailField = true;
-        this.showCheckBox = true;
-        this.authorize = this.spouseAuthorize;
+      if (coTenant.value.email?.length > 0) {
+        disableEmailField.value = true;
+        showCheckBox.value = true;
+        authorize.value = spouseAuthorize.value;
       }
     }
+  })
+
+  function scrollToEnd() {
+    // TODO
+    // window.scrollTo(0, checkboxauthorize.value?.lastElementChild.offsetTop);
   }
 
-  scrollToEnd() {
-    const element: any = this.$refs["checkbox-authorize"];
-    window.scrollTo(0, element.lastElementChild.offsetTop);
-  }
-
-  handleInput() {
-    this.$emit("input", [this.coTenant]);
-    if (this.coTenant.email?.length > 0) {
-      this.showCheckBox = true;
-      this.$nextTick(function () {
-        this.scrollToEnd();
-      });
+  function handleInput() {
+    emit("input", [coTenant.value]);
+    if (coTenant.value.email?.length > 0) {
+      showCheckBox.value = true;
+      // TODO
+      // this.$nextTick(function () {
+      //   scrollToEnd();
+      // });
     } else {
-      this.showCheckBox = false;
+      showCheckBox.value = false;
     }
   }
 
-  updateAuthorize() {
-    this.$store.commit("updateCoupleAuthorize", this.authorize);
+  function updateAuthorize() {
+    store.updateCoupleAuthorize(authorize.value);
   }
-}
 </script>
 
 <style scoped lang="scss">

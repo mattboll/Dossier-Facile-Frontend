@@ -38,7 +38,7 @@ import DfButton from "df-shared-next/src/Button/Button.vue";
 const props = 
   defineProps<{
     label: string,
-    subLabel: string,
+    subLabel?: string,
   }>();
 
   function hasClickEditionListener() {

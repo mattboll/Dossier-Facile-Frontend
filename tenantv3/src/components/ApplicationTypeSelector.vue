@@ -16,99 +16,86 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+import useTenantStore from "@/stores/tenant-store";
 import RichRadioButtons from "df-shared-next/src/Button/RichRadioButtons.vue";
-import { mapGetters, mapState } from "vuex";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import { User } from "df-shared-next/src/models/User";
+import { computed, onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      roommates: "getRoommates",
-    }),
+const store = useTenantStore();
+const user = computed(() => store.user);
+const roommates = computed(() => store.getRoommates);
+const { t } = useI18n();
+const emit = defineEmits(["selected"]);
+
+const applicationType = ref("");
+const checkedApplicationType = ref("");
+
+const showConfirmationModal = ref(false);
+
+const applicationTypeOptions = [
+  {
+    id: "alone-choice",
+    labelKey: "tenantinformationform.alone",
+    iconClass: "fr-icon-user-line",
+    optionName: "ALONE",
   },
-  components: {
-    ConfirmModal,
-    RichRadioButtons,
+  {
+    id: "couple-choice",
+    labelKey: "tenantinformationform.couple",
+    iconClass: "fr-icon-user-line",
+    iconCount: 2,
+    optionName: "COUPLE",
   },
-})
-export default class ApplicationTypeSelector extends Vue {
-  user!: User;
-  roommates!: User[];
+  {
+    id: "group-choice",
+    labelKey: "tenantinformationform.roommate",
+    iconClass: "fr-icon-team-line",
+    optionName: "GROUP",
+  },
+];
 
-  applicationType = "";
-  checkedApplicationType = "";
+onBeforeMount(() => {
+  applicationType.value = user.value.applicationType || "ALONE";
+  checkedApplicationType.value = applicationType.value;
+});
 
-  showConfirmationModal = false;
-
-  applicationTypeOptions = [
-    {
-      id: "alone-choice",
-      labelKey: "tenantinformationform.alone",
-      iconClass: "fr-icon-user-line",
-      optionName: "ALONE",
-    },
-    {
-      id: "couple-choice",
-      labelKey: "tenantinformationform.couple",
-      iconClass: "fr-icon-user-line",
-      iconCount: 2,
-      optionName: "COUPLE",
-    },
-    {
-      id: "group-choice",
-      labelKey: "tenantinformationform.roommate",
-      iconClass: "fr-icon-team-line",
-      optionName: "GROUP",
-    },
-  ];
-
-  beforeMount() {
-    this.applicationType = this.user.applicationType || "ALONE";
-    this.checkedApplicationType = this.applicationType;
+function onChange() {
+  if (applicationType.value === checkedApplicationType.value) {
+    return;
   }
-
-  onChange() {
-    if (this.applicationType === this.checkedApplicationType) {
-      return;
-    }
-    if (this.roommates.length || 0 > 1) {
-      this.displayConfirmationModal();
-    } else {
-      this.applicationType = this.checkedApplicationType;
-      this.$emit("selected", this.checkedApplicationType);
-    }
+  if (roommates.value.length || 0 > 1) {
+    displayConfirmationModal();
+  } else {
+    applicationType.value = checkedApplicationType.value;
+    emit("selected", checkedApplicationType.value);
   }
+}
 
-  undoSelect() {
-    this.checkedApplicationType = this.applicationType;
-    this.hideConfirmationModal();
-  }
+function undoSelect() {
+  checkedApplicationType.value = applicationType.value;
+  hideConfirmationModal();
+}
 
-  validSelect() {
-    this.applicationType = this.checkedApplicationType;
-    this.hideConfirmationModal();
-    this.$emit("selected", this.checkedApplicationType);
-  }
+function validSelect() {
+  applicationType.value = checkedApplicationType.value;
+  hideConfirmationModal();
+  emit("selected", checkedApplicationType.value);
+}
 
-  getConfirmModalContent(): string {
-    return this.applicationType === "COUPLE"
-      ? this.$tc("tenantinformationform.will-delete-couple")
-      : this.$tc("tenantinformationform.will-delete-roommates");
-  }
+function getConfirmModalContent(): string {
+  return applicationType.value === "COUPLE"
+    ? t("tenantinformationform.will-delete-couple")
+    : t("tenantinformationform.will-delete-roommates");
+}
 
-  displayConfirmationModal() {
-    this.showConfirmationModal = true;
-  }
+function displayConfirmationModal() {
+  showConfirmationModal.value = true;
+}
 
-  hideConfirmationModal() {
-    this.showConfirmationModal = false;
-  }
+function hideConfirmationModal() {
+  showConfirmationModal.value = false;
 }
 </script>
 

@@ -6,11 +6,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-
-@Component
-export default class CoupleInformationHelp extends Vue {}
+<script setup lang="ts">
 </script>
 
 <style scoped lang="scss">
