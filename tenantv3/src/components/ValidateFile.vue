@@ -11,6 +11,7 @@
           <Field
             id="declaration"
             name="declaration"
+            type="checkbox"
             v-model="declaration"
             v-slot="{ field, meta }"
             :rules="{
@@ -40,6 +41,7 @@
           <Field
             id="declaration2"
             name="declaration2"
+            type="checkbox"
             v-model="declaration2"
             v-slot="{ field, meta }"
             :rules="{

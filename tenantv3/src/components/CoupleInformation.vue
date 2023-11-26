@@ -56,7 +56,7 @@
           <Field
             id="coTenantFirstName"
             name="coTenantFirstName"
-            v-model="coTenant.lastName"
+            v-model="coTenant.firstName"
             v-slot="{ field, meta }"
             :rules="{
               required: true,
@@ -75,7 +75,7 @@
                 :disabled="disableNameFields"
               />
               </Field>
-            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+            <ErrorMessage name="coTenantFirstName" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
             <!-- </div>
@@ -118,13 +118,14 @@
                 {{ $t("coupleinformation.spouseEmail") }}
               </FieldLabel>
           <Field
-            id="coTenantFirstName"
-            name="coTenantFirstName"
-            v-model="coTenant.lastName"
+            id="email"
+            name="email"
+            v-model="coTenant.email"
             v-slot="{ field, meta }"
             :rules="{
               required: true,
-              onlyAlpha: true,
+              email: true,
+              custom: user.email,
             }"
           >
               <input
@@ -141,7 +142,7 @@
                 :disabled="disableEmailField"
               />
               </Field>
-            <ErrorMessage name="coTenantLastName" v-slot="{ message }">
+            <ErrorMessage name="email" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
 
@@ -210,7 +211,7 @@ import CoupleInformationHelp from "./helps/CoupleInformationHelp.vue";
 import FieldLabel from "df-shared-next/src/components/form/FieldLabel.vue";
 import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
-import { Field, ErrorMessage } from "vee-validate";
+import { Field, ErrorMessage, defineRule } from "vee-validate";
 
 // extend("is", {
 //   ...is,
@@ -225,6 +226,12 @@ import { Field, ErrorMessage } from "vee-validate";
 //     return v1 !== v2.other;
 //   },
 // });
+defineRule('custom', (v1: any, [v2]: any[]) => {
+  if (v1 === v2) {
+    return 'same-email-not-valid';
+  }
+  return true;
+});
 
 const emit = defineEmits(["input"]);
 

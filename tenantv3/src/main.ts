@@ -32,7 +32,7 @@ defineRule('zipcode', (value: any) => {
 
 defineRule('validateEmail', (value: any) => {
   if (!value) {
-    return 'register.email-not-valid';
+    return 'email-not-valid';
   }
   return true;
 });
@@ -65,7 +65,7 @@ defineRule('email', (value: any) => {
     return true;
   }
   if (!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/.test(value)) {
-    return 'register.email-not-valid';
+    return 'email-not-valid';
   }
   return true;
 });
