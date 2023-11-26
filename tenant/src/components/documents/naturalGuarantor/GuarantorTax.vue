@@ -384,13 +384,12 @@ export default class GuarantorTax extends Vue {
         this.taxDocument.maxFileCount &&
         this.taxFiles().length > this.taxDocument.maxFileCount
       ) {
-        // TODO
-        // Vue.toasted.global.max_file({
-        //   message: this.$i18n.t("max-file", [
-        //     this.taxFiles().length,
-        //     this.taxDocument.maxFileCount,
-        //   ]),
-        // });
+        Vue.toasted.global.max_file({
+          message: this.$i18n.t("max-file", [
+            this.taxFiles().length,
+            this.taxDocument.maxFileCount,
+          ]),
+        });
         this.files = [];
         return false;
       }
@@ -448,7 +447,7 @@ export default class GuarantorTax extends Vue {
       .then(() => {
         this.files = [];
         this.fileUploadStatus = UploadStatus.STATUS_INITIAL;
-        // Vue.toasted.global.save_success();
+        Vue.toasted.global.save_success();
       })
       .catch((err) => {
         this.fileUploadStatus = UploadStatus.STATUS_FAILED;
