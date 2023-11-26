@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import useTenantStore from './stores/tenant-store';
 import { computed } from 'vue';
 import TenantSkipLinks from './components/TenantSkipLinks.vue';
@@ -11,6 +11,7 @@ import Announcement from 'df-shared-next/src/components/Announcement.vue';
 import FollowSocials from 'df-shared-next/src/Footer/FollowSocials.vue';
 
 const store = useTenantStore();
+const router = useRouter();
 
   const isFunnel = computed(() => store.isFunnel);
   const isLoggedIn = computed(() => store.isLoggedIn);
@@ -22,8 +23,7 @@ const store = useTenantStore();
   }
 
   function onLoginTenant() {
-    // TODO
-    // this.$router.push("/login");
+    router.push("/login");
   }
 
   function onCreateOwner() {
