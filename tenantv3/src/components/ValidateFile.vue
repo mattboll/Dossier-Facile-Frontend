@@ -5,6 +5,9 @@
           <NakedCard class="fr-p-md-5w fr-mb-3w">
             <h1 class="fr-h6">{{ t("validatefile.title") }}</h1>
             <p>{{ getCheckboxInstructions() }}</p>
+            <div
+                class="fr-checkbox-group bg-purple fr-mb-3w"
+              >
           <Field
             id="declaration"
             name="declaration"
@@ -29,7 +32,11 @@
                 <label for="declaration">
                   <span v-html="t('validatefile.declaration')"></span>
                 </label>
+                </div>
             <div v-if="hasGuarantors()">
+            <div
+                class="fr-checkbox-group bg-purple fr-mb-3w"
+              >
           <Field
             id="declaration2"
             name="declaration2"
@@ -56,6 +63,7 @@
                       ? t("validatefile.declaration2-plural")
                       : t("validatefile.declaration2")
                   }}</label>
+              </div>
             </div>
           </NakedCard>
 
