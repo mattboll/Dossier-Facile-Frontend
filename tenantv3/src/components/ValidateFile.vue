@@ -1,84 +1,96 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ validate }">
-      <form name="form" @submit.prevent="validate().then(sendFile)">
+      <Form name="form" @submit="sendFile">
         <div v-if="!hasErrors()">
           <NakedCard class="fr-p-md-5w fr-mb-3w">
             <h1 class="fr-h6">{{ t("validatefile.title") }}</h1>
             <p>{{ getCheckboxInstructions() }}</p>
-
-            <validation-provider rules="isvalid" v-slot="{ errors }">
-              <div
-                class="fr-checkbox-group bg-purple fr-mb-3w"
-                :class="errors[0] ? 'fr-checkbox-group--error' : ''"
-              >
+          <Field
+            id="declaration"
+            name="declaration"
+            v-model="declaration"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+            }"
+          >
                 <input
                   type="checkbox"
-                  id="declaration"
-                  value="false"
-                  v-model="declaration"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
+                  v-bind="field"
                 />
+              </Field>
+            <ErrorMessage name="declaration" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                 <label for="declaration">
                   <span v-html="t('validatefile.declaration')"></span>
                 </label>
-                <span class="fr-error-text" v-if="errors[0]">{{
-                  t(errors[0])
-                }}</span>
-              </div>
-            </validation-provider>
             <div v-if="hasGuarantors()">
-              <validation-provider rules="isvalid" v-slot="{ errors }">
-                <div
-                  class="fr-checkbox-group bg-purple fr-mb-3w"
-                  :class="errors[0] ? 'fr-checkbox-group--error' : ''"
-                >
+          <Field
+            id="declaration2"
+            name="declaration2"
+            v-model="declaration2"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+            }"
+          >
                   <input
                     type="checkbox"
-                    id="declaration2"
-                    value="false"
-                    v-model="declaration2"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
+                    v-bind="field"
                   />
+              </Field>
+            <ErrorMessage name="declaration2" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                   <label for="declaration2">{{
                     user.guarantors.length > 1
                       ? t("validatefile.declaration2-plural")
                       : t("validatefile.declaration2")
                   }}</label>
-                  <span class="fr-error-text" v-if="errors[0]">{{
-                    t(errors[0])
-                  }}</span>
-                </div>
-              </validation-provider>
             </div>
           </NakedCard>
 
           <div v-if="user.tenantType === 'CREATE'">
             <NakedCard class="fr-px-5w fr-py-3w fr-mb-2w">
-              <validation-provider rules="isvalid" v-slot="{ errors }">
-                <div
-                  class="fr-input-group"
-                  :class="errors[0] ? 'fr-input-group--error' : ''"
-                >
                   <p>
                     <label for="precision" class="fr-label">
                       {{ t("validatefile.precision") }}
                     </label>
+          <Field
+            id="precision"
+            name="precision"
+            v-model="precision"
+            v-slot="{ field, meta }"
+          >
                     <textarea
                       id="precision"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                       :placeholder="t('validatefile.placeholder')"
                       type="text"
                       maxlength="2000"
                       rows="3"
-                      v-model="precision"
+                      v-bind="field"
                       name="precision"
                       class="validate-required form-control fr-input"
                     />
+              </Field>
                     <span>{{ precision.length }} / 2000</span>
-                    <span class="fr-error-text" v-if="errors[0]">{{
-                      t(errors[0])
-                    }}</span>
+            <ErrorMessage name="precision" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                   </p>
-                </div>
-              </validation-provider>
             </NakedCard>
           </div>
         </div>
@@ -87,7 +99,7 @@
           :disabled="hasErrors()"
           :nextLabel="t('validatefile.validate')"
         ></ProfileFooter>
-      </form>
+      </Form>
       <div v-if="hasErrors()">
         <NakedCard class="fr-px-5w fr-py-3w">
           <div>
@@ -101,7 +113,6 @@
         </NakedCard>
         <FileErrors></FileErrors>
       </div>
-    </ValidationObserver>
   </div>
 </template>
 
@@ -116,6 +127,7 @@ import type { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { ToastService } from "@/services/ToastService";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 // extend("isvalid", {
 //   ...is,

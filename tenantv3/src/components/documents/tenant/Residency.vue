@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ validate }">
       <NakedCard class="fr-p-md-5w">
         <div>
           <h1 class="fr-h6">
@@ -97,9 +96,8 @@
       </NakedCard>
       <ProfileFooter
         @on-back="emit('on-back')"
-        @on-next="validate().then(goNext)"
+        @on-next="goNext"
       ></ProfileFooter>
-    </ValidationObserver>
     <ConfirmModal
       v-if="isDocDeleteVisible"
       @valid="validSelect()"
@@ -127,7 +125,6 @@ import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
 import { UtilsService } from "@/services/UtilsService";
-// import { ValidationObserver } from "vee-validate";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
 import { computed, onBeforeMount, ref } from "vue";

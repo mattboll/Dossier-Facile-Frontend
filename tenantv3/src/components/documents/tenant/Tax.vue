@@ -1,7 +1,6 @@
 <template>
   <div class="fr-mb-5w">
-    <ValidationObserver v-slot="{ validate }">
-      <form name="form">
+      <Form name="form">
         <NakedCard class="fr-p-md-5w">
           <h1 class="fr-h6">{{ $t("tax-page.title") }}</h1>
           <div class="fr-mt-3w">
@@ -18,36 +17,37 @@
           class="fr-p-md-5w fr-mt-3w"
           v-if="taxDocument.key && taxDocument.key === 'other-tax'"
         >
-          <validation-provider rules="required" v-slot="{ errors, valid }">
-            <div
-              class="fr-input-group"
-              :class="errors[0] ? 'fr-input-group--error' : ''"
-            >
               <label class="fr-label" for="customText">{{
                 $t("tax-page.custom-text")
               }}</label>
+          <Field
+            id="customText"
+            name="customText"
+            v-model="customText"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+            }"
+          >
               <textarea
-                v-model="customText"
+                v-bind="field"
                 class="form-control fr-input validate-required"
-                :class="{
-                  'fr-input--valid': valid,
-                  'fr-input--error': errors[0],
-                }"
-                id="customText"
-                name="customText"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                 placeholder=""
                 type="text"
                 required
                 maxlength="2000"
                 rows="4"
               />
-              <span class="fr-error-text" v-if="errors[0]">{{
-                $t(errors[0])
-              }}</span>
-            </div>
-          </validation-provider>
+              </Field>
+            <ErrorMessage name="customText" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
         </NakedCard>
-      </form>
+      </Form>
 
       <NakedCard
         class="fr-p-md-5w fr-mt-3w"
@@ -87,9 +87,8 @@
       </NakedCard>
       <ProfileFooter
         @on-back="goBack"
-        @on-next="validate().then(goNext)"
+        @on-next="goNext"
       ></ProfileFooter>
-    </ValidationObserver>
     <ConfirmModal
       v-if="isDocDeleteVisible"
       @valid="validSelect()"
@@ -140,7 +139,6 @@ import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 // import { extend } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
