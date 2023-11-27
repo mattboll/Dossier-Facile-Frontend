@@ -16,7 +16,7 @@
               <TextField
                 name="lastname"
                 :fieldLabel="$tc('cotenantname.lastname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="lastName"
                 :required="true"
               />
@@ -33,7 +33,7 @@
               <TextField
                 name="preferredname"
                 :fieldLabel="$tc('cotenantname.preferredname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="preferredName"
               >
                 <template v-slot:right>
@@ -51,7 +51,7 @@
               <TextField
                 name="firstname"
                 :fieldLabel="$tc('cotenantname.firstname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="firstName"
                 :required="true"
               />

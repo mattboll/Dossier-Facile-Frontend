@@ -11,7 +11,7 @@
           <div class="fr-grid-row fr-grid-row--center fr-mt-4w">
             <div class="fr-col-12 fr-mb-3w">
               <!-- <validation-provider
-                rules="required|only-alpha"
+                rules="required|onlyAlpha"
                 v-slot="{ errors, valid }"
               > -->
                   <!-- :class="errors[0] ? 'fr-input-group--error' : ''" -->
@@ -42,7 +42,7 @@
             </div>
             <div class="fr-col-12 fr-mb-3w">
               <!-- <validation-provider
-                rules="required|only-alpha"
+                rules="required|onlyAlpha"
                 v-slot="{ errors, valid }"
               > -->
                   <!-- :class="errors[0] ? 'fr-input-group--error' : ''" -->

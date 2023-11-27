@@ -39,7 +39,7 @@
               <TextField
                 name="lastname"
                 :fieldLabel="$t('nameinformationform.lastname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="lastname"
                 :required="true"
                 :disabled="user.franceConnect"
@@ -57,7 +57,7 @@
               <TextField
                 name="preferredname"
                 :fieldLabel="$t('nameinformationform.preferredname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="preferredname"
               >
                 <template v-slot:right>
@@ -75,7 +75,7 @@
               <TextField
                 name="firstname"
                 :fieldLabel="$t('nameinformationform.firstname')"
-                validation-rules="only-alpha"
+                validation-rules="onlyAlpha"
                 v-model.trim="firstname"
                 :required="true"
                 :disabled="user.franceConnect"

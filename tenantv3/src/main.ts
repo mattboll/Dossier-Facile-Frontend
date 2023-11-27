@@ -18,7 +18,7 @@ import { defineRule } from 'vee-validate';
 
 defineRule('onlyAlpha', (value: any) => {
   if (!value.match("^[a-zA-Z \\-'’àâäçéèêëîïôöùûüÿæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]*$")) {
-    return 'onlyAlpha';
+    return 'only-alpha';
   }
   return true
 })
