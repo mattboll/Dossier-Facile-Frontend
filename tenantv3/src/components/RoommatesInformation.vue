@@ -171,7 +171,6 @@
 </template>
 
 <script setup lang="ts">
-// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { User } from "df-shared-next/src/models/User";
 import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
@@ -181,12 +180,6 @@ import { UtilsService } from "../services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
 import { Field, ErrorMessage } from "vee-validate";
-
-// extend("is", {
-//   ...is,
-//   message: "field-required",
-//   validate: (value) => !!value,
-// });
 
 const emit = defineEmits(["update:modelValue"]);
 
