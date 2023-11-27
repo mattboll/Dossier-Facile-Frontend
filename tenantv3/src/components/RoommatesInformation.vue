@@ -1,7 +1,6 @@
 <template>
   <div>
     <NakedCard class="fr-p-md-5w">
-      <!-- <ValidationObserver v-slot="{ invalid }"> -->
         <div class="fr-grid-row fr-grid-row--center">
           <div class="fr-col-12">
             <h6>{{ $t("roommatesinformation.title") }}</h6>
@@ -92,10 +91,6 @@
               email: true,
             }"
           >
-            <!-- <validation-provider
-              :rules="{ email: true, required: value.length == 0 }"
-              v-slot="{ errors }"
-            > -->
                 <input
                   v-bind="field"
                   class="form-control fr-input"
@@ -135,21 +130,21 @@
     </NakedCard>
     <div class="fr-grid-row fr-grid-row--center">
       <div class="fr-col-12 fr-mb-3w fr-mt-3w bg-bf200">
-        <!-- <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
           <div
             class="fr-checkbox-group bg-purple"
-            :class="errors[0] ? 'fr-input-group--error' : ''"
-          > -->
+          >
           <Field
-            id="authorize"
             name="authorize"
             v-model="authorize"
             v-slot="{ field, meta }"
+            type="checkbox"
             :rules="{
-              required: true
+              isTrue: true
             }"
+            :value="true"
           >
             <input
+              id="authorize"
               type="checkbox"
               v-bind="field"
               @change="updateAuthorize()"
@@ -169,8 +164,7 @@
                     $t(message || "")
                   }}</span>
                 </ErrorMessage>
-          <!-- </div>
-        </validation-provider> -->
+          </div>
       </div>
     </div>
   </div>
