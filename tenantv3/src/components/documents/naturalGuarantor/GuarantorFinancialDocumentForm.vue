@@ -30,7 +30,7 @@
         <h1 class="fr-h6">
           {{ $t(`guarantorfinancialdocumentform.title.${guarantorKey()}`) }}
         </h1>
-        <form name="form" @submit.prevent="validate().then(save())">
+        <Form name="form" @submit.prevent="save">
           <div>
             <div>
               <div class="fr-mt-3w">
@@ -45,10 +45,6 @@
           </div>
           <div class="fr-mt-3w" v-if="financialDocument.documentType?.key">
             <div>
-              <!-- <validation-provider
-                :rules="{ required: true, regex: /^[0-9 ]+$/ }"
-                v-slot="{ errors, valid }"
-              > -->
                 <div
                   class="fr-input-group"
                 >
@@ -89,7 +85,7 @@
             </ErrorMessage>
                   <span
                     class="fr-error-text"
-                    v-if="financialDocument.monthlySum || 0 > 10000"
+                    v-if="(financialDocument.monthlySum || 0) > 10000"
                   >
                     {{ $t("guarantorfinancialdocumentform.high-salary") }}
                   </span>
@@ -105,7 +101,7 @@
                 </div>
             </div>
           </div>
-        </form>
+        </Form>
         <div
           class="fr-mt-3w"
           v-if="
@@ -213,7 +209,6 @@ import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
-// import { regex } from "vee-validate/dist/rules";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
@@ -231,11 +226,8 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import { Form, Field, ErrorMessage } from "vee-validate";
 
-// extend("regex", {
-//   ...regex,
-//   message: "guarantorfinancialdocumentform.number-not-valid",
-// });
 
 const { t } = useI18n();
 const store = useTenantStore();
@@ -281,7 +273,7 @@ const guarantorFinancialDocumentSelected = computed(() => {
   }
 
   function onSelectChange($event: any) {
-    financialDocument.value = $event;
+    financialDocument.value.documentType = $event;
     if (financialDocument.value.id === null) {
       return false;
     }
