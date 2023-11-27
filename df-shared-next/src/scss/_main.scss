@@ -1,5 +1,11 @@
 @import "variables";
 
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   color: var(--g700);
   min-width: 350px;

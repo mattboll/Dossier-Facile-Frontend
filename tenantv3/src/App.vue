@@ -59,12 +59,6 @@ const router = useRouter();
 @import "df-shared-next/src/scss/_main.scss";
 @import 'vue3-toastify/dist/index.css';
 
-#app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 #content {
   flex: auto;
   display: flex;
