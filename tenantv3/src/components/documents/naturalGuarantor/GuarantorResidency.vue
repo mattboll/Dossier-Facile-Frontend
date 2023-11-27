@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ validate }">
       <NakedCard class="fr-p-md-5w">
         <div>
           <h1 class="fr-h6">
@@ -91,10 +90,9 @@
         </div>
       </NakedCard>
       <ProfileFooter
-        @on-back="$emit('on-back')"
-        @on-next="validate().then(goNext)"
+        @on-back="emit('on-back')"
+        @on-next="goNext"
       ></ProfileFooter>
-    </ValidationObserver>
   </div>
 </template>
 
@@ -112,7 +110,6 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { UtilsService } from "@/services/UtilsService";
 import ProfileFooter from "@/components/footer/ProfileFooter.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
