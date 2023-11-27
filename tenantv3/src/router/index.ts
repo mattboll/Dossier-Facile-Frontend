@@ -120,20 +120,20 @@ const router = createRouter({
     component: () =>
       import(/* webpackChunkName: "profile" */ "../views/CoTenantDocument.vue"),
   },
-  // {
-  //   path: "/choix-garant",
-  //   name: "GuarantorChoice",
-  //   meta: {
-  //     title: "Mon garant - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "profile" */ "../views/GuarantorChoicePage.vue"
-  //     ),
-  // },
+  {
+    path: "/choix-garant",
+    name: "GuarantorChoice",
+    meta: {
+      title: "Mon garant - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "profile" */ "../views/GuarantorChoicePage.vue"
+      ),
+  },
   {
     path: "/liste-garants",
     name: "GuarantorList",

@@ -21,7 +21,7 @@
           </div>
 
           <GuarantorTypeSelector
-            :localStorageKey="`guarantorType_${this.user.email}`"
+            :localStorageKey="`guarantorType_${user.email}`"
             @selected="tmpGuarantorType = $event"
           >
           </GuarantorTypeSelector>
@@ -40,7 +40,7 @@
           </div>
           <p>{{ $t("guarantorchoice.visale-text") }}</p>
           <div style="text-align: right">
-            <DfButton primary="true" @on-click="gotoVisale()">
+            <DfButton :primary="true" @on-click="gotoVisale()">
               {{ $t("guarantorchoice.visale-btn") }}
             </DfButton>
           </div>
@@ -55,132 +55,90 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import GuarantorIdentification from "./documents/naturalGuarantor/GuarantorIdentification.vue";
-import RepresentativeIdentification from "./documents/legalPersonGuarantor/RepresentativeIdentification.vue";
-import CorporationIdentification from "./documents/legalPersonGuarantor/CorporationIdentification.vue";
-import OrganismCert from "./documents/organismGuarantor/OrganismCert.vue";
-import GuarantorResidency from "./documents/naturalGuarantor/GuarantorResidency.vue";
-import GuarantorProfessional from "./documents/naturalGuarantor/GuarantorProfessional.vue";
-import GuarantorFinancial from "./documents/naturalGuarantor/GuarantorFinancial.vue";
-import GuarantorTax from "./documents/naturalGuarantor/GuarantorTax.vue";
-import { mapGetters, mapState } from "vuex";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import { User } from "df-shared-next/src/models/User";
+<script setup lang="ts">
 import DfButton from "df-shared-next/src/Button/Button.vue";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
-import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
-import ProfileContainer from "./ProfileContainer.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
 
-@Component({
-  components: {
-    DfButton,
-    GuarantorTax,
-    GuarantorFinancial,
-    GuarantorProfessional,
-    GuarantorResidency,
-    GuarantorIdentification,
-    RepresentativeIdentification,
-    CorporationIdentification,
-    OrganismCert,
-    ConfirmModal,
-    VGouvFrButton,
-    GuarantorFooter,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    ProfileContainer,
-    GuarantorTypeSelector,
-  },
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      guarantor: "guarantor",
-      coTenants: "coTenants",
-    }),
-  },
-})
-export default class GuarantorDocuments extends Vue {
-  user!: User;
-  coTenants!: User[];
-  guarantor!: Guarantor;
-  tmpGuarantorType = "";
-  changeGuarantorVisible = false;
+const router = useRouter();
+const store = useTenantStore();
+const user = computed(() => store.user);
+const guarantor = computed(() => store.guarantor);
+const coTenants = computed(() => store.coTenants);
 
-  updated() {
+  const tmpGuarantorType = ref("");
+
+  function updated() {
     // each dom update involved a scrollToEnd
-    this.$nextTick(() => this.scrollToEnd());
+    // TODO
+    // this.$nextTick(() => this.scrollToEnd());
   }
-  scrollToEnd() {
-    const element: any = this.$refs["guarantor-body-content"];
-    window.scrollTo(0, element.lastElementChild.offsetTop);
-  }
-
-  beforeMount() {
-    this.$store.dispatch("updateSelectedGuarantor", this.user.id);
+  function scrollToEnd() {
+    // TODO
+    // const element: any = this.$refs["guarantor-body-content"];
+    // window.scrollTo(0, element.lastElementChild.offsetTop);
   }
 
-  goBack() {
-    this.$router.push({
+  onBeforeMount(() => {
+    store.updateSelectedGuarantor(user.value.id);
+  })
+
+  function goBack() {
+    router.push({
       name: "TenantDocuments",
       params: { substep: "5" },
     });
   }
 
-  setGuarantorType() {
-    if (!this.tmpGuarantorType) {
+  function setGuarantorType() {
+    if (!tmpGuarantorType.value) {
       ToastService.error("guarantorchoice.type-required");
       return;
     }
-    AnalyticsService.addGuarantor(this.tmpGuarantorType || "");
-    if (this.tmpGuarantorType === "NO_GUARANTOR") {
-      if (this.user.applicationType === "COUPLE") {
-        this.$router.push({
+    AnalyticsService.addGuarantor(tmpGuarantorType.value || "");
+    if (tmpGuarantorType.value === "NO_GUARANTOR") {
+      if (user.value.applicationType === "COUPLE") {
+        router.push({
           name: "CoTenantDocuments",
           params: {
             step: "4",
             substep: "0",
-            tenantId: this.coTenants[0].id.toString(),
+            tenantId: coTenants.value[0].id.toString(),
           },
         });
       } else {
-        this.$router.push({
+        router.push({
           name: "ValidateFile",
         });
       }
     } else if (
-      this.tmpGuarantorType != this.guarantor.typeGuarantor ||
-      (this.user.guarantors.length || 0) <= 0
+      tmpGuarantorType.value != guarantor.value?.typeGuarantor ||
+      (user.value.guarantors.length || 0) <= 0
     ) {
-      this.$store
-        .dispatch("setGuarantorType", { typeGuarantor: this.tmpGuarantorType })
+      store
+        .setGuarantorType({ typeGuarantor: tmpGuarantorType.value })
         .then(() => {
-          this.$router.push({
+          router.push({
             name: "GuarantorDocuments",
             params: { substep: "0" },
           });
         });
     } else {
-      this.$router.push({
+      router.push({
         name: "GuarantorList",
       });
     }
   }
 
-  gotoVisale() {
+  function gotoVisale() {
     window.open("https://www.visale.fr", "_blank");
   }
-}
 </script>
 
 <style scoped lang="scss">

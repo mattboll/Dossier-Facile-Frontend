@@ -16,40 +16,30 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import RichRadioButtons from "df-shared-next/src/Button/RichRadioButtons.vue";
-import { mapGetters, mapState } from "vuex";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import { User } from "df-shared-next/src/models/User";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { ToastService } from "@/services/ToastService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, ref } from "vue";
 
-@Component({
-  computed: {
-    ...mapState({
-      user: "user",
-    }),
-    ...mapGetters({
-      guarantor: "guarantor",
-    }),
-  },
-  components: {
-    ConfirmModal,
-    RichRadioButtons,
-  },
-})
-export default class GuarantorTypeSelector extends Vue {
-  user!: User;
-  guarantor!: Guarantor;
+  const store = useTenantStore();
+  const user = computed(() => store.user);
+  const guarantor = computed(() => store.guarantor);
 
-  @Prop({ default: false }) isCotenant!: boolean;
-  @Prop() localStorageKey!: string;
+  const props = withDefaults(defineProps<{
+    isCotenant: boolean;
+    localStorageKey: string;
+  }>(), {
+    isCotenant: false,
+  });
 
-  checkedGuarantorType = "";
-  confirmGuarantorChangeModal = false;
+  const emit = defineEmits(["selected"]);
 
-  guarantorTypeOptions = [
+  const checkedGuarantorType = ref("");
+  const confirmGuarantorChangeModal = ref(false);
+
+  const guarantorTypeOptions = [
     {
       id: "natural-person-choice",
       labelKey: "guarantorchoice.natural-person.label",
@@ -74,39 +64,39 @@ export default class GuarantorTypeSelector extends Vue {
     {
       id: "no-guarantor-choice",
       labelKey: `${
-        this.isCotenant ? "tenantguarantorchoice" : "guarantorchoice"
+        props.isCotenant ? "tenantguarantorchoice" : "guarantorchoice"
       }.no-guarantor`,
       iconClass: "fr-icon-close-line",
       optionName: "NO_GUARANTOR",
     },
   ];
 
-  beforeMount() {
-    if (this.guarantor.typeGuarantor && !this.isCotenant) {
-      this.checkedGuarantorType = this.guarantor.typeGuarantor;
-      this.selectType(this.guarantor.typeGuarantor);
+  onBeforeMount(() => {
+    if (guarantor.value?.typeGuarantor && !props.isCotenant) {
+      checkedGuarantorType.value = guarantor.value.typeGuarantor;
+      selectType(guarantor.value.typeGuarantor);
     } else {
-      this.resetType();
+      resetType();
     }
-  }
+  })
 
-  onButtonSelected() {
+  function onButtonSelected() {
     if (
-      this.guarantor.typeGuarantor !== this.checkedGuarantorType &&
-      (this.user.guarantors.length || 0) > 0 &&
-      !this.isCotenant
+      guarantor.value?.typeGuarantor !==checkedGuarantorType.value &&
+      (user.value.guarantors.length || 0) > 0 &&
+      !props.isCotenant
     ) {
-      this.confirmGuarantorChangeModal = true;
+      confirmGuarantorChangeModal.value = true;
     } else {
-      this.selectType(this.checkedGuarantorType);
+      selectType(checkedGuarantorType.value);
     }
   }
 
-  confirmGuarantorTypeChange() {
-    this.$store.dispatch("deleteAllGuarantors").then(
+  function confirmGuarantorTypeChange() {
+    store.deleteAllGuarantors().then(
       () => {
-        this.confirmGuarantorChangeModal = false;
-        this.selectType(this.checkedGuarantorType);
+        confirmGuarantorChangeModal.value = false;
+        selectType(checkedGuarantorType.value);
       },
       () => {
         ToastService.error();
@@ -114,25 +104,24 @@ export default class GuarantorTypeSelector extends Vue {
     );
   }
 
-  undoGuarantorTypeChange() {
-    this.resetType();
-    this.confirmGuarantorChangeModal = false;
+  function undoGuarantorTypeChange() {
+    resetType();
+    confirmGuarantorChangeModal.value = false;
   }
 
-  selectType(type: string) {
+  function selectType(type: string) {
     // TODO store on back-end side
-    localStorage.setItem(this.localStorageKey, type);
-    this.$emit("selected", this.checkedGuarantorType);
+    localStorage.setItem(props.localStorageKey, type);
+    emit("selected", checkedGuarantorType.value);
   }
 
-  resetType() {
-    const type = localStorage.getItem(this.localStorageKey);
+  function resetType() {
+    const type = localStorage.getItem(props.localStorageKey);
     if (type) {
-      this.checkedGuarantorType = type;
+      checkedGuarantorType.value = type;
     }
-    this.$emit("selected", this.checkedGuarantorType);
+    emit("selected", checkedGuarantorType.value);
   }
-}
 </script>
 
 <style scoped lang="scss">
