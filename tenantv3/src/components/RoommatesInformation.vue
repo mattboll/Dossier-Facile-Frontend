@@ -1,145 +1,127 @@
 <template>
   <div>
     <NakedCard class="fr-p-md-5w">
-        <div class="fr-grid-row fr-grid-row--center">
-          <div class="fr-col-12">
-            <h6>{{ $t("roommatesinformation.title") }}</h6>
-            <v-gouv-fr-modal>
-              <template v-slot:button>
-                <span class="small-font">{{
-                  $t("roommatesinformation.more-information")
-                }}</span>
-              </template>
-              <template v-slot:title>
-                {{ $t("roommatesinformation.more-information") }}
-              </template>
-              <template v-slot:content>
-                <p>
-                  <RoommatesInformationHelp></RoommatesInformationHelp>
-                </p>
-              </template>
-            </v-gouv-fr-modal>
+      <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12">
+          <h6>{{ $t("roommatesinformation.title") }}</h6>
+          <v-gouv-fr-modal>
+            <template v-slot:button>
+              <span class="small-font">{{
+                $t("roommatesinformation.more-information")
+              }}</span>
+            </template>
+            <template v-slot:title>
+              {{ $t("roommatesinformation.more-information") }}
+            </template>
+            <template v-slot:content>
+              <p>
+                <RoommatesInformationHelp></RoommatesInformationHelp>
+              </p>
+            </template>
+          </v-gouv-fr-modal>
+        </div>
+        <div class="fr-col-12 fr-mt-2w">
+          <div v-if="showEmailExists" class="fr-callout">
+            <p class="fr-mb-1w" v-html="$t('roommatesinformation.email-exists')"></p>
           </div>
-          <div class="fr-col-12 fr-mt-2w">
-            <div v-if="showEmailExists" class="fr-callout">
-              <p
-                class="fr-mb-1w"
-                v-html="$t('roommatesinformation.email-exists')"
-              ></p>
-            </div>
-            <div v-if="value.length > 0">
-              <div
-                v-for="(roommate, key) in value"
-                v-bind:key="key"
-                class="fr-mb-1w"
-              >
-                <NakedCard>
-                  <div class="fr-grid-row bg--white">
-                    <div class="fr-col-10">
-                      <div class="fr-grid-row nowrap">
-                        <div class="center-icon fr-mr-1w">
-                          <i
-                            class="color--white ri-user-fill fs-24 round-icon icon"
-                          ></i>
+          <div v-if="modelValue.length > 0">
+            <div v-for="(roommate, key) in modelValue" v-bind:key="key" class="fr-mb-1w">
+              <NakedCard>
+                <div class="fr-grid-row bg--white">
+                  <div class="fr-col-10">
+                    <div class="fr-grid-row nowrap">
+                      <div class="center-icon fr-mr-1w">
+                        <i class="color--white ri-user-fill fs-24 round-icon icon"></i>
+                      </div>
+                      <div class="fr-grid-col overflow--hidden max-content">
+                        <div :title="roommate.email" class="overflow--hidden">
+                          <b>
+                            {{ roommate.email }}
+                          </b>
                         </div>
-                        <div class="fr-grid-col overflow--hidden max-content">
-                          <div :title="roommate.email" class="overflow--hidden">
-                            <b>
-                              {{ roommate.email }}
-                            </b>
-                          </div>
-                          <div class="small-text">
-                            {{
-                              $t(
-                                roommate.id
-                                  ? "roommatesinformation.invite-sent"
-                                  : "roommatesinformation.invite-waiting"
-                              )
-                            }}
-                          </div>
+                        <div class="small-text">
+                          {{
+                            $t(
+                              roommate.id
+                                ? "roommatesinformation.invite-sent"
+                                : "roommatesinformation.invite-waiting"
+                            )
+                          }}
                         </div>
                       </div>
                     </div>
-                    <div class="fr-col-2 center-icon">
-                      <button
-                        class="fr-btn fr-btn--secondary icon-btn"
-                        :title="$t('roommatesinformation.delete')"
-                        @click="remove(roommate)"
-                        type="button"
-                      >
-                        <i
-                          class="fs-24 ri-delete-bin-2-fill color--primary icon"
-                        ></i>
-                      </button>
-                    </div>
                   </div>
-                </NakedCard>
-              </div>
+                  <div class="fr-col-2 center-icon">
+                    <button
+                      class="fr-btn fr-btn--secondary icon-btn"
+                      :title="$t('roommatesinformation.delete')"
+                      @click="remove(roommate)"
+                      type="button"
+                    >
+                      <i class="fs-24 ri-delete-bin-2-fill color--primary icon"></i>
+                    </button>
+                  </div>
+                </div>
+              </NakedCard>
             </div>
           </div>
-          <div class="fr-col-12 fr-col-xl-7 fr-mt-2w">
-            <label class="fr-label fr-mb-1w">{{
-              $t("roommatesinformation.roommateEmail")
-            }}</label>
+        </div>
+        <div class="fr-col-12 fr-col-xl-7 fr-mt-2w">
+          <label class="fr-label fr-mb-1w">{{
+            $t("roommatesinformation.roommateEmail")
+          }}</label>
           <Field
             id="email"
             name="email"
             v-model="newRoommate"
             v-slot="{ field, meta }"
             :rules="{
-              required: true,
               email: true,
             }"
           >
-                <input
-                  v-bind="field"
-                  class="form-control fr-input"
-                  name="email"
+            <input
+              v-bind="field"
+              class="form-control fr-input"
+              name="email"
               :class="{
                 'fr-input--valid': meta.valid,
                 'fr-input--error': !meta.valid,
               }"
-                  placeholder="Ex : exemple@exemple.fr"
-                  type="email"
-                />
-                </Field>
-                <ErrorMessage name="email" v-slot="{ message }">
-                  <span role="alert" class="fr-error-text">{{
-                    $t(message || "")
-                  }}</span>
-                </ErrorMessage>
-          </div>
+              placeholder="Ex : exemple@exemple.fr"
+              type="email"
+            />
+          </Field>
+          <ErrorMessage name="email" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+          </ErrorMessage>
+        </div>
 
-          <div class="fr-col-12 fr-col-xl-5 btn-container">
-            <div class="fr-grid-row fr-grid-row--right">
-
-<!-- TODO
+        <div class="fr-col-12 fr-col-xl-5 btn-container">
+          <div class="fr-grid-row fr-grid-row--right">
+            <!-- TODO
                 :disabled="invalid" -->
-              <v-gouv-fr-button
-                class="full-width-xs"
-                :fullWidth="isMobile()"
-                :secondary="true"
-                :label="$t('roommatesinformation.add-a-roommate')"
-                :btn-type="'button'"
-                @click="addMail"
-              ></v-gouv-fr-button>
-            </div>
+            <v-gouv-fr-button
+              class="full-width-xs"
+              :fullWidth="isMobile()"
+              :secondary="true"
+              :label="$t('roommatesinformation.add-a-roommate')"
+              :btn-type="'button'"
+              @click="addMail"
+            ></v-gouv-fr-button>
           </div>
         </div>
-      <!-- </ValidationObserver> -->
+      </div>
     </NakedCard>
     <div class="fr-grid-row fr-grid-row--center">
       <div class="fr-col-12 fr-mb-3w fr-mt-3w bg-bf200">
-          <div
-            class="fr-checkbox-group bg-purple"
-          >
+        <div class="fr-checkbox-group bg-purple">
           <Field
             name="authorize"
             v-model="authorize"
             v-slot="{ field, meta }"
             type="checkbox"
             :rules="{
-              isTrue: true
+              isTrue: true,
             }"
             :value="true"
           >
@@ -153,18 +135,13 @@
                 'fr-input--error': !meta.valid,
               }"
             />
-            <label
-              for="authorize"
-              v-html="$t('roommatesinformation.acceptAuthor')"
-            >
+            <label for="authorize" v-html="$t('roommatesinformation.acceptAuthor')">
             </label>
-                </Field>
-                <ErrorMessage name="authorize" v-slot="{ message }">
-                  <span role="alert" class="fr-error-text">{{
-                    $t(message || "")
-                  }}</span>
-                </ErrorMessage>
-          </div>
+          </Field>
+          <ErrorMessage name="authorize" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+          </ErrorMessage>
+        </div>
       </div>
     </div>
   </div>
@@ -183,61 +160,61 @@ import { Field, ErrorMessage } from "vee-validate";
 
 const emit = defineEmits(["update:modelValue"]);
 
-    const store = useTenantStore();
-    const user = computed(() => store.user);
-    const coTenantAuthorize = computed(() => store.coTenantAuthorize);
+const store = useTenantStore();
+const user = computed(() => store.user);
+const coTenantAuthorize = computed(() => store.coTenantAuthorize);
 
-  const props = withDefaults(defineProps<{ value: User[] }>(), {
-    value: () => [],
-  });
+const props = withDefaults(defineProps<{ modelValue: User[] }>(), {
+  modelValue: () => [],
+});
 
-  const authorize = ref(false);
-  const newRoommate = ref("");
-  const showEmailExists = ref(false);
+const authorize = ref(false);
+const newRoommate = ref("");
+const showEmailExists = ref(false);
 
-  onMounted(() => {
-    authorize.value = coTenantAuthorize.value;
-  })
+onMounted(() => {
+  authorize.value = coTenantAuthorize.value;
+});
 
-  function addMail() {
-    showEmailExists.value = false;
-    if (newRoommate.value !== "") {
-      if (user.value.email !== newRoommate.value) {
-        const coTenant = new User();
-        coTenant.email = newRoommate.value;
-        store.createCoTenant(newRoommate.value);
-        const newCoTenants = [...props.value, coTenant];
-        emit("update:modelValue", newCoTenants);
-        newRoommate.value = "";
-      } else {
-        showEmailExists.value = true;
-      }
-    }
-  }
-
-  function remove(tenant: User) {
-    if (tenant.id) {
-      store.deleteCoTenant(tenant)
-        emit(
-          "update:modelValue",
-          props.value.filter((t) => t.email != tenant.email)
-        )
+function addMail() {
+  showEmailExists.value = false;
+  if (newRoommate.value !== "") {
+    if (user.value.email !== newRoommate.value) {
+      const coTenant = new User();
+      coTenant.email = newRoommate.value;
+      store.createCoTenant(newRoommate.value);
+      const newCoTenants = [...props.modelValue, coTenant];
+      emit("update:modelValue", newCoTenants);
+      newRoommate.value = "";
     } else {
-      emit(
-          "update:modelValue",
-        props.value.filter((t) => t.email != tenant.email)
-      );
+      showEmailExists.value = true;
     }
-    return false;
   }
+}
 
-  function updateAuthorize() {
-    store.updateCoTenantAuthorize(authorize.value);
+function remove(tenant: User) {
+  if (tenant.id) {
+    store.deleteCoTenant(tenant);
+    emit(
+      "update:modelValue",
+      props.modelValue.filter((t) => t.email != tenant.email)
+    );
+  } else {
+    emit(
+      "update:modelValue",
+      props.modelValue.filter((t) => t.email != tenant.email)
+    );
   }
+  return false;
+}
 
-  function isMobile() {
-    return UtilsService.isMobile();
-  }
+function updateAuthorize() {
+  store.updateCoTenantAuthorize(authorize.value);
+}
+
+function isMobile() {
+  return UtilsService.isMobile();
+}
 </script>
 
 <style scoped lang="scss">
