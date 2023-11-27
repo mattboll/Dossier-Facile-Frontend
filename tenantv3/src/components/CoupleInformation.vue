@@ -8,11 +8,6 @@
           </h1>
         </div>
         <div class="fr-col-12 fr-mb-3w">
-          <!-- <validation-provider rules="required|only-alpha" v-slot="{ errors }">
-            <div
-              class="fr-input-group"
-              :class="errors[0] ? 'fr-input-group--error' : ''"
-            > -->
               <FieldLabel :required="true">
                 {{ $t("coupleinformation.spouseLastName") }}
               </FieldLabel>
@@ -41,15 +36,8 @@
             <ErrorMessage name="coTenantLastName" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
-            <!-- </div>
-          </validation-provider> -->
         </div>
         <div class="fr-col-12 fr-mb-3w">
-          <!-- <validation-provider rules="required|only-alpha" v-slot="{ errors }">
-            <div
-              class="fr-input-group"
-              :class="errors[0] ? 'fr-input-group--error' : ''"
-            > -->
               <FieldLabel :required="true">
                 {{ $t("coupleinformation.spouseFirstName") }}
               </FieldLabel>
@@ -78,8 +66,6 @@
             <ErrorMessage name="coTenantFirstName" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
-            <!-- </div>
-          </validation-provider> -->
         </div>
       </div>
     </NakedCard>
@@ -106,14 +92,6 @@
           </v-gouv-fr-modal>
         </div>
         <div class="fr-col-12 fr-mt-3w fr-mb-3w">
-          <!-- <validation-provider
-            v-slot="{ errors }"
-            :rules="{ email: true, custom: user.email }"
-          >
-            <div
-              class="fr-input-group"
-              :class="errors[0] ? 'fr-input-group--error' : ''"
-            > -->
               <FieldLabel for-input="email">
                 {{ $t("coupleinformation.spouseEmail") }}
               </FieldLabel>
@@ -145,9 +123,6 @@
             <ErrorMessage name="email" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
-
-            <!-- </div> -->
-          <!-- </validation-provider> -->
         </div>
       </div>
     </NakedCard>
@@ -157,23 +132,19 @@
       class="fr-grid-row fr-grid-row--center"
     >
       <div class="fr-col-12 fr-mb-3w fr-mt-3w">
-        <!-- <validation-provider rules="is" v-slot="{ errors }" class="fr-col-10">
-          <div
-            class="fr-checkbox-group bg-purple"
-            :class="errors[0] ? 'fr-input-group--error' : ''"
-          > -->
+      <div class="bg-purple fr-checkbox-group">
           <Field
-            id="authorize"
             name="authorize"
             v-model="authorize"
             v-slot="{ field, meta }"
+            type="checkbox"
             :rules="{
               required: true,
-              onlyAlpha: true,
             }"
           >
             <input
               type="checkbox"
+              id="authorize"
               v-bind="field"
               @change="updateAuthorize()"
               :class="{
@@ -186,24 +157,17 @@
               v-html="$t('coupleinformation.acceptAuthor')"
             >
             </label>
-            <!-- <span class="fr-error-text" v-if="errors[0]">{{
-              $t(errors[0])
-            }}</span>
-          </div> -->
               </Field>
             <ErrorMessage name="coTenantLastName" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
-        <!-- </validation-provider> -->
+</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-// import { is } from "vee-validate/dist/rules";
-// import { mapGetters, mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
@@ -213,19 +177,6 @@ import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 import { Field, ErrorMessage, defineRule } from "vee-validate";
 
-// extend("is", {
-//   ...is,
-//   message: "field-required",
-//   validate: (value) => !!value,
-// });
-
-// extend("custom", {
-//   ...is,
-//   message: "same-email-not-valid",
-//   validate: (v1, v2: any) => {
-//     return v1 !== v2.other;
-//   },
-// });
 defineRule('custom', (v1: any, [v2]: any[]) => {
   if (v1 === v2) {
     return 'same-email-not-valid';
