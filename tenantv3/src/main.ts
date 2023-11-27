@@ -101,7 +101,6 @@ defineRule('positiveOrNull', (value: any) => {
   return true;
 });
 
-
 const TENANT_API_URL = import.meta.env.VITE_API_URL;
 
 keycloak

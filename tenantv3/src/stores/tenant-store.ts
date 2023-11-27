@@ -42,7 +42,7 @@ interface State {
   newMessage: number;
   messageList: DfMessage[][];
   skipLinks: SkipLink[];
-  guarantorFinancialDocumentSelected: FinancialDocument;
+  guarantorFinancialDocumentSelected: FinancialDocument | undefined;
   editGuarantorFinancialDocument: boolean;
   apartmentSharingLinks: ApartmentSharingLink[];
 }
@@ -242,7 +242,7 @@ const useTenantStore = defineStore('tenant', {
     getEditFinancialDocument(state: State): boolean {
       return state.editFinancialDocument;
     },
-    getGuarantorFinancialDocumentSelected(state: State): FinancialDocument {
+    getGuarantorFinancialDocumentSelected(state: State): FinancialDocument | undefined {
       return state.guarantorFinancialDocumentSelected;
     },
     getEditGuarantorFinancialDocument(state: State): boolean {
@@ -325,6 +325,30 @@ const useTenantStore = defineStore('tenant', {
       return d.documentCategory === docType;
     });
     return UtilsService.isDocumentValid(document);
+  },
+  documentsFilled: (state: State) =>(user?: User) => {
+    return (
+      this.hasDoc("IDENTIFICATION", user) &&
+      this.hasDoc("PROFESSIONAL", user) &&
+      this.isTenantDocumentValid("RESIDENCY", user) &&
+      this.isTenantDocumentValid("FINANCIAL", user) &&
+      this.isTenantDocumentValid("TAX", user)
+    );
+  },
+  guarantorDocumentsFilled: (state: State) => (g: Guarantor) => {
+    return (
+      (g.typeGuarantor === "NATURAL_PERSON" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+        UtilsService.guarantorHasDoc("PROFESSIONAL", g) &&
+        UtilsService.isGuarantorDocumentValid("RESIDENCY", g) &&
+        UtilsService.isGuarantorDocumentValid("FINANCIAL", g) &&
+        UtilsService.isGuarantorDocumentValid("TAX", g)) ||
+      (g.typeGuarantor === "LEGAL_PERSON" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
+      (g.typeGuarantor === "ORGANISM" &&
+        UtilsService.guarantorHasDoc("IDENTIFICATION", g))
+    );
   },
   },
   actions: {
@@ -467,11 +491,11 @@ const useTenantStore = defineStore('tenant', {
       this.editFinancialDocument = true;
     },
     selectGuarantorDocumentFinancial(d: FinancialDocument | undefined) {
-      Object.assign(this.guarantorFinancialDocumentSelected, d);
-      Object.assign(this.editGuarantorFinancialDocument, d !== undefined);
+      this.guarantorFinancialDocumentSelected = d;
+      this.editGuarantorFinancialDocument= (d !== undefined);
     },
     createGuarantorDocumentFinancial() {
-      Object.assign(this.guarantorFinancialDocumentSelected, new FinancialDocument());
+      this.guarantorFinancialDocumentSelected= new FinancialDocument();
       this.editGuarantorFinancialDocument = true;
     },
     setApartmentSharingLinks(links: ApartmentSharingLink[]) {
@@ -1107,30 +1131,6 @@ const useTenantStore = defineStore('tenant', {
         loader.hide();
         this.loadUser();
       });
-  },
-  documentsFilled(user?: User): any {
-    return (
-      this.hasDoc("IDENTIFICATION", user) &&
-      this.hasDoc("PROFESSIONAL", user) &&
-      this.isTenantDocumentValid("RESIDENCY", user) &&
-      this.isTenantDocumentValid("FINANCIAL", user) &&
-      this.isTenantDocumentValid("TAX", user)
-    );
-  },
-  guarantorDocumentsFilled(g: Guarantor) {
-    return (
-      (g.typeGuarantor === "NATURAL_PERSON" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
-        UtilsService.guarantorHasDoc("PROFESSIONAL", g) &&
-        UtilsService.isGuarantorDocumentValid("RESIDENCY", g) &&
-        UtilsService.isGuarantorDocumentValid("FINANCIAL", g) &&
-        UtilsService.isGuarantorDocumentValid("TAX", g)) ||
-      (g.typeGuarantor === "LEGAL_PERSON" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
-      (g.typeGuarantor === "ORGANISM" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g))
-    );
   },
   dispatchByName(name: string, formData: any): any {
     const func = this[name];

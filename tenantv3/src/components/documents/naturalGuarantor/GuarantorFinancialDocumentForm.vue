@@ -30,7 +30,7 @@
         <h1 class="fr-h6">
           {{ $t(`guarantorfinancialdocumentform.title.${guarantorKey()}`) }}
         </h1>
-        <Form name="form" @submit.prevent="save">
+        <Form name="form" @submit="save">
           <div>
             <div>
               <div class="fr-mt-3w">
@@ -57,7 +57,6 @@
             v-model="financialDocument.monthlySum"
             :rules="{
               required: true,
-              regex: /^[0-9 ]+$/,
             }"
           >
                   <input
