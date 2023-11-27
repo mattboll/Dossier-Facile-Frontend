@@ -76,13 +76,13 @@ import {useLoading} from 'vue-loading-overlay'
 const { t } = useI18n();
 
 const store = useTenantStore();
-const editFinancialDocument = computed(() => store.editGuarantorFinancialDocument);
+const editFinancialDocument = computed(() => store.getEditGuarantorFinancialDocument);
 const financialDocuments = computed(() => store.guarantorFinancialDocuments);
 
 const emit = defineEmits(["on-back", "on-next"]);
 
 const props = defineProps<{
-  tenantId: String
+  tenantId: string
 }>();
 
 onBeforeMount(() => {

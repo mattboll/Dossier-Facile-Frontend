@@ -1,8 +1,6 @@
 <template>
   <div>
-    <!-- <ValidationObserver v-slot="{ validate }"> -->
-      <!-- <form name="form" @submit.prevent="validate().then(save)"> -->
-      <form name="form" @submit.prevent="save">
+      <Form name="form" @submit="save">
         <NakedCard class="fr-p-md-5w fr-mb-3w">
           <div>
             <h1 class="fr-h6">
@@ -36,23 +34,21 @@
                 "
               >
                 <div>
-                  <!-- <validation-provider
-                    :rules="{ required: true, regex: /^[0-9 ]+$/ }"
-                    v-slot="{ errors, valid }"
-                  > -->
-                      <!-- :class="{
-                        'fr-input-group--error': errors[0],
-                      }" -->
                     <div
                       class="fr-input-group"
                     >
                       <label for="monthlySum" class="fr-label">
                         {{ getMonthlySumLabel() }} :
                       </label>
-                        <!-- :class="{
-                          'fr-input--valid': valid,
-                          'fr-input--error': errors[0],
-                        }" -->
+          <Field
+            name="monthlySum"
+            v-slot="{ field, meta }"
+            v-model="financialDocument.monthlySum"
+            :rules="{
+              required: true,
+              regex: /^[0-9 ]+$/,
+            }"
+          >
                       <input
                         id="monthlySum"
                         :placeholder="
@@ -61,14 +57,19 @@
                         type="number"
                         min="0"
                         step="1"
-                        v-model="financialDocument.monthlySum"
+                        v-bind="field"
                         name="monthlySum"
                         class="validate-required form-control fr-input"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                         required
                       />
-                      <!-- <span class="fr-error-text" v-if="errors[0]">{{
-                        t(errors[0])
-                      }}</span> -->
+          </Field>
+            <ErrorMessage name="monthlySum" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                       <span
                         class="fr-error-text"
                         v-if="(financialDocument.monthlySum || 0) > 10000"
@@ -187,8 +188,7 @@
             </div>
           </div>
         </NakedCard>
-      </form>
-    <!-- </ValidationObserver> -->
+      </Form>
     <div
       v-if="
         financialDocument.documentType.key &&
@@ -196,8 +196,7 @@
       "
     >
       <NakedCard class="fr-p-md-5w fr-mb-3w">
-        <!-- <ValidationObserver v-slot="{ validate, valid }"> -->
-          <form name="customTextForm" @submit.prevent="save">
+          <Form name="customTextForm" @submit="save">
             <div class="fr-input-group">
               <label class="fr-label" for="customTextNoDocument">
                 {{ t("financialdocumentform.has-no-income") }}
@@ -217,7 +216,7 @@
               />
               <span>{{ financialDocument.customText.length }} / 2000</span>
             </div>
-          </form>
+          </Form>
         <!-- </ValidationObserver> -->
       </NakedCard>
     </div>
@@ -253,10 +252,7 @@ import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-// TODO
-// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
-import { regex } from "vee-validate/dist/rules";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import Modal from "df-shared-next/src/components/Modal.vue";
@@ -273,12 +269,6 @@ import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
-
-// TODO
-// extend("regex", {
-//   ...regex,
-//   message: "financialdocumentform.number-not-valid",
-// });
 
     const store = useTenantStore();
     const user = computed(() => {

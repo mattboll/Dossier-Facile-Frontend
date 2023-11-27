@@ -26,7 +26,6 @@
         $t(`explanation-text.${guarantorKey()}.will-delete-files`)
       }}</span>
     </ConfirmModal>
-    <ValidationObserver v-slot="{ validate }">
       <NakedCard class="fr-p-md-5w fr-mb-3w">
         <h1 class="fr-h6">
           {{ $t(`guarantorfinancialdocumentform.title.${guarantorKey()}`) }}
@@ -46,41 +45,48 @@
           </div>
           <div class="fr-mt-3w" v-if="financialDocument.documentType?.key">
             <div>
-              <validation-provider
+              <!-- <validation-provider
                 :rules="{ required: true, regex: /^[0-9 ]+$/ }"
                 v-slot="{ errors, valid }"
-              >
+              > -->
                 <div
                   class="fr-input-group"
-                  :class="{
-                    'fr-input-group--error': errors[0],
-                  }"
                 >
                   <label for="monthlySum" class="fr-label">
                     {{ getMonthlySumLabel() }} :
                   </label>
+          <Field
+            name="monthlySum"
+            v-slot="{ field, meta }"
+            v-model="financialDocument.monthlySum"
+            :rules="{
+              required: true,
+              regex: /^[0-9 ]+$/,
+            }"
+          >
                   <input
                     id="monthlySum"
                     :placeholder="
-                      $tc(
+                      $t(
                         'guarantorfinancialdocumentform.monthlySum.placeholder'
                       )
                     "
                     type="number"
                     min="0"
                     step="1"
-                    v-model="financialDocument.monthlySum"
+                    v-bind="field"
                     name="monthlySum"
                     class="validate-required form-control fr-input"
-                    :class="{
-                      'fr-input--valid': valid,
-                      'fr-input--error': errors[0],
-                    }"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                     required
                   />
-                  <span class="fr-error-text" v-if="errors[0]">{{
-                    $t(errors[0])
-                  }}</span>
+          </Field>
+            <ErrorMessage name="monthlySum" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                   <span
                     class="fr-error-text"
                     v-if="financialDocument.monthlySum || 0 > 10000"
@@ -97,7 +103,6 @@
                     {{ $t("guarantorfinancialdocumentform.low-salary") }}
                   </span>
                 </div>
-              </validation-provider>
             </div>
           </div>
         </form>
@@ -158,10 +163,6 @@
             </label>
           </div>
           <div class="fr-mb-5w" v-if="financialDocument.noDocument">
-            <validation-provider
-              :rules="{ required: true }"
-              v-slot="{ errors, valid }"
-            >
               <div class="fr-input-group">
                 <label class="fr-label" for="customText">
                   {{
@@ -172,28 +173,34 @@
                     )
                   }}
                 </label>
+          <Field
+            name="customText"
+            v-slot="{ field, meta }"
+            v-model="financialDocument.customText"
+            :rules="{
+              required: true,
+            }"
+          >
                 <input
-                  v-model="financialDocument.customText"
+                  v-bind="field"
                   class="form-control fr-input validate-required"
                   :class="{
-                    'fr-input--valid': valid,
-                    'fr-input--error': errors[0],
+                    'fr-input--valid': meta.valid,
+                    'fr-input--error': !meta.valid,
                   }"
                   id="customText"
-                  name="customText"
                   placeholder=""
                   type="text"
                   required
                 />
-                <span class="fr-error-text" v-if="errors[0]">{{
-                  $t(errors[0])
-                }}</span>
+          </Field>
+            <ErrorMessage name="customText" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
               </div>
-            </validation-provider>
           </div>
         </div>
       </NakedCard>
-    </ValidationObserver>
     <ProfileFooter @on-back="goBack" @on-next="goNext"></ProfileFooter>
   </div>
 </template>
@@ -205,7 +212,6 @@ import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import ListItem from "../../uploads/ListItem.vue";
 import { DfFile } from "df-shared-next/src/models/DfFile";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-// import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
 import { RegisterService } from "../../../services/RegisterService";
 // import { regex } from "vee-validate/dist/rules";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";

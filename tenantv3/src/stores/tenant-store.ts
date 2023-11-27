@@ -472,7 +472,7 @@ const useTenantStore = defineStore('tenant', {
     },
     createGuarantorDocumentFinancial() {
       Object.assign(this.guarantorFinancialDocumentSelected, new FinancialDocument());
-      Object.assign(this.editGuarantorFinancialDocument, true);
+      this.editGuarantorFinancialDocument = true;
     },
     setApartmentSharingLinks(links: ApartmentSharingLink[]) {
       const sortedLinks = links.sort(
