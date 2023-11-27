@@ -139,8 +139,9 @@
             v-slot="{ field, meta }"
             type="checkbox"
             :rules="{
-              required: true,
+              isTrue: true,
             }"
+            :value="true"
           >
             <input
               type="checkbox"

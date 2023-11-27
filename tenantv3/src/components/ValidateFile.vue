@@ -5,7 +5,6 @@
         <NakedCard class="fr-p-md-5w fr-mb-3w">
           <h1 class="fr-h6">{{ t("validatefile.title") }}</h1>
           <p>{{ getCheckboxInstructions() }}</p>
-          --{{ declaration }}--
           <div class="fr-checkbox-group bg-purple fr-mb-3w">
             <Field
               name="declaration"
@@ -13,8 +12,9 @@
               v-model="declaration"
               v-slot="{ field, meta }"
               :rules="{
-                required: true,
+                isTrue: true,
               }"
+            :value="true"
             >
               <input
                 id="declaration"
@@ -26,10 +26,10 @@
                 v-bind="field"
               />
             </Field>
+            <label for="declaration" v-html="t('validatefile.declaration')"> </label>
             <ErrorMessage name="declaration" v-slot="{ message }">
               <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
             </ErrorMessage>
-            <label for="declaration" v-html="t('validatefile.declaration')"> </label>
           </div>
           <div v-if="hasGuarantors()">
             <div class="fr-checkbox-group bg-purple fr-mb-3w">
@@ -39,8 +39,9 @@
                 v-model="declaration2"
                 v-slot="{ field, meta }"
                 :rules="{
-                  required: true,
+                  isTrue: true,
                 }"
+            :value="true"
               >
                 <input
                   type="checkbox"
@@ -52,14 +53,14 @@
                   v-bind="field"
                 />
               </Field>
-              <ErrorMessage name="declaration2" v-slot="{ message }">
-                <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
-              </ErrorMessage>
               <label for="declaration2">{{
                 user.guarantors.length > 1
                   ? t("validatefile.declaration2-plural")
                   : t("validatefile.declaration2")
               }}</label>
+              <ErrorMessage name="declaration2" v-slot="{ message }">
+                <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+              </ErrorMessage>
             </div>
           </div>
         </NakedCard>
