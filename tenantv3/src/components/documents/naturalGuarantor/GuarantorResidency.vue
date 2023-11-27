@@ -276,7 +276,7 @@ const uploadProgress = ref({} as {
     formData.append("typeDocumentResidency", residencyDocument.value.value);
 
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
-    if (store.guarantor.id) {
+    if (store.guarantor?.id) {
       formData.append("guarantorId", store.guarantor.id.toString());
     }
     if (props.tenantId) {

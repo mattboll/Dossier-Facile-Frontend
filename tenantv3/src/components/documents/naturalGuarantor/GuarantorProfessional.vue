@@ -7,21 +7,12 @@
         </h1>
         <h1 class="fr-h6" v-else>{{ t("guarantorprofessional.title") }}</h1>
         <div class="fr-mt-3w">
-          <validation-provider
-            rules="select"
-            name="professionalDocument"
-            v-slot="{ errors, valid }"
-          >
             <label v-if="isCotenant">{{
               t("guarantorprofessional.select-label-cotenant")
             }}</label>
             <select
               v-model="professionalDocument"
               class="fr-select fr-mb-3w"
-              :class="{
-                'fr-select--valid': valid,
-                'fr-select--error': errors[0],
-              }"
               id="select"
               as="select"
               @change="onSelectChange()"
@@ -31,10 +22,6 @@
                 {{ t(d.key) }}
               </option>
             </select>
-            <span class="fr-error-text" v-if="errors[0]">
-              {{ t(errors[0]) }}
-            </span>
-          </validation-provider>
         </div>
       </div>
     </NakedCard>
@@ -85,7 +72,6 @@
 </template>
 
 <script setup lang="ts">
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
@@ -95,13 +81,10 @@ import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { RegisterService } from "../../../services/RegisterService";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-// import { ValidationProvider } from "vee-validate";
 import { UtilsService } from "@/services/UtilsService";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
@@ -115,9 +98,6 @@ const { t } = useI18n();
       return store.selectedGuarantor;
     });
 
-
-  // @Prop() tenantId?: string;
-  // @Prop({ default: false }) isCotenant?: boolean;
   const props = withDefaults(defineProps<{
     tenantId?: string;
     isCotenant?: boolean;
@@ -128,9 +108,9 @@ const { t } = useI18n();
 
   const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
   const files = ref([] as DfFile[]);
-  const uploadProgress: {
+const uploadProgress = ref({} as {
     [key: string]: { state: string; percentage: number };
-  } = {};
+  });
   const professionalDocument = ref(new DocumentType());
   const documents = ref(DocumentTypeConstants.GUARANTOR_PROFESSIONAL_DOCS);
   const isDocDeleteVisible = ref(false);
@@ -196,7 +176,7 @@ const { t } = useI18n();
         }
       }
     }
-    this.isDocDeleteVisible = false;
+    isDocDeleteVisible.value = false;
   }
 
   async function validSelect() {
@@ -253,7 +233,7 @@ const { t } = useI18n();
     );
 
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
-    if (store.guarantor.id) {
+    if (store.guarantor?.id) {
       formData.append("guarantorId", store.guarantor.id.toString());
     }
     if (props.tenantId) {
