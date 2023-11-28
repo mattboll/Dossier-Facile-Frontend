@@ -45,7 +45,7 @@
           </div>
           <p>{{ $t("tenantguarantorchoice.visale-text") }}</p>
           <div style="text-align: right">
-            <DfButton primary="true" @on-click="gotoVisale()">
+            <DfButton :primary="true" @on-click="gotoVisale()">
               {{ $t("tenantguarantorchoice.visale-btn") }}
             </DfButton>
           </div>
@@ -60,67 +60,64 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+<script setup lang="ts">
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
-import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
+import { onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    GuarantorTypeSelector,
-    VGouvFrModal,
-    DfButton,
-    NakedCard,
-    GuarantorFooter,
-    GuarantorChoiceHelp,
-  },
-})
-export default class TenantGuarantorChoice extends Vue {
-  @Prop() tenantId!: number;
-  @Prop({ default: false }) isCotenant!: boolean;
-  tmpGuarantorType = "";
+  const props = withDefaults(defineProps<{
+    tenantId: number;
+    isCotenant: boolean;
+  }>(), {
+    isCotenant: false
+  })
+  const emit = defineEmits(["on-back", "on-select"]);
+  const store = useTenantStore();
 
-  getLocalStorageKey() {
-    return "cotenantGuarantorType_" + this.tenantId;
+  const tmpGuarantorType = ref("");
+
+  function getLocalStorageKey() {
+    return "cotenantGuarantorType_" + props.tenantId;
   }
 
-  beforeMount() {
-    this.$store.dispatch("updateSelectedGuarantor", this.tenantId);
-  }
+  onBeforeMount(() => {
+    store.updateSelectedGuarantor(props.tenantId);
+  })
 
-  updated() {
+  function updated() {
     // each dom update involved a scrollToEnd
-    this.$nextTick(() => this.scrollToEnd());
+    // TODO
+    // this.$nextTick(() => this.scrollToEnd());
   }
 
-  scrollToEnd() {
-    const element: any = this.$refs["guarantor-body-content"];
-    window.scrollTo(0, element.lastElementChild.offsetTop);
+  function scrollToEnd() {
+    // TODO
+    // const element: any = this.$refs["guarantor-body-content"];
+    // window.scrollTo(0, element.lastElementChild.offsetTop);
   }
 
-  setGuarantorType() {
-    if (!this.tmpGuarantorType) {
+  function setGuarantorType() {
+    if (!tmpGuarantorType.value) {
       ToastService.error("tenantguarantorchoice.type-required");
       return;
     }
-    AnalyticsService.addGuarantor(this.tmpGuarantorType);
-    if (this.tmpGuarantorType === "NO_GUARANTOR") {
-      this.$emit("on-select", this.tmpGuarantorType);
+    AnalyticsService.addGuarantor(tmpGuarantorType.value);
+    if (tmpGuarantorType.value === "NO_GUARANTOR") {
+      emit("on-select", tmpGuarantorType.value);
     } else {
-      this.$store
-        .dispatch("setGuarantorType", {
-          tenantId: this.tenantId.toString(),
-          typeGuarantor: this.tmpGuarantorType,
+      store
+        .setGuarantorType({
+          tenantId: props.tenantId.toString(),
+          typeGuarantor: tmpGuarantorType.value,
         })
         .then(
           () => {
-            this.$emit("on-select", this.tmpGuarantorType);
+            emit("on-select", tmpGuarantorType.value);
           },
           () => {
             ToastService.error("try-again");
@@ -129,14 +126,13 @@ export default class TenantGuarantorChoice extends Vue {
     }
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  gotoVisale() {
+  function gotoVisale() {
     window.open("https://www.visale.fr", "_blank");
   }
-}
 </script>
 
 <style scoped lang="scss">
