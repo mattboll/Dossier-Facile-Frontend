@@ -489,6 +489,7 @@ const { t } = useI18n();
     return user.value.applicationType === "COUPLE";
   }
 
+  // TODO : j'ai eu un getCoTenant not found, essayer de le reproduire
   function getCoTenant(index: number): User {
     return coTenants.value[index];
   }

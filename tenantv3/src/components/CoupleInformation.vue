@@ -101,7 +101,6 @@
             v-model="coTenant.email"
             v-slot="{ field, meta }"
             :rules="{
-              required: true,
               email: true,
               custom: user.email,
             }"
@@ -185,7 +184,7 @@ defineRule('custom', (v1: any, [v2]: any[]) => {
   return true;
 });
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue"]);
 
     const store = useTenantStore();
     const user = computed(() => store.user);
@@ -221,7 +220,7 @@ const checkboxauthorize = ref(null);
   }
 
   function handleInput() {
-    emit("input", [coTenant.value]);
+    emit("update:modelValue", [coTenant.value]);
     if (coTenant.value.email?.length > 0) {
       showCheckBox.value = true;
       // TODO
