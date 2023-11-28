@@ -34,8 +34,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
 import GuarantorChoiceHelp from "../components/helps/GuarantorChoiceHelp.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
@@ -47,45 +46,42 @@ import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import { ToastService } from "@/services/ToastService";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    GuarantorFooter,
-    GuarantorChoiceHelp,
-    NakedCard,
-    ProfileContainer,
-    CardRow,
-    ColoredTag,
-    VGouvFrModal,
-    ConfirmModal,
-  },
-  computed: {},
-})
-export default class TenantGuarantorList extends Vue {
-  @Prop() step!: number;
-  @Prop() guarantors!: Guarantor[];
+  const props = defineProps<{
+    step: number;
+    guarantors: Guarantor[];
+  }>();
 
-  isRemoveGuarantor = false;
+const route = useRoute();
+const { t } = useI18n();
+const store = useTenantStore();
+  const  emit = defineEmits(["on-edit", "on-delete", "on-back", "on-next"]);
 
-  getGuarantorName(g: Guarantor) {
+  const isRemoveGuarantor = ref(false);
+
+  function getGuarantorName(g: Guarantor) {
     if (g.firstName || g.lastName) {
       return `${g.firstName || ""} ${g.lastName || ""}`;
     }
     if (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) {
       return g.legalPersonName;
     }
-    return this.$i18n.t("tenantguarantorlist.guarantor." + g.typeGuarantor);
+    return t("tenantguarantorlist.guarantor." + g.typeGuarantor);
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    this.$emit("on-next");
+  function goNext() {
+    emit("on-next");
   }
 
-  getStatus(g: Guarantor) {
+  function getStatus(g: Guarantor) {
     if (!g.documents) {
       return;
     }
@@ -116,42 +112,42 @@ export default class TenantGuarantorList extends Vue {
     return "VALIDATED";
   }
 
-  editGuarantor(g: Guarantor) {
-    this.$emit("on-edit", g);
+  function editGuarantor(g: Guarantor) {
+    emit("on-edit", g);
   }
 
-  removeGuarantor(g: Guarantor) {
-    this.$store
-      .dispatch("deleteGuarantor", g)
+  function removeGuarantor(g: Guarantor) {
+    store
+      .deleteGuarantor(g)
       .then(() => {
-        this.$emit("on-delete", g);
+        emit("on-delete", g);
       })
       .catch(() => {
         ToastService.error();
       })
       .finally(() => {
-        this.isRemoveGuarantor = false;
+        isRemoveGuarantor.value = false;
       });
   }
 
-  hasOneNaturalGuarantor() {
+  function hasOneNaturalGuarantor() {
     return (
-      this.guarantors?.length === 1 &&
-      this.guarantors[0].typeGuarantor === "NATURAL_PERSON"
+      props.guarantors?.length === 1 &&
+      props.guarantors[0].typeGuarantor === "NATURAL_PERSON"
     );
   }
 
-  addNaturalGuarantor() {
-    this.$store
-      .dispatch("setGuarantorType", {
-        tenantId: Number(this.$route.params.tenantId),
+  function addNaturalGuarantor() {
+    // TODO : wrong parameters
+    store
+      .setGuarantorType({
+        tenantId: Number(route.params.tenantId),
         typeGuarantor: "NATURAL_PERSON",
       })
       .then(() => {
-        this.$emit("on-edit", this.guarantors[this.guarantors.length - 1]);
+        emit("on-edit", props.guarantors[props.guarantors.length - 1]);
       });
   }
-}
 </script>
 
 <style scoped lang="scss">
