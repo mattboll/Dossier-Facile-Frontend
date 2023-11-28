@@ -36,12 +36,9 @@
 
 <script setup lang="ts">
 import GuarantorFooter from "../components/footer/GuarantorFooter.vue";
-import GuarantorChoiceHelp from "../components/helps/GuarantorChoiceHelp.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
-import ProfileContainer from "../components/ProfileContainer.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
@@ -138,7 +135,6 @@ const store = useTenantStore();
   }
 
   function addNaturalGuarantor() {
-    // TODO : wrong parameters
     store
       .setGuarantorType({
         tenantId: Number(route.params.tenantId),

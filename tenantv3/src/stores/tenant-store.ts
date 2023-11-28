@@ -733,7 +733,7 @@ const useTenantStore = defineStore('tenant', {
         }
       );
     },
-    setGuarantorType(guarantorType: Guarantor) {
+    setGuarantorType(guarantorType: any) {
       return ProfileService.setGuarantorType(guarantorType).then(
         async (response) => {
           this.loadUserCommit(response.data);
