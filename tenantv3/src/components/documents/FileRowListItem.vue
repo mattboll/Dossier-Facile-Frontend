@@ -60,7 +60,7 @@ const props = withDefaults(
     label: string,
     subLabel?: string,
     document?: DfDocument,
-    enableDownload: boolean,
+    enableDownload?: boolean,
     tagLabel?: string,
     showValidated?: boolean,
     onClickEdit?: Function;
