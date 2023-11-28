@@ -326,15 +326,14 @@ const useTenantStore = defineStore('tenant', {
       });
       return UtilsService.isDocumentValid(document);
     },
-    documentsFilled() {
-      const store = this;
+    documentsFilled(state: State) {
       return (user?: User) => {
         return (
-          store.hasDoc("IDENTIFICATION", user) &&
-          store.hasDoc("PROFESSIONAL", user) &&
-          store.isTenantDocumentValid("RESIDENCY", user) &&
-          store.isTenantDocumentValid("FINANCIAL", user) &&
-          store.isTenantDocumentValid("TAX", user)
+          this.hasDoc("IDENTIFICATION", user) &&
+          this.hasDoc("PROFESSIONAL", user) &&
+          this.isTenantDocumentValid("RESIDENCY", user) &&
+          this.isTenantDocumentValid("FINANCIAL", user) &&
+          this.isTenantDocumentValid("TAX", user)
         );
       }
     },
