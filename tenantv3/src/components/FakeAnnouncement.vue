@@ -14,7 +14,7 @@
     <div class="announcement-container">
       <div class="announcement-text">
         <p>
-          <i18n path="fakeannouncement.content">
+          <i18n-t keypath="fakeannouncement.content">
             <template v-slot:nodocument>
               <span style="font-weight: bold">{{
                 $t("fakeannouncement.nodocument")
@@ -29,7 +29,7 @@
                 >{{ $t("fakeannouncement.masecurite") }}</a
               >
             </template>
-          </i18n>
+          </i18n-t>
         </p>
         <DfButton class="fr-mr-3w" @on-click="signal()">{{
           $t("fakeannouncement.signal-button")

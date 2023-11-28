@@ -77,7 +77,7 @@
               </h3>
             </div>
             <div class="fr-m-0 fr-py-2w">
-              <i18n path="partnerssection.signal-text">
+              <i18n-t keypath="partnerssection.signal-text">
                 <template v-slot:nodocument>
                   <span style="font-weight: bold">{{
                     $t("partnerssection.nodocument")
@@ -92,7 +92,7 @@
                     >{{ $t("partnerssection.masecurite") }}</a
                   >
                 </template>
-              </i18n>
+              </i18n-t>
             </div>
           </div>
           <div class="service-box-btn">
