@@ -667,7 +667,7 @@ const useTenantStore = defineStore('tenant', {
         lang,
         expireTimes,
         '/',
-        MAIN_URL.endsWith('dossierfacile.fr') ? 'dossierfacile.fr' : 'localhost',
+        import.meta.env.COOKIE_DOMAIN || 'localhost',
       );
     },
     validateFile(

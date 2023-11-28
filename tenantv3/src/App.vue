@@ -24,7 +24,7 @@ const router = useRouter();
     const lang = cookies.get('lang') === 'en' ? 'en' : 'fr';
     const store = useTenantStore();
     store.setLang(lang);
-  }),
+  })
 
   function onLogout() {
     store.logout(true);

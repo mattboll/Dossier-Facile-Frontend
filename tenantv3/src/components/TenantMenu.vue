@@ -92,7 +92,9 @@
         {{ t("menu.contact-us") }}
       </a>
     </li>
-    <LanguageSelector :initialLanguage="$i18n.locale" />
+    <li class="fr-nav__item fr-translate">
+      <LanguageSelector :initial-language="lang" @on-change-lang="changeLang" />
+    </li>
   </ul>
 </template>
 
@@ -100,9 +102,10 @@
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import LanguageSelector from "df-shared-next/src/Header/LanguageSelector.vue";
 
-import { useI18n } from "vue-i18n";
+import { useI18n, type Composer } from "vue-i18n";
 import { computed, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import i18n from "@/i18n";
 
   const { t } = useI18n();
   const store = useTenantStore();
@@ -116,6 +119,8 @@ import useTenantStore from "@/stores/tenant-store";
 
 const currentPage = ref("/")
 
+      const lang: string = (i18n.global as unknown as Composer).locale.value;
+
 onMounted(() => {
   currentPage.value = window.location.pathname;
 });
@@ -127,6 +132,9 @@ onMounted(() => {
         messageList.value[user.value.id].length > 0)
     );
   }
+function changeLang(lang: string) {
+  store.setLang(lang);
+}
 </script>
 
 <style scoped lang="scss">
