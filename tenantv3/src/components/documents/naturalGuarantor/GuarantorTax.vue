@@ -449,7 +449,7 @@ function goBack() {
 }
 
 function guarantorKey() {
-  if (isCotenant.value) {
+  if (props.isCotenant) {
     return "cotenant-guarantor";
   }
   return "guarantor";

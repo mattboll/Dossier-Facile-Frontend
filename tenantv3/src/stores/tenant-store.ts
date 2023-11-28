@@ -267,89 +267,92 @@ const useTenantStore = defineStore('tenant', {
         return r.id === id;
       }) as User;
     },
-  allDocumentsFilled(state: State): boolean {
-    const user = state.user;
-    const tenantDocumentsFilled = (tenant: User) =>
-      this.documentsFilled(tenant) &&
-      tenant.guarantors?.every((g) => !!this.guarantorDocumentsFilled(g));
+    allDocumentsFilled(state: State): boolean {
+      const user = state.user;
+      const tenantDocumentsFilled = (tenant: User) =>
+        this.documentsFilled(tenant) &&
+        tenant.guarantors?.every((g) => !!this.guarantorDocumentsFilled(g));
 
-    if (user.applicationType === "COUPLE") {
-      const cotenants = user.apartmentSharing?.tenants.filter(
-        (cotenant: User) => user.id !== cotenant.id
-      );
-      return (
-        (tenantDocumentsFilled(user) &&
-          cotenants.every(tenantDocumentsFilled)) ||
-        false
-      );
-    }
-    return tenantDocumentsFilled(user) || false;
-  },
-  allNamesFilled(state: State): boolean {
-    const userNamesFilled = (u: User) => u.firstName && u.lastName;
-    const guarantorNamesFilled = (g: Guarantor) =>
-      !g ||
-      (g.typeGuarantor === "NATURAL_PERSON" && g.firstName && g.lastName) ||
-      (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
-      g.typeGuarantor === "ORGANISM";
-
-    const user = state.user;
-    if (user.applicationType === "COUPLE") {
-      const couple = user.apartmentSharing?.tenants.find(
-        (cotenant: User) => user.id !== cotenant.id
-      ) as User;
-
-      if (
-        !userNamesFilled(couple) ||
-        !couple.guarantors.every(guarantorNamesFilled)
-      ) {
-        return false;
+      if (user.applicationType === "COUPLE") {
+        const cotenants = user.apartmentSharing?.tenants.filter(
+          (cotenant: User) => user.id !== cotenant.id
+        );
+        return (
+          (tenantDocumentsFilled(user) &&
+            cotenants.every(tenantDocumentsFilled)) ||
+          false
+        );
       }
-    }
-    return (userNamesFilled(user) &&
-      user.guarantors.every(guarantorNamesFilled)) as boolean;
-  },
-  hasDoc: (state: State) => (docType: string, user?: User) => {
-    const u = user ? user : state.user;
-    const f = u.documents?.find((d: DfDocument) => {
+      return tenantDocumentsFilled(user) || false;
+    },
+    allNamesFilled(state: State): boolean {
+      const userNamesFilled = (u: User) => u.firstName && u.lastName;
+      const guarantorNamesFilled = (g: Guarantor) =>
+        !g ||
+        (g.typeGuarantor === "NATURAL_PERSON" && g.firstName && g.lastName) ||
+        (g.typeGuarantor === "LEGAL_PERSON" && g.legalPersonName) ||
+        g.typeGuarantor === "ORGANISM";
+
+      const user = state.user;
+      if (user.applicationType === "COUPLE") {
+        const couple = user.apartmentSharing?.tenants.find(
+          (cotenant: User) => user.id !== cotenant.id
+        ) as User;
+
+        if (
+          !userNamesFilled(couple) ||
+          !couple.guarantors.every(guarantorNamesFilled)
+        ) {
+          return false;
+        }
+      }
+      return (userNamesFilled(user) &&
+        user.guarantors.every(guarantorNamesFilled)) as boolean;
+    },
+    hasDoc: (state: State) => (docType: string, user?: User) => {
+      const u = user ? user : state.user;
+      const f = u.documents?.find((d: DfDocument) => {
+        return (
+          d.documentCategory === docType &&
+          (d.documentStatus === "TO_PROCESS" || d.documentStatus === "VALIDATED")
+        );
+      })?.files;
+      return f && f.length > 0;
+    },
+    isTenantDocumentValid: (state: State) => (docType: string, user?: User) => {
+      const u = user ? user : state.user;
+      const document = u.documents?.find((d: DfDocument) => {
+        return d.documentCategory === docType;
+      });
+      return UtilsService.isDocumentValid(document);
+    },
+    documentsFilled() {
+      const store = this;
+      return (user?: User) => {
+        return (
+          store.hasDoc("IDENTIFICATION", user) &&
+          store.hasDoc("PROFESSIONAL", user) &&
+          store.isTenantDocumentValid("RESIDENCY", user) &&
+          store.isTenantDocumentValid("FINANCIAL", user) &&
+          store.isTenantDocumentValid("TAX", user)
+        );
+      }
+    },
+    guarantorDocumentsFilled: (state: State) => (g: Guarantor) => {
       return (
-        d.documentCategory === docType &&
-        (d.documentStatus === "TO_PROCESS" || d.documentStatus === "VALIDATED")
+        (g.typeGuarantor === "NATURAL_PERSON" &&
+          UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+          UtilsService.guarantorHasDoc("PROFESSIONAL", g) &&
+          UtilsService.isGuarantorDocumentValid("RESIDENCY", g) &&
+          UtilsService.isGuarantorDocumentValid("FINANCIAL", g) &&
+          UtilsService.isGuarantorDocumentValid("TAX", g)) ||
+        (g.typeGuarantor === "LEGAL_PERSON" &&
+          UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
+          UtilsService.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
+        (g.typeGuarantor === "ORGANISM" &&
+          UtilsService.guarantorHasDoc("IDENTIFICATION", g))
       );
-    })?.files;
-    return f && f.length > 0;
-  },
-  isTenantDocumentValid: (state: State) => (docType: string, user?: User) => {
-    const u = user ? user : state.user;
-    const document = u.documents?.find((d: DfDocument) => {
-      return d.documentCategory === docType;
-    });
-    return UtilsService.isDocumentValid(document);
-  },
-  documentsFilled: (state: State) =>(user?: User) => {
-    return (
-      this.hasDoc("IDENTIFICATION", user) &&
-      this.hasDoc("PROFESSIONAL", user) &&
-      this.isTenantDocumentValid("RESIDENCY", user) &&
-      this.isTenantDocumentValid("FINANCIAL", user) &&
-      this.isTenantDocumentValid("TAX", user)
-    );
-  },
-  guarantorDocumentsFilled: (state: State) => (g: Guarantor) => {
-    return (
-      (g.typeGuarantor === "NATURAL_PERSON" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
-        UtilsService.guarantorHasDoc("PROFESSIONAL", g) &&
-        UtilsService.isGuarantorDocumentValid("RESIDENCY", g) &&
-        UtilsService.isGuarantorDocumentValid("FINANCIAL", g) &&
-        UtilsService.isGuarantorDocumentValid("TAX", g)) ||
-      (g.typeGuarantor === "LEGAL_PERSON" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g) &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION_LEGAL_PERSON", g)) ||
-      (g.typeGuarantor === "ORGANISM" &&
-        UtilsService.guarantorHasDoc("IDENTIFICATION", g))
-    );
-  },
+    },
   },
   actions: {
     initState() {
