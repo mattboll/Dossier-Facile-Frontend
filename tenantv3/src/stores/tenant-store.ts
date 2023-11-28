@@ -3,6 +3,7 @@ import { ApartmentSharingLink } from 'df-shared-next/src/models/ApartmentSharing
 import type { SkipLink } from 'df-shared-next/src/models/SkipLink';
 import { DfMessage } from 'df-shared-next/src/models/DfMessage';
 import { FinancialDocument } from 'df-shared-next/src/models/FinancialDocument';
+import i18n from '../i18n';
 
 import { User } from 'df-shared-next/src/models/User';
 import { Guarantor } from 'df-shared-next/src/models/Guarantor';
@@ -23,6 +24,8 @@ import { RegisterService } from '@/services/RegisterService';
 import axios from 'axios';
 import { ToastService } from '@/services/ToastService';
 import {useLoading} from 'vue-loading-overlay'
+import { useCookies } from 'vue3-cookies';
+import type { Composer } from 'vue-i18n';
 
 const MAIN_URL = `//${import.meta.env.VITE_MAIN_URL}`;
 const FC_LOGOUT_URL = import.meta.env.VITE_FC_LOGOUT_URL || "";
@@ -651,21 +654,21 @@ const useTenantStore = defineStore('tenant', {
       );
     },
     setLang(lang: any) {
-      // TODO
-      // i18n.locale = lang;
-      // i18n.fallbackLocale = "fr";
-      // moment.locale(lang);
-      // const html = document.documentElement;
-      // html.setAttribute("lang", i18n.locale);
-      // const aYearFromNow = new Date();
-      // aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
-      // Vue.$cookies.set(
-      //   "lang",
-      //   lang,
-      //   aYearFromNow,
-      //   "",
-      //   MAIN_URL.endsWith("dossierfacile.fr") ? "dossierfacile.fr" : "localhost"
-      // );
+      (i18n.global as unknown as Composer).locale.value = lang;
+      i18n.global.fallbackLocale = 'fr';
+      moment.locale(lang);
+      const html = document.documentElement;
+      html.setAttribute('lang', (i18n.global as unknown as Composer).locale.value);
+      const { cookies } = useCookies();
+      const expireTimes = new Date();
+      expireTimes.setFullYear(expireTimes.getFullYear() + 1);
+      cookies.set(
+        'lang',
+        lang,
+        expireTimes,
+        '/',
+        MAIN_URL.endsWith('dossierfacile.fr') ? 'dossierfacile.fr' : 'localhost',
+      );
     },
     validateFile(
       data: { honorDeclaration: boolean; clarification: string }

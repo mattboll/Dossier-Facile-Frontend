@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router'
 import useTenantStore from './stores/tenant-store';
-import { computed } from 'vue';
+import { computed, onBeforeMount } from 'vue';
 import TenantSkipLinks from './components/TenantSkipLinks.vue';
 import TenantMenu from './components/TenantMenu.vue';
 import MyHeader from "./components/Header.vue";
@@ -9,6 +9,7 @@ import Footer from "df-shared-next/src/Footer/Footer.vue";
 import DeleteAccount from './components/DeleteAccount.vue';
 import Announcement from 'df-shared-next/src/components/Announcement.vue';
 import FollowSocials from 'df-shared-next/src/Footer/FollowSocials.vue';
+import { useCookies } from 'vue3-cookies';
 
 const store = useTenantStore();
 const router = useRouter();
@@ -17,6 +18,13 @@ const router = useRouter();
   const isLoggedIn = computed(() => store.isLoggedIn);
 
   const OWNER_URL = `//${import.meta.env.VITE_OWNER_URL}`;
+  const { cookies } = useCookies();
+
+  onBeforeMount(() => {
+    const lang = cookies.get('lang') === 'en' ? 'en' : 'fr';
+    const store = useTenantStore();
+    store.setLang(lang);
+  }),
 
   function onLogout() {
     store.logout(true);

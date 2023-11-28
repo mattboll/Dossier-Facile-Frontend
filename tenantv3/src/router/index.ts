@@ -438,10 +438,6 @@ router.beforeEach(async (to: RouteLocationNormalized, from, next: NavigationGuar
     store.updateSkipLinks(record.meta.skipLinks as SkipLink[]);
   });
 
-  // // TODO
-  // // const lang = Vue.$cookies.get("lang") === "en" ? "en" : "fr";
-  // // store.dispatch("setLang", lang);
-
   await loadUserIfAuthenticated(next);
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {

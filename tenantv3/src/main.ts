@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
   import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
+  import { globalCookiesConfig } from 'vue3-cookies';
 
 import App from './App.vue'
 import router from './router'
@@ -102,20 +103,20 @@ defineRule('positiveOrNull', (value: any) => {
 });
 
 const TENANT_API_URL = import.meta.env.VITE_API_URL;
+const MAIN_URL = import.meta.env.VITE_MAIN_URL;
 
 keycloak
   .init({ onLoad: 'check-sso', checkLoginIframe: false })
   .then((auth) => {
     const aYearFromNow = new Date();
     aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
-    // TODO
-    //       globalCookiesConfig({
-    //         expireTimes: aYearFromNow.toUTCString(),
-    //         path: '/',
-    //         domain: MAIN_URL.endsWith('dossierfacile.fr') ? 'dossierfacile.fr' : 'localhost',
-    //         secure: true,
-    //         sameSite: 'None',
-    //       });
+          globalCookiesConfig({
+            expireTimes: aYearFromNow.toUTCString(),
+            path: '/',
+            domain: MAIN_URL,
+            secure: true,
+            sameSite: 'None',
+          });
 
     // Token Refresh
     setInterval(() => {
