@@ -17,7 +17,7 @@
           <div>{{ $t("cotenantfinanciallist.subtitle") }}</div>
         </div>
       </NakedCard>
-      <div v-for="f in tenantFinancialDocuments.value" :key="f.id">
+      <div v-for="f in tenantFinancialDocuments" :key="f.id">
         <CardRow
           @edit="selectFinancialDocument(f)"
           @remove="removeFinancial(f)"
@@ -61,19 +61,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
-import FileUpload from "../../uploads/FileUpload.vue";
+<script setup lang="ts">
 import { FinancialDocument } from "df-shared-next/src/models/FinancialDocument";
-import ListItem from "../../uploads/ListItem.vue";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import Modal from "df-shared-next/src/components/Modal.vue";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import ProfileFooter from "../../footer/ProfileFooter.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import CardRow from "df-shared-next/src/components/CardRow.vue";
@@ -81,40 +72,26 @@ import CoTenantFinancialForm from "./CoTenantFinancialForm.vue";
 import ColoredTag from "df-shared-next/src/components/ColoredTag.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import SimulationCaf from "../share/SimulationCaf.vue";
-import { Ref, ref } from "@vue/reactivity";
-import { UtilsService } from "@/services/UtilsService";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import { onBeforeMount, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    AllDeclinedMessages,
-    ColoredTag,
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    WarningMessage,
-    ConfirmModal,
-    Modal,
-    DocumentHelp,
-    CoTenantFinancialForm,
-    VGouvFrModal,
-    ProfileFooter,
-    NakedCard,
-    CardRow,
-    SimulationCaf,
-  },
-})
-export default class CoTenantFinancialList extends Vue {
-  @Prop() readonly coTenantId!: number;
+  const props = defineProps<{
+    coTenantId: number
+  }>();
+const { t } = useI18n();
+  const store = useTenantStore();
+  const emit = defineEmits(["on-back", "on-next"]);
 
-  tenantFinancialDocuments: Ref<FinancialDocument[]> = ref([]);
-  tenantOriginalDocuments?: DfDocument[];
-  financialDocument!: FinancialDocument;
-  editFinancialDocument = false;
+  const tenantFinancialDocuments = ref([] as FinancialDocument[]);
+  const tenantOriginalDocuments = ref([] as DfDocument[]);
+  const financialDocument = ref(new FinancialDocument());
+  const editFinancialDocument = ref(false);
 
-  private getOriginalDocuments(): DfDocument[] {
-    const tenant = UtilsService.getTenant(Number(this.coTenantId));
+  function getOriginalDocuments(): DfDocument[] {
+    const tenant = store.getTenant(Number(props.coTenantId));
 
     if (tenant.documents) {
       const docs = tenant.documents?.filter((d: DfDocument) => {
@@ -130,7 +107,7 @@ export default class CoTenantFinancialList extends Vue {
     return [];
   }
 
-  private getTenantFinancialDocuments(
+  function getTenantFinancialDocuments(
     documents: DfDocument[]
   ): FinancialDocument[] {
     const financialDocuments: FinancialDocument[] = [];
@@ -158,17 +135,15 @@ export default class CoTenantFinancialList extends Vue {
     return financialDocuments;
   }
 
-  setEditFinancialDocument(value: boolean) {
-    this.editFinancialDocument = value;
+  function setEditFinancialDocument(value: boolean) {
+    editFinancialDocument.value = value;
   }
 
-  documents = DocumentTypeConstants.FINANCIAL_DOCS;
+  onBeforeMount(() => {
+    initialize();
+  })
 
-  beforeMount() {
-    this.initialize();
-  }
-
-  private hasNoIncome(financialDocuments?: FinancialDocument[]): boolean {
+  function hasNoIncome(financialDocuments?: FinancialDocument[]): boolean {
     return (financialDocuments &&
       financialDocuments.length > 0 &&
       financialDocuments.find((f) => {
@@ -176,38 +151,38 @@ export default class CoTenantFinancialList extends Vue {
       }) === undefined) as boolean;
   }
 
-  initialize() {
-    this.tenantOriginalDocuments = this.getOriginalDocuments();
-    this.tenantFinancialDocuments.value = this.getTenantFinancialDocuments(
-      this.tenantOriginalDocuments
+  function initialize() {
+    tenantOriginalDocuments.value = getOriginalDocuments();
+    tenantFinancialDocuments.value = getTenantFinancialDocuments(
+      tenantOriginalDocuments.value
     );
-    if (this.hasNoIncome(this.tenantFinancialDocuments.value)) {
-      this.financialDocument = this.tenantFinancialDocuments.value.find((f) => {
+    if (hasNoIncome(tenantFinancialDocuments.value)) {
+      financialDocument.value = tenantFinancialDocuments.value.find((f) => {
         return f.documentType && f.documentType.key === "no-income";
       }) as FinancialDocument;
     } else {
-      this.financialDocument = new FinancialDocument();
-      this.editFinancialDocument = !this.hasFinancial();
+      financialDocument.value = new FinancialDocument();
+      editFinancialDocument.value = !hasFinancial();
     }
   }
 
-  documentDeniedReasons(f: FinancialDocument) {
-    const d = this.tenantOriginalDocuments?.find(
+  function documentDeniedReasons(f: FinancialDocument) {
+    const d = tenantOriginalDocuments.value?.find(
       (d: DfDocument) => f.id === d.id
     );
 
     return d ? d.documentDeniedReasons : "unknown";
   }
 
-  documentStatus(f: FinancialDocument) {
-    const d = this.tenantOriginalDocuments?.find(
+  function documentStatus(f: FinancialDocument) {
+    const d = tenantOriginalDocuments.value?.find(
       (d: DfDocument) => f.id === d.id
     );
     return d ? d.documentStatus : "EMPTY";
   }
 
-  hasFinancial() {
-    const tenant = UtilsService.getTenant(Number(this.coTenantId));
+  function hasFinancial() {
+    const tenant = store.getTenant(Number(props.coTenantId));
     if (tenant === undefined) {
       return false;
     }
@@ -217,25 +192,28 @@ export default class CoTenantFinancialList extends Vue {
     return docs?.length !== 0;
   }
 
-  addFinancialDocument() {
-    this.financialDocument = new FinancialDocument();
-    this.editFinancialDocument = true;
+  function addFinancialDocument() {
+    financialDocument.value = new FinancialDocument();
+    editFinancialDocument.value = true;
   }
 
-  selectFinancialDocument(f?: FinancialDocument) {
-    this.financialDocument = f ? f : new FinancialDocument();
-    this.editFinancialDocument = true;
+  function selectFinancialDocument(f?: FinancialDocument) {
+    financialDocument.value = f ? f : new FinancialDocument();
+    editFinancialDocument.value = true;
   }
 
-  removeFinancial(f?: FinancialDocument) {
+  function removeFinancial(f?: FinancialDocument) {
+    if (!f?.id) {
+      return;
+    }
     const $loading = useLoading({});
     const loader = $loading.show();
-    this.$store
-      .dispatch("deleteDocument", f?.id)
+    store
+      .deleteDocument(f?.id)
       .then(
         () => {
-          this.tenantFinancialDocuments.value =
-            this.tenantFinancialDocuments.value?.filter((d) => d.id != f?.id);
+          tenantFinancialDocuments.value =
+            tenantFinancialDocuments.value?.filter((d) => d.id != f?.id);
         },
         () => {
           ToastService.error();
@@ -243,34 +221,33 @@ export default class CoTenantFinancialList extends Vue {
       )
       .finally(() => {
         loader.hide();
-        this.initialize();
+        initialize();
       });
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
-    if (this.editFinancialDocument) {
-      this.editFinancialDocument = false;
-      this.initialize();
+  function goNext() {
+    if (editFinancialDocument.value) {
+      editFinancialDocument.value = false;
+      initialize();
     } else {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
 
-  private getDocumentName(document: FinancialDocument): string {
-    return this.$t(`documents.${document.documentType.key}`).toString();
+  function getDocumentName(document: FinancialDocument): string {
+    return t(`documents.${document.documentType.key}`).toString();
   }
 
-  allowNoIncome(): boolean {
+  function allowNoIncome(): boolean {
     return (
-      !this.hasFinancial() ||
-      this.financialDocument.documentType.key === "no-income"
+      !hasFinancial() ||
+      financialDocument.value.documentType.key === "no-income"
     );
   }
-}
 </script>
 
 <style scoped lang="scss">

@@ -1,7 +1,6 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ handleSubmit }">
-      <form name="coTenantNameForm" @submit.prevent="handleSubmit(save)">
+      <Form name="coTenantNameForm" @submit="save">
         <NakedCard class="fr-p-md-5w">
           <h1 class="fr-h6">{{ $t("cotenantname.title") }}</h1>
           <div>
@@ -61,89 +60,71 @@
         <FooterContainer>
           <BackNext :showBack="true" @on-back="goBack()"> </BackNext>
         </FooterContainer>
-      </form>
-    </ValidationObserver>
+      </Form>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
+<script setup lang="ts">
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { User } from "df-shared-next/src/models/User";
 import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";
-import { UtilsService } from "@/services/UtilsService";
 import RequiredFieldsInstruction from "df-shared-next/src/components/form/RequiredFieldsInstruction.vue";
 import TextField from "df-shared-next/src/components/form/TextField.vue";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import { onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    BackNext,
-    FooterContainer,
-    ValidationProvider,
-    ValidationObserver,
-    WarningMessage,
-    ConfirmModal,
-    DfButton,
-    VGouvFrModal,
-    NakedCard,
-    RequiredFieldsInstruction,
-    TextField,
-  },
-})
-export default class CoTenantName extends Vue {
-  @Prop() coTenantId!: number;
+  const props = defineProps<{
+    coTenantId: number;
+  }>();
 
-  selectedCoTenant: User = new User();
+  const selectedCoTenant = ref(new User());
+  const store = useTenantStore();
 
-  firstName = "";
-  lastName = "";
-  preferredName = "";
-  displayPreferredNameField = false;
+  const firstName = ref("");
+  const lastName = ref("");
+  const preferredName = ref("");
+  const displayPreferredNameField = ref(false);
 
-  isDocDeleteVisible = false;
+  const emit = defineEmits(["on-back", "on-next"]);
 
-  beforeMount() {
-    this.selectedCoTenant = UtilsService.getTenant(Number(this.coTenantId));
-    this.firstName = this.selectedCoTenant?.firstName || "";
-    this.lastName = this.selectedCoTenant?.lastName || "";
-    this.preferredName = this.selectedCoTenant?.preferredName || "";
-    this.displayPreferredNameField = this.preferredName !== "";
+  onBeforeMount(() => {
+    selectedCoTenant.value = store.getTenant(Number(props.coTenantId));
+    firstName.value = selectedCoTenant.value?.firstName || "";
+    lastName.value = selectedCoTenant.value?.lastName || "";
+    preferredName.value = selectedCoTenant.value?.preferredName || "";
+    displayPreferredNameField.value = preferredName.value !== "";
+    
+  })
+
+  function deletePreferredName() {
+    preferredName.value = "";
+    displayPreferredNameField.value = false;
   }
 
-  deletePreferredName() {
-    this.preferredName = "";
-    this.displayPreferredNameField = false;
-  }
-
-  save() {
+  function save() {
     if (
-      this.firstName === this.selectedCoTenant?.firstName &&
-      this.lastName === this.selectedCoTenant?.lastName &&
-      this.preferredName === this.selectedCoTenant?.preferredName
+      firstName.value === selectedCoTenant.value?.firstName &&
+      lastName.value === selectedCoTenant.value?.lastName &&
+      preferredName.value === selectedCoTenant.value?.preferredName
     ) {
-      this.$emit("on-next");
+      emit("on-next");
       return;
     }
 
-    this.selectedCoTenant.firstName = this.firstName;
-    this.selectedCoTenant.lastName = this.lastName;
-    this.selectedCoTenant.preferredName = this.preferredName;
+    selectedCoTenant.value.firstName = firstName.value;
+    selectedCoTenant.value.lastName = lastName.value;
+    selectedCoTenant.value.preferredName = preferredName.value;
 
     const $loading = useLoading({});
     const loader = $loading.show();
-    this.$store
-      .dispatch("setNames", this.selectedCoTenant)
+    store
+      .setNames(selectedCoTenant.value)
       .then(() => {
         ToastService.saveSuccess();
-        this.$emit("on-next");
+        emit("on-next");
       })
       .catch(() => {
         ToastService.saveFailed();
@@ -153,10 +134,9 @@ export default class CoTenantName extends Vue {
       });
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
-}
 </script>
 
 <style scoped lang="scss">

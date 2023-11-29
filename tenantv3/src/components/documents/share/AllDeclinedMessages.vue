@@ -28,7 +28,7 @@ import DeclinedMessage from "df-shared-next/src/components/DeclinedMessage.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 
   const props = withDefaults(defineProps<{
-    documentDeniedReasons?: DocumentDeniedReasons | null;
+    documentDeniedReasons?: DocumentDeniedReasons | string | null;
     documentStatus?: string;
   }>(), {
     documentDeniedReasons: null,

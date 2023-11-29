@@ -48,12 +48,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
-import { extend, ValidationProvider } from "vee-validate";
+// import { extend, ValidationProvider } from "vee-validate";
 import { is } from "vee-validate/dist/rules";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
@@ -62,51 +61,50 @@ import BackNext from "../../footer/BackNext.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
+import useTenantStore from "@/stores/tenant-store";
+import { ref } from "vue";
 
-extend("is", {
-  ...is,
-  message: "field-required",
-  validate: (value) => !!value,
-});
+// extend("is", {
+//   ...is,
+//   message: "field-required",
+//   validate: (value) => !!value,
+// });
 
-@Component({
-  components: {
-    ValidationProvider,
-    DocumentDownloader,
-    NakedCard,
-    FooterContainer,
-    BackNext,
-  },
-})
-export default class CoTenantTax extends Vue {
-  documentsDefinitions = DocumentTypeConstants.TAX_DOCS;
-  @Prop() coTenantId!: number;
-  documentType?: DocumentType;
-  showDownloader = false;
-  forceShowDownloader = false;
-  document!: DfDocument;
+  const documentsDefinitions = DocumentTypeConstants.TAX_DOCS;
 
-  changeDocument(docType?: DocumentType, doc?: DfDocument) {
-    this.documentType = docType;
-    this.document = doc as DfDocument;
-    this.showDownloader = this.documentType?.key === "my-name";
-    this.forceShowDownloader = this.documentType?.key === "my-name";
+  const props = defineProps<{
+    coTenantId: number
+  }>();
+  const emit = defineEmits(["on-back", "on-next"]);
+  const store = useTenantStore();
+
+
+  const documentType = ref(new DocumentType());
+  const showDownloader = ref(false);
+  const forceShowDownloader = ref(false);
+  const document = ref(new DfDocument());
+
+  function changeDocument(docType?: DocumentType, doc?: DfDocument) {
+    documentType.value = docType;
+    document.value = doc as DfDocument;
+    showDownloader.value = documentType.value?.key === "my-name";
+    forceShowDownloader.value = documentType.value?.key === "my-name";
   }
 
-  enrichFormData(formData: FormData) {
-    if (this.documentType?.key === "my-name") {
+  function enrichFormData(formData: FormData) {
+    if (documentType.value?.key === "my-name") {
       formData.append("noDocument", "false");
     } else {
       formData.append("noDocument", "true");
     }
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  getRegisteredDoc() {
-    const coTenant = UtilsService.getTenant(Number(this.coTenantId));
+  function getRegisteredDoc() {
+    const coTenant = store.getTenant(Number(props.coTenantId));
     if (coTenant.documents !== null) {
       const doc = coTenant.documents?.find((d: DfDocument) => {
         return d.documentCategory === "TAX";
@@ -116,12 +114,12 @@ export default class CoTenantTax extends Vue {
     return undefined;
   }
 
-  goNext() {
+  function goNext() {
     const formData = new FormData();
 
-    if (this.documentType?.key === "other-tax") {
-      if (this.document.customText) {
-        formData.append("customText", this.document.customText);
+    if (documentType.value?.key === "other-tax") {
+      if (document.value.customText) {
+        formData.append("customText", document.value.customText);
       } else {
         // TODO : replace by form and validation
         ToastService.error("cotenanttax.custom-text-required");
@@ -129,30 +127,30 @@ export default class CoTenantTax extends Vue {
       }
     }
 
-    this.enrichFormData(formData);
+    enrichFormData(formData);
 
-    const d = this.getRegisteredDoc();
+    const d = getRegisteredDoc();
     if (
-      this.documentType?.value === d?.subCategory &&
-      this.document.customText === d?.customText
+      documentType.value?.value === d?.subCategory &&
+      document.value.customText === d?.customText
     ) {
-      this.$emit("on-next");
+      emit("on-next");
       return true;
     }
 
-    formData.append("typeDocumentTax", this.documentType?.value as string);
-    if (this.document.id && this.document.id > 0) {
-      formData.append("id", this.document.id.toString());
+    formData.append("typeDocumentTax", documentType.value?.value as string);
+    if (document.value.id && document.value.id > 0) {
+      formData.append("id", document.value.id.toString());
     }
-    formData.append("tenantId", this.coTenantId.toString());
+    formData.append("tenantId", props.coTenantId.toString());
     const $loading = useLoading({});
     const loader = $loading.show();
 
-    this.$store
-      .dispatch("saveTenantTax", formData)
+    store
+      .saveTenantTax(formData)
       .then(() => {
         ToastService.saveSuccess();
-        this.$emit("on-next");
+        emit("on-next");
       })
       .catch((err) => {
         UtilsService.handleCommonSaveError(err);
@@ -161,5 +159,4 @@ export default class CoTenantTax extends Vue {
         loader.hide();
       });
   }
-}
 </script>

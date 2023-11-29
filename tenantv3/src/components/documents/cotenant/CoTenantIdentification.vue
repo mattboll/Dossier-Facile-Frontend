@@ -17,20 +17,15 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+<script setup lang="ts">
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
 
-@Component({
-  components: {
-    DocumentDownloader,
-  },
-})
-export default class CoTenantIdentification extends Vue {
-  documentsDefinitions = DocumentTypeConstants.IDENTIFICATION_DOCS;
-  @Prop() coTenantId!: number;
-}
+  const documentsDefinitions = DocumentTypeConstants.IDENTIFICATION_DOCS;
+
+  const props = defineProps<{
+    coTenantId: number
+  }>();
 </script>
 
 <style scoped lang="scss"></style>

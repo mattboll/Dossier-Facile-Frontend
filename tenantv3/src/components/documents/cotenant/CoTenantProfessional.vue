@@ -16,30 +16,27 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DocumentType } from "df-shared-next/src/models/Document";
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentHelp from "../../helps/DocumentHelp.vue";
-import DocumentInsert from "../share/DocumentInsert.vue";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
+import { ref } from "vue";
 
-@Component({
-  components: {
-    DocumentHelp,
-    DocumentInsert,
-    DocumentDownloader,
-  },
-})
-export default class CoTenantProfessional extends Vue {
-  documentsDefinitions = DocumentTypeConstants.PROFESSIONAL_DOCS;
-  @Prop() coTenantId!: number;
-  documentType?: DocumentType;
+  const documentsDefinitions = DocumentTypeConstants.PROFESSIONAL_DOCS;
 
-  changeDocumentType(docType?: DocumentType) {
-    this.documentType = docType;
+  const props = defineProps<{
+    coTenantId: number;
+  }>();
+  const documentType = ref(new DocumentType());
+
+  function changeDocumentType(docType?: DocumentType) {
+    // TODO : documentType est utilisé ??
+    if (docType) {
+      documentType.value = docType;
+    } else {
+      documentType.value = new DocumentType();
+    }
   }
-}
 </script>
 
 <style scoped lang="scss"></style>

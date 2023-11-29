@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ validate }">
       <DocumentDownloader
         :coTenantId="coTenantId"
         :documentsDefinitions="documentsDefinitions"
@@ -19,130 +18,131 @@
             class="fr-p-md-5w fr-mb-3w fr-mt-3w"
             v-if="documentType ? documentType.key === 'other-residency' : false"
           >
-            <validation-provider rules="required" v-slot="{ errors }">
               <div
                 class="fr-input-group"
-                :class="errors[0] ? 'fr-input-group--error' : ''"
               >
+                      <Field
+                        name="customText"
+                        v-model="document.customText"
+                        v-slot="{ field, meta }"
+                        :rules="{
+                          required: true
+                        }"
+                      >
                 <label class="fr-label" for="customText">{{
                   $t("residency-page.custom-text")
                 }}</label>
                 <textarea
-                  v-model="document.customText"
+                  v-bind="field"
                   class="form-control fr-input validate-required"
                   id="customText"
-                  name="customText"
+                            :class="{
+                              'fr-input--valid': meta.valid,
+                              'fr-input--error': !meta.valid
+                            }"
                   placeholder=""
                   type="text"
                   required
                   maxlength="2000"
                   rows="4"
                 />
+                      </Field>
+                        <ErrorMessage name="customText" v-slot="{ message }">
+                          <span role="alert" class="fr-error-text">{{
+                            t(message || "")
+                          }}</span>
+                        </ErrorMessage>
               </div>
-              <span class="fr-error-text" v-if="errors[0]">
-                {{ $t(errors[0]) }}
-              </span>
-            </validation-provider>
           </NakedCard>
         </template>
       </DocumentDownloader>
       <FooterContainer>
+      <!-- TODO validate before gonext (submit ?) -->
         <BackNext
           :showBack="true"
-          @on-next="validate().then(goNext)"
+          @on-next="goNext"
           @on-back="goBack()"
         >
         </BackNext>
       </FooterContainer>
-    </ValidationObserver>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
 import { UtilsService } from "@/services/UtilsService";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
-import TextField from "df-shared-next/src/components/form/TextField.vue";
 import FooterContainer from "@/components/footer/FooterContainer.vue";
 import BackNext from "@/components/footer/BackNext.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { ToastService } from "@/services/ToastService";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { useLoading } from 'vue-loading-overlay';
+import { onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
 
-@Component({
-  components: {
-    ValidationProvider,
-    ValidationObserver,
-    BackNext,
-    FooterContainer,
-    TextField,
-    NakedCard,
-    DocumentDownloader,
-  },
-})
-export default class CoTenantResidency extends Vue {
-  documentsDefinitions: any[] = [];
-  @Prop() coTenantId!: number;
+  const props = defineProps<{
+    coTenantId: number
+  }>();
+  const store = useTenantStore();
+  const emit = defineEmits(["on-back", "on-next"]);
 
-  documentType?: DocumentType;
-  document!: DfDocument;
-  showDownloader = false;
-  forceShowDownloader = false;
+const documentsDefinitions = ref({});
+  const documentType = ref(new DocumentType());
+  const document = ref(new DfDocument());
+  const showDownloader = ref(false);
 
-  beforeMount() {
-    this.documentsDefinitions = DocumentTypeConstants.RESIDENCY_DOCS.filter(
+  onBeforeMount(() => {
+    documentsDefinitions.value = DocumentTypeConstants.RESIDENCY_DOCS.filter(
       (type: any) =>
         type.key !== "other-residency" ||
         UtilsService.useNewOtherResidencyCategory()
     );
+  })
+
+  function changeDocument(docType: DocumentType, doc: DfDocument) {
+    documentType.value = docType;
+    document.value = doc as DfDocument;
+    document.value.noDocument = docType?.key === "other-residency";
+    showDownloader.value = docType?.key !== "other-residency";
   }
 
-  changeDocument(docType: DocumentType, doc: DfDocument) {
-    this.documentType = docType;
-    this.document = doc as DfDocument;
-    this.document.noDocument = docType?.key === "other-residency";
-    this.showDownloader = docType?.key !== "other-residency";
+  function goBack() {
+    emit("on-back");
   }
 
-  goBack() {
-    this.$emit("on-back");
-  }
-
-  goNext() {
+  function goNext() {
     if (
-      this.documentType?.key !== "other-residency" ||
-      this.documentHasNotChanged()
+      documentType.value?.key !== "other-residency" ||
+      documentHasNotChanged()
     ) {
-      this.$emit("on-next");
+      emit("on-next");
       return true;
     }
 
-    if (!this.document.customText) {
+    if (!document.value.customText) {
       return;
     }
 
     const formData = new FormData();
     formData.append("noDocument", "true");
-    formData.append("customText", this.document.customText);
-    formData.append("typeDocumentResidency", this.documentType?.value);
+    formData.append("customText", document.value.customText);
+    formData.append("typeDocumentResidency", documentType.value?.value);
 
-    if (this.document.id && this.document.id > 0) {
-      formData.append("id", this.document.id.toString());
+    if (document.value.id && document.value.id > 0) {
+      formData.append("id", document.value.id.toString());
     }
-    formData.append("tenantId", this.coTenantId.toString());
+    formData.append("tenantId", props.coTenantId.toString());
     const $loading = useLoading({});
     const loader = $loading.show();
 
-    this.$store
-      .dispatch("saveTenantResidency", formData)
+    store
+      .saveTenantResidency(formData)
       .then(() => {
         ToastService.saveSuccess();
-        this.$emit("on-next");
+        emit("on-next");
       })
       .catch((err) => {
         ToastService.saveFailed();
@@ -152,15 +152,14 @@ export default class CoTenantResidency extends Vue {
       });
   }
 
-  documentHasNotChanged() {
-    const document = DocumentService.getCoTenantDocument(
-      this.coTenantId,
+  function documentHasNotChanged() {
+    const doc = DocumentService.getCoTenantDocument(
+      props.coTenantId,
       "RESIDENCY"
     );
     return (
-      this.documentType?.value === document?.subCategory &&
-      this.document.customText === document?.customText
+      documentType.value?.value === doc?.subCategory &&
+      document.value.customText === doc?.customText
     );
   }
-}
 </script>
