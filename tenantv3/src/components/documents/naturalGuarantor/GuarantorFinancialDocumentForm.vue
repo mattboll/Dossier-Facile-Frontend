@@ -239,7 +239,7 @@ const guarantorFinancialDocumentSelected = computed(() => {
 });
 
   const props = defineProps<{
-    tenantId?: string;
+    tenantId?: number;
   }>();
 
   const financialDocument = ref(new FinancialDocument());
@@ -419,9 +419,9 @@ const guarantorFinancialDocumentSelected = computed(() => {
     }
 
     financialDocument.value.fileUploadStatus = UploadStatus.STATUS_SAVING;
-    formData.append("guarantorId", store.guarantor.id?.toString() || "");
+    formData.append("guarantorId", store.guarantor?.id?.toString() || "");
     if (props.tenantId) {
-      formData.append("tenantId", props.tenantId);
+      formData.append("tenantId", props.tenantId.toString());
     }
     const $loading = useLoading({});
     const loader = $loading.show();

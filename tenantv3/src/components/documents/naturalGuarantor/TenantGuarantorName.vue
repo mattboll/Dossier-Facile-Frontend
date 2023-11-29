@@ -1,7 +1,6 @@
 <template>
   <div>
-    <ValidationObserver v-slot="{ handleSubmit }">
-      <form name="tenantGuarantorNameForm" @submit.prevent="handleSubmit(save)">
+      <Form name="tenantGuarantorNameForm" @submit="save">
         <NakedCard class="fr-p-md-5w">
           <h1 class="fr-h6">{{ $t("tenantguarantorname.title") }}</h1>
           <div class="fr-alert fr-alert--info">
@@ -9,24 +8,28 @@
           </div>
           <div class="fr-grid-row fr-grid-row--center fr-mt-4w">
             <div class="fr-col-12 fr-mb-3w">
-              <validation-provider
-                rules="required|onlyAlpha"
-                v-slot="{ errors, valid }"
-              >
                 <div
                   class="fr-input-group"
-                  :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label class="fr-label" for="lastname"
                     >{{ $t("tenantguarantorname.lastname") }} :</label
                   >
+          <Field
+            name="lastname"
+            v-model="lastName"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
+          >
                   <input
-                    v-model="lastName"
+                    v-bind="field"
                     class="form-control fr-input validate-required"
-                    :class="{
-                      'fr-input--valid': valid,
-                      'fr-input--error': errors[0],
-                    }"
+              :class="{
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
+              }"
                     id="lastname"
                     name="lastname"
                     :placeholder="
@@ -35,140 +38,116 @@
                     type="text"
                     required
                   />
-                  <span class="fr-error-text" v-if="errors[0]">{{
-                    $t(errors[0])
-                  }}</span>
+          </Field>
+          <ErrorMessage name="lastname" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ t(message || "") }}</span>
+          </ErrorMessage>
                 </div>
-              </validation-provider>
             </div>
             <div class="fr-col-12 fr-mb-3w">
-              <validation-provider
-                rules="required|onlyAlpha"
-                v-slot="{ errors, valid }"
-              >
                 <div
                   class="fr-input-group"
-                  :class="errors[0] ? 'fr-input-group--error' : ''"
                 >
                   <label for="firstname" class="fr-label"
                     >{{ $t("tenantguarantorname.firstname") }} :</label
                   >
+          <Field
+            name="firstname"
+            v-model="firstName"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+              onlyAlpha: true,
+            }"
+          >
                   <input
                     id="firstname"
                     :placeholder="
                       $t('tenantguarantorname.firstname-placeholder')
                     "
                     type="text"
-                    v-model="firstName"
-                    name="firstname"
+                    v-bind="field"
                     class="validate-required form-control fr-input"
                     :class="{
-                      'fr-input--valid': valid,
-                      'fr-input--error': errors[0],
+                      'fr-input--valid': meta.valid,
+                      'fr-input--error': !meta.valid,
                     }"
                     required
                   />
-                  <span class="fr-error-text" v-if="errors[0]">{{
-                    $t(errors[0])
-                  }}</span>
+          </Field>
+          <ErrorMessage name="firstname" v-slot="{ message }">
+            <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+          </ErrorMessage>
                 </div>
-              </validation-provider>
             </div>
           </div>
         </NakedCard>
         <GuarantorFooter @on-back="goBack"></GuarantorFooter>
-      </form>
-    </ValidationObserver>
+      </Form>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import DocumentInsert from "../share/DocumentInsert.vue";
-import FileUpload from "../../uploads/FileUpload.vue";
-import { DocumentType } from "df-shared-next/src/models/Document";
+<script setup lang="ts">
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
-import ListItem from "../../uploads/ListItem.vue";
-import { DfFile } from "df-shared-next/src/models/DfFile";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
-import WarningMessage from "df-shared-next/src/components/WarningMessage.vue";
-import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
-import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import DfButton from "df-shared-next/src/Button/Button.vue";
-import GuarantorChoiceHelp from "../../helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import { UtilsService } from "../../../services/UtilsService";
 import GuarantorFooter from "../../footer/GuarantorFooter.vue";
 import { ToastService } from "@/services/ToastService";
-import { ValidationProvider } from "vee-validate/dist/types/components/Provider";
 import { useLoading } from 'vue-loading-overlay';
+import { onBeforeMount, ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { Form, Field, ErrorMessage } from "vee-validate";
+import { useI18n } from "vue-i18n";
 
-@Component({
-  components: {
-    DocumentInsert,
-    FileUpload,
-    ListItem,
-    ValidationProvider,
-    ValidationObserver,
-    WarningMessage,
-    ConfirmModal,
-    DfButton,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    GuarantorFooter,
-  },
-  computed: {},
-})
-export default class TenantGuarantorName extends Vue {
-  documents = DocumentTypeConstants.GUARANTOR_IDENTIFICATION_DOCS;
-  @Prop() tenantId!: number;
-  @Prop() guarantor!: Guarantor;
+const { t } = useI18n();
 
-  fileUploadStatus = UploadStatus.STATUS_INITIAL;
-  files: DfFile[] = [];
-  identificationDocument = new DocumentType();
-  firstName = "";
-  lastName = "";
-  isDocDeleteVisible = false;
+  const props = defineProps<{
+    tenantId: number;
+    guarantor: Guarantor;
+  }>();
+  const emit = defineEmits(["on-next", "on-back"]);
+  const store = useTenantStore();
 
-  beforeMount() {
-    this.firstName = this.guarantor.firstName as string;
-    this.lastName = this.guarantor.lastName as string;
-  }
+  const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
+  const firstName = ref("");
+  const lastName = ref("");
 
-  save() {
+  onBeforeMount(() => {
+    firstName.value = props.guarantor.firstName as string;
+    lastName.value = props.guarantor.lastName as string;
+  })
+
+  function save() {
     if (
-      this.firstName === this.guarantor.firstName &&
-      this.lastName === this.guarantor.lastName
+      firstName.value === props.guarantor.firstName &&
+      lastName.value === props.guarantor.lastName
     ) {
-      this.$emit("on-next");
+      emit("on-next");
       return;
     }
     const formData = new FormData();
-    if (this.firstName) {
-      formData.append("firstName", UtilsService.capitalize(this.firstName));
+    if (firstName.value) {
+      formData.append("firstName", UtilsService.capitalize(firstName.value));
     }
-    if (this.lastName) {
-      formData.append("lastName", UtilsService.capitalize(this.lastName));
+    if (lastName.value) {
+      formData.append("lastName", UtilsService.capitalize(lastName.value));
     }
-    if (this.guarantor.id) {
-      formData.append("guarantorId", this.guarantor.id?.toString());
+    if (props.guarantor.id) {
+      formData.append("guarantorId", props.guarantor.id?.toString());
     }
-    formData.append("tenantId", this.tenantId.toString());
+    formData.append("tenantId", props.tenantId.toString());
 
     const $loading = useLoading({});
     const loader = $loading.show();
-    this.$store
-      .dispatch("saveGuarantorName", formData)
+    store
+      .saveGuarantorName(formData)
       .then(() => {
         ToastService.saveSuccess();
-        this.$emit("on-next");
+        emit("on-next");
       })
       .catch(() => {
-        this.fileUploadStatus = UploadStatus.STATUS_FAILED;
+        fileUploadStatus.value = UploadStatus.STATUS_FAILED;
         ToastService.saveFailed();
       })
       .finally(() => {
@@ -176,10 +155,9 @@ export default class TenantGuarantorName extends Vue {
       });
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
-}
 </script>
 
 <style scoped lang="scss"></style>

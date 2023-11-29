@@ -93,7 +93,7 @@ import { useLoading } from 'vue-loading-overlay';
 
   const documents = DocumentTypeConstants.GUARANTOR_IDENTIFICATION_DOCS;
   const props = withDefaults(defineProps<{
-    tenantId?: string;
+    tenantId?: number;
     isCotenant?: boolean;
   }>(), {
     isCotenant: false
@@ -247,7 +247,7 @@ import { useLoading } from 'vue-loading-overlay';
       identificationDocument.value.value
     );
     if (props.tenantId) {
-      formData.append("tenantId", props.tenantId);
+      formData.append("tenantId", props.tenantId.toString());
     }
     fileUploadStatus.value = UploadStatus.STATUS_SAVING;
     if (!selectedGuarantor.value?.id) {

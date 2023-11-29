@@ -123,7 +123,7 @@ const selectedGuarantor = computed(() => store.selectedGuarantor);
 
 
 const props = defineProps<{
-  tenantId: string
+  tenantId: number
 }>();
 
   const fileUploadStatus = ref(UploadStatus.STATUS_INITIAL);
@@ -280,7 +280,7 @@ const uploadProgress = ref({} as {
       formData.append("guarantorId", store.guarantor.id.toString());
     }
     if (props.tenantId) {
-      formData.append("tenantId", props.tenantId);
+      formData.append("tenantId", props.tenantId.toString());
     }
     const $loading = useLoading({});
     const loader = $loading.show();

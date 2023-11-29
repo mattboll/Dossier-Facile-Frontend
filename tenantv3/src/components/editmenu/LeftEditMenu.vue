@@ -429,21 +429,14 @@ const { t } = useI18n();
     }
   );
 
-  const coTenants = ref([] as User[]);
-
-  // TODO
-  // @Watch("user")
-  function loadCotenants() {
-    coTenants.value = user.value.apartmentSharing?.tenants?.filter((r: User) => {
+const coTenants = computed(() => {
+const c =user.value.apartmentSharing?.tenants?.filter((r: User) => {
       return r.id != user.value.id;
     }) as User[];
-    if (!coTenants.value) {
-      return [];
+  if (!c) {
+      return []
     }
-  }
-
-  onBeforeMount(() => {
-    loadCotenants();
+    return c
   });
 
   function getClass(s: number) {
@@ -489,9 +482,11 @@ const { t } = useI18n();
     return user.value.applicationType === "COUPLE";
   }
 
-  // TODO : j'ai eu un getCoTenant not found, essayer de le reproduire
   function getCoTenant(index: number): User {
-    return coTenants.value[index];
+    if (coTenants.value[index]) {
+      return coTenants.value[index];
+    }
+    return new User();
   }
 
   function getStepNumber(stepName: string): number {

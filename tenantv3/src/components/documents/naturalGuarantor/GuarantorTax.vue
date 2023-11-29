@@ -165,7 +165,7 @@ const user = computed(() => {
 
 const props = withDefaults(
   defineProps<{
-    tenantId?: string;
+    tenantId?: number;
     isCotenant?: boolean;
   }>(),
   {
@@ -384,12 +384,12 @@ async function save(force = false) {
   }
 
   fileUploadStatus.value = UploadStatus.STATUS_SAVING;
-  if (store.guarantor.id) {
+  if (store.guarantor?.id) {
     formData.append("guarantorId", store.guarantor.id.toString());
   }
 
   if (props.tenantId) {
-    formData.append("tenantId", props.tenantId);
+    formData.append("tenantId", props.tenantId.toString());
   }
   showLoader();
   await store

@@ -9,68 +9,63 @@
   </ProfileContainer>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import TenantGuarantorDocuments from "../components/TenantGuarantorDocuments.vue";
 import ProfileContainer from "../components/ProfileContainer.vue";
-import { mapState } from "vuex";
 import { User } from "df-shared-next/src/models/User";
 import { Guarantor } from "df-shared-next/src/models/Guarantor";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, onBeforeMount, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-@Component({
-  components: {
-    TenantGuarantorDocuments,
-    ProfileContainer,
-  },
-  computed: {
-    ...mapState({
-      coTenants: "coTenants",
-    }),
-  },
-})
-export default class TenantGuarantorDocumentsPage extends Vue {
-  @Prop() step!: number;
-  coTenants!: User[];
+const route = useRoute();
+const router = useRouter();
+      const store = useTenantStore();
+      const coTenants = computed(() => store.coTenants);
 
-  beforeMount() {
+  const props = defineProps<{
+    step: number
+  }>();
+
+
+  onBeforeMount(() => {
     window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
-    const coTenant = this.coTenants.find((r: User) => {
+    const coTenant = coTenants.value.find((r: User) => {
       console.log("tenid=" + r.id + r.firstName);
-      return r.id === this.tenantId();
+      return r.id === tenantId();
     });
     const guarantor = coTenant?.guarantors?.find((g: Guarantor) => {
       console.log("gid=" + g.id);
-      return g.id === this.guarantorId();
+      return g.id === guarantorId();
     }) as Guarantor;
-    this.$store.commit("setSelectedGuarantor", guarantor);
-  }
+    store.setSelectedGuarantor(guarantor);
+  })
 
-  beforeDestroy() {
+  onBeforeUnmount(() => {
     window.Beacon("destroy");
-  }
+  })
 
-  getSubStep() {
-    return Number(this.$route.params.substep) || 0;
+  function getSubStep() {
+    return Number(route.params.substep) || 0;
   }
-  getStep() {
-    return Number(this.$route.params.step) || 0;
+  function getStep() {
+    return Number(route.params.step) || 0;
   }
-  tenantId() {
-    return Number(this.$route.params.tenantId) || 0;
+  function tenantId() {
+    return Number(route.params.tenantId) || 0;
   }
-  guarantorId() {
-    return Number(this.$route.params.guarantorId);
+  function guarantorId() {
+    return Number(route.params.guarantorId);
   }
-  goNext() {
-    this.$router.push({
+  function goNext() {
+    router.push({
       name: "TenantGuarantors",
       params: {
-        tenantId: this.tenantId().toString(),
-        step: this.getStep().toString(),
+        tenantId: tenantId().toString(),
+        step: getStep().toString(),
       },
     });
   }
-}
 </script>
 
 <style lang="scss" scoped>

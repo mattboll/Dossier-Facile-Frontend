@@ -1,7 +1,7 @@
 <template>
   <div class="fr-mb-15w">
     <div>
-      <div v-if="selectedGuarantor.typeGuarantor === 'NATURAL_PERSON'">
+      <div v-if="selectedGuarantor?.typeGuarantor === 'NATURAL_PERSON'">
         <div v-if="substep === 0">
           <TenantGuarantorName
             :tenantId="tenantId"
@@ -64,7 +64,7 @@
           @on-next="nextStep"
         ></GuarantorFooter>
       </div>
-      <div v-if="selectedGuarantor.typeGuarantor === 'LEGAL_PERSON'">
+      <div v-if="selectedGuarantor?.typeGuarantor === 'LEGAL_PERSON'">
         <div v-if="substep === 0">
           <CorporationIdentification
             :tenantId="tenantId"
@@ -115,8 +115,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
 import TenantGuarantorName from "./documents/naturalGuarantor/TenantGuarantorName.vue";
 import RepresentativeIdentification from "./documents/legalPersonGuarantor/RepresentativeIdentification.vue";
 import CorporationIdentification from "./documents/legalPersonGuarantor/CorporationIdentification.vue";
@@ -126,66 +125,45 @@ import GuarantorResidency from "./documents/naturalGuarantor/GuarantorResidency.
 import GuarantorProfessional from "./documents/naturalGuarantor/GuarantorProfessional.vue";
 import GuarantorFinancial from "./documents/naturalGuarantor/GuarantorFinancial.vue";
 import GuarantorTax from "./documents/naturalGuarantor/GuarantorTax.vue";
-import { mapState } from "vuex";
-import { Guarantor } from "df-shared-next/src/models/Guarantor";
 import { User } from "df-shared-next/src/models/User";
-import DfButton from "df-shared-next/src/Button/Button.vue";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
-import VGouvFrButton from "df-shared-next/src/Button/v-gouv-fr-button/VGouvFrButton.vue";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
-import GuarantorChoiceHelp from "./helps/GuarantorChoiceHelp.vue";
-import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal.vue";
-import NakedCard from "df-shared-next/src/components/NakedCard.vue";
-import ProfileContainer from "./ProfileContainer.vue";
 import { DocumentService } from "@/services/DocumentService";
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { ToastService } from "@/services/ToastService";
+import useTenantStore from "@/stores/tenant-store";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-@Component({
-  components: {
-    DfButton,
-    TenantGuarantorName,
-    GuarantorTax,
-    GuarantorFinancial,
-    GuarantorProfessional,
-    GuarantorResidency,
-    GuarantorIdentification,
-    RepresentativeIdentification,
-    CorporationIdentification,
-    OrganismCert,
-    ConfirmModal,
-    VGouvFrButton,
-    GuarantorFooter,
-    GuarantorChoiceHelp,
-    VGouvFrModal,
-    NakedCard,
-    ProfileContainer,
-  },
-  computed: {
-    ...mapState({
-      coTenants: "coTenants",
-      selectedGuarantor: "selectedGuarantor",
-    }),
-  },
-})
-export default class TenantGuarantorDocuments extends Vue {
-  @Prop({ default: 0 }) substep!: number;
-  @Prop() guarantorId!: number;
-  @Prop() tenantId!: number;
+const route = useRoute();
+const router = useRouter();
+const emit = defineEmits(["on-next"]);
+  const store = useTenantStore();
+  const coTenants = computed(() => store.coTenants);
+  const selectedGuarantor = computed(() => store.selectedGuarantor);
 
-  user!: User;
-  coTenants!: User[];
-  selectedGuarantor!: Guarantor;
-  tmpGuarantorType = "";
-  changeGuarantorVisible = false;
-  showNbDocumentsResidency = false;
+  const props = withDefaults(
+    defineProps<{
+      substep: number;
+      guarantorId: number;
+      tenantId: number;
+    }>(),
+    {
+      substep: 0,
+    }
+  );
 
-  validSelect() {
-    this.$store.dispatch("deleteAllGuarantors").then(
+  const user= ref(new User());
+  const tmpGuarantorType = ref("");
+  const changeGuarantorVisible = ref(false);
+  const showNbDocumentsResidency = ref(false);
+
+  function validSelect() {
+    store.deleteAllGuarantors().then(
       () => {
-        this.changeGuarantorVisible = false;
-        if (!this.user.guarantors.length || 0 >= 1) {
-          this.$router.push({ name: "GuarantorChoice" });
+        changeGuarantorVisible.value = false;
+        if (!user.value.guarantors.length || 0 >= 1) {
+          router.push({ name: "GuarantorChoice" });
         }
       },
       () => {
@@ -194,30 +172,33 @@ export default class TenantGuarantorDocuments extends Vue {
     );
   }
 
-  undoSelect() {
-    this.tmpGuarantorType = this.selectedGuarantor.typeGuarantor || "";
-    this.changeGuarantorVisible = false;
+  function undoSelect() {
+    tmpGuarantorType.value = selectedGuarantor.value?.typeGuarantor || "";
+    changeGuarantorVisible.value = false;
   }
 
-  goBack() {
-    if (this.substep > 0) {
-      this.$router.push({
+  function goBack() {
+    if (props.substep > 0) {
+      router.push({
         name: "TenantGuarantorDocuments",
         params: {
-          step: this.$route.params.step,
-          substep: (this.substep - 1).toString(),
-          tenantId: this.$route.params.tenantId,
-          guarantorId: this.$route.params.guarantorId,
+          step: route.params.step,
+          substep: (props.substep - 1).toString(),
+          tenantId: route.params.tenantId,
+          guarantorId: route.params.guarantorId,
         },
       });
     } else {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
 
-  checkResidencyAndGoNext() {
+  function checkResidencyAndGoNext() {
+    if (!selectedGuarantor.value) {
+      return
+    }
     const docs = DocumentService.getGuarantorDocs(
-      this.selectedGuarantor,
+      selectedGuarantor.value,
       "RESIDENCY"
     );
     if (docs.length === 1) {
@@ -228,36 +209,35 @@ export default class TenantGuarantorDocuments extends Vue {
           0
         );
         if ((nbPages || 0) < 3) {
-          this.showNbDocumentsResidency = true;
+          showNbDocumentsResidency.value = true;
           AnalyticsService.missingResidencyDocumentDetected();
           return;
         }
       }
     }
-    this.goNext();
+    goNext();
   }
 
-  cancelAndGoNext() {
+  function cancelAndGoNext() {
     AnalyticsService.forceMissingResidencyDocument();
-    this.goNext();
+    goNext();
   }
 
-  goNext() {
-    this.$router.push({
+  function goNext() {
+    router.push({
       name: "TenantGuarantorDocuments",
       params: {
-        step: this.$route.params.step,
-        substep: (this.substep + 1).toString(),
-        tenantId: this.$route.params.tenantId,
-        guarantorId: this.$route.params.guarantorId,
+        step: route.params.step,
+        substep: (props.substep + 1).toString(),
+        tenantId: route.params.tenantId,
+        guarantorId: route.params.guarantorId,
       },
     });
   }
 
-  nextStep() {
-    this.$emit("on-next");
+  function nextStep() {
+    emit("on-next");
   }
-}
 </script>
 
 <style scoped lang="scss">

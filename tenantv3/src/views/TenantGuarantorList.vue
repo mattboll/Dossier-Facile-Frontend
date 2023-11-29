@@ -49,7 +49,6 @@ import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 
   const props = defineProps<{
-    step: number;
     guarantors: Guarantor[];
   }>();
 
