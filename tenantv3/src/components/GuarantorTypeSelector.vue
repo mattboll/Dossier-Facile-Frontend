@@ -3,7 +3,7 @@
     <RichRadioButtons
       name="guarantor-type-selector"
       v-model="checkedGuarantorType"
-      @input="onButtonSelected"
+      @input="onButtonSelected($event)"
       :elements="guarantorTypeOptions"
     ></RichRadioButtons>
     <ConfirmModal
@@ -80,7 +80,8 @@ import { computed, onBeforeMount, ref } from "vue";
     }
   })
 
-  function onButtonSelected() {
+  function onButtonSelected($event: any) {
+    checkedGuarantorType.value = $event
     if (
       guarantor.value?.typeGuarantor !==checkedGuarantorType.value &&
       (user.value.guarantors.length || 0) > 0 &&

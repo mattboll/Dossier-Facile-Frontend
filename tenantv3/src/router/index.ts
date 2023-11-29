@@ -211,20 +211,20 @@ const router = createRouter({
         /* webpackChunkName: "profile" */ "../views/GuarantorDocumentsPage.vue"
       ),
   },
-  // {
-  //   path: "/info-garant-locataire/:tenantId/:guarantorId/:step/:substep?",
-  //   name: "TenantGuarantorDocuments",
-  //   meta: {
-  //     title: "Édition du garant du locataire - DossierFacile",
-  //     requiresAuth: true,
-  //     hideFooter: true,
-  //     skipLinks: FUNNEL_SKIP_LINKS,
-  //   },
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "profile" */ "../views/TenantGuarantorDocumentsPage.vue"
-  //     ),
-  // },
+  {
+    path: "/info-garant-locataire/:tenantId/:guarantorId/:step/:substep?",
+    name: "TenantGuarantorDocuments",
+    meta: {
+      title: "Édition du garant du locataire - DossierFacile",
+      requiresAuth: true,
+      hideFooter: true,
+      skipLinks: FUNNEL_SKIP_LINKS,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "profile" */ "../views/TenantGuarantorDocumentsPage.vue"
+      ),
+  },
   {
     path: "/public-file/:token",
     name: "File",

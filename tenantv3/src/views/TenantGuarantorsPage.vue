@@ -33,22 +33,13 @@ import { useRoute, useRouter } from "vue-router";
       const store = useTenantStore();
 const coTenants =  computed(() => store.coTenants);
 
-  const guarantors = ref([] as Guarantor[]);
+  const guarantors = computed(() => {
+    return coTenants.value.find((t) => {
+      return t.id === Number(route.params.tenantId);
+    })?.guarantors || [];
+  })
   const route = useRoute();
   const router = useRouter();
-
-  // TODO
-  // @Watch("coTenants")
-  function onCotenantsChange(): any {
-    guarantors.value =
-      coTenants.value.find((t) => {
-        return t.id === Number(route.params.tenantId);
-      })?.guarantors || [];
-  }
-
-  onBeforeMount(() => {
-    onCotenantsChange();
-  })
 
   function getStep() {
     return Number(route.params.step) || 0;
@@ -71,11 +62,11 @@ const coTenants =  computed(() => store.coTenants);
   }
 
   onMounted(() => {
-    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
   })
 
   onBeforeUnmount(() => {
-    // window.Beacon("destroy");
+    window.Beacon("destroy");
   })
 
   function updateGuarantorType(value: string) {
@@ -85,6 +76,10 @@ const coTenants =  computed(() => store.coTenants);
       if (guarantors.value === undefined) {
         return;
       }
+      var guarantorId = "0";
+      if (guarantors.value.length >= 0) {
+        guarantorId = guarantors.value[0].id?.toString() || "0"
+      }
 
       router.push({
         name: "TenantGuarantorDocuments",
@@ -92,7 +87,7 @@ const coTenants =  computed(() => store.coTenants);
           step: getStep().toString(),
           substep: "0",
           tenantId: getTenantId().toString(),
-          guarantorId: guarantors.value[0].id?.toString() || "0",
+          guarantorId: guarantorId,
         },
       });
     }
