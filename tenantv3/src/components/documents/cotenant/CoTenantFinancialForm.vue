@@ -3,7 +3,7 @@
     <DocumentDownloader
       :coTenantId="coTenantId"
       :documentsDefinitions="documentsDefinitions()"
-      :editedDocumentId="financialDocument.id ? financialDocument.id : -1"
+      :editedDocumentId="modelValue.id ? modelValue.id : -1"
       documentCategory="FINANCIAL"
       dispatchMethodName="saveTenantFinancial"
       typeDocument="typeDocumentFinancial"
@@ -13,7 +13,7 @@
       @on-change-document="changeDocument"
     >
       <template v-slot:title>
-        {{ $t("cotenantfinancialform.title") }}
+        {{ t("cotenantfinancialform.title") }}
       </template>
       <template v-slot:after-select-block>
         <NakedCard
@@ -41,12 +41,13 @@
                 <input
                   id="monthlySum"
                   :placeholder="
-                    $tc('cotenantfinancialform.monthlySum.placeholder')
+                    t('cotenantfinancialform.monthlySum.placeholder')
                   "
                   type="number"
                   min="0"
                   step="1"
-                  v-model="financialDocument.monthlySum"
+                  :value="modelValue.monthlySum"
+                  @on-update="emit('update:modelValue', $event)"
                   name="monthlySum"
                   class="validate-required form-control fr-input"
                   :class="{
@@ -57,19 +58,19 @@
                   required
                 />
                 <span class="fr-error-text" v-if="errors[0]">{{
-                  $t(errors[0])
+                  t(errors[0])
                 }}</span>
                 <span
                   class="fr-error-text"
                   v-if="
-                    financialDocument
-                      ? financialDocument.monthlySum
-                        ? financialDocument.monthlySum > 10000
+                    modelValue
+                      ? modelValue.monthlySum
+                        ? modelValue.monthlySum > 10000
                         : false
                       : false
                   "
                 >
-                  {{ $t("cotenantfinancialform.high-salary") }}
+                  {{ t("cotenantfinancialform.high-salary") }}
                 </span>
               </div>
             </validation-provider>
@@ -87,7 +88,7 @@
             >
               <div class="fr-input-group">
                 <label class="fr-label" for="customTextNoDocument">
-                  {{ $t("cotenantfinancialform.has-no-income") }}
+                  {{ t("cotenantfinancialform.has-no-income") }}
                 </label>
                 <textarea
                   v-model="document.customText"
@@ -124,130 +125,130 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DocumentType } from "df-shared-next/src/models/Document";
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import DocumentDownloader from "./DocumentDownloader.vue";
 // import { ValidationObserver, ValidationProvider } from "vee-validate";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";
-import { ref } from "@vue/reactivity";
 import { UtilsService } from "@/services/UtilsService";
 import { useLoading } from 'vue-loading-overlay';
+import { ref } from "vue";
+import useTenantStore from "@/stores/tenant-store";
+import { useI18n } from "vue-i18n";
+import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
+import { ToastService } from "@/services/ToastService";
+const store = useTenantStore();
+const emit = defineEmits(["on-next", "on-back", "update:modelValue"]);
+const { t } = useI18n();
 
-@Component({
-  components: {
-    NakedCard,
-    ValidationObserver,
-    ValidationProvider,
-    DocumentDownloader,
-    FooterContainer,
-    BackNext,
-  },
-})
-export default class CoTenantFinancialForm extends Vue {
-  @Prop() coTenantId!: number;
-  @Prop() financialDocument!: DfDocument;
-  @Prop() allowNoIncome!: boolean;
+  const props = defineProps<{
+    coTenantId: number;
+    modelValue: DfDocument;
+    allowNoIncome: boolean;
+  }>();
 
-  documentType?: DocumentType;
-  document!: DfDocument;
-  showDownloader = false;
+  const documentType = ref(new DocumentType());
+  const document = ref(new DfDocument());
+  const showDownloader = ref(false);
 
-  documentsDefinitions() {
+  function documentsDefinitions() {
     return DocumentTypeConstants.FINANCIAL_DOCS.filter((d: DocumentType) => {
-      return d.key !== "no-income" || this.allowNoIncome;
+      return d.key !== "no-income" || props.allowNoIncome;
     });
   }
 
-  changeDocument(docType?: DocumentType, doc?: DfDocument) {
-    this.documentType = docType;
-    this.document = doc as DfDocument;
-    this.updateMonthlySum();
+  function changeDocument(docType?: DocumentType, doc?: DfDocument) {
+    if (!docType) {
+      return
+    }
+
+    documentType.value = docType;
+    document.value = doc as DfDocument;
+    updateMonthlySum();
   }
 
-  updateMonthlySum() {
-    this.showDownloader = Boolean(
-      this.documentType?.key &&
-        this.documentType?.key !== "no-income" &&
-        !!this.financialDocument.monthlySum &&
-        this.financialDocument.monthlySum >= 0
+  function updateMonthlySum() {
+    showDownloader.value = Boolean(
+      documentType.value?.key &&
+        documentType.value?.key !== "no-income" &&
+        !!props.modelValue.monthlySum &&
+        props.modelValue.monthlySum >= 0
     );
   }
 
-  enrichFormData(formData: FormData) {
-    if (this.documentType?.key === "no-income") {
-      this.document.noDocument = true;
-      this.document.monthlySum = 0;
+  function enrichFormData(formData: FormData) {
+    if (documentType.value?.key === "no-income") {
+      document.value.noDocument = true;
+      document.value.monthlySum = 0;
     }
     formData.append(
       "noDocument",
-      this.document?.noDocument === true ? "true" : "false"
+      document.value?.noDocument === true ? "true" : "false"
     );
     if (
-      this.documentType?.key === "no-income" &&
-      (!this.document.customText || this.document.customText.length < 0)
+      documentType.value?.key === "no-income" &&
+      (!document.value.customText || document.value.customText.length < 0)
     ) {
       formData.append("customText", "-");
     } else {
-      formData.append("customText", this.document.customText as string);
+      formData.append("customText", document.value.customText as string);
     }
     if (
-      this.financialDocument.monthlySum !== undefined &&
-      this.financialDocument.monthlySum >= 0
+      props.modelValue.monthlySum !== undefined &&
+      props.modelValue.monthlySum >= 0
     ) {
       formData.append(
         "monthlySum",
-        this.financialDocument.monthlySum.toString()
+        props.modelValue.monthlySum.toString()
       );
     }
   }
 
-  getMonthlySumLabel() {
-    const docType = this.documentType?.key;
-    let label = this.$tc("cotenantfinancialform.monthlySum.label");
+  function getMonthlySumLabel() {
+    const docType = documentType.value?.key;
+    let label = t("cotenantfinancialform.monthlySum.label");
     if (docType === "salary" || docType === "pension" || docType === "rent") {
       label += " ";
-      label += this.$tc("cotenantfinancialform.monthlySum.label-tax");
+      label += t("cotenantfinancialform.monthlySum.label-tax");
     }
     return label;
   }
 
-  goBack() {
-    this.$emit("on-back");
+  function goBack() {
+    emit("on-back");
   }
 
-  goNext() {
+  function goNext() {
     // push data if there is not files in documents - noDocument
     // TODO : we should have local value for monthlySum and customText and check for update
     // to know if we have to save or not
     if (
-      this.document?.noDocument === true ||
-      this.documentType?.key === "no-income" ||
-      (this.financialDocument.monthlySum !== undefined &&
-        this.financialDocument.monthlySum > 0) ||
-      (this.document.customText !== undefined &&
-        this.document.customText.length > 0)
+      document.value?.noDocument === true ||
+      documentType.value?.key === "no-income" ||
+      (props.modelValue.monthlySum !== undefined &&
+        props.modelValue.monthlySum > 0) ||
+      (document.value.customText !== undefined &&
+        document.value.customText.length > 0)
     ) {
       const formData = new FormData();
-      this.enrichFormData(formData);
+      enrichFormData(formData);
 
       formData.append(
         "typeDocumentFinancial",
-        this.documentType?.value as string
+        documentType.value?.value as string
       );
-      if (this.document.id && this.document.id > 0) {
-        formData.append("id", this.document.id.toString());
+      if (document.value.id && document.value.id > 0) {
+        formData.append("id", document.value.id.toString());
       }
-      formData.append("tenantId", this.coTenantId.toString());
+      formData.append("tenantId", props.coTenantId.toString());
     const $loading = useLoading({});
     const loader = $loading.show();
 
-      this.$store
-        .dispatch("saveTenantFinancial", formData)
+      store
+        .saveTenantFinancial(formData)
         .then(() => {
           ToastService.success();
         })
@@ -256,13 +257,12 @@ export default class CoTenantFinancialForm extends Vue {
         })
         .finally(() => {
           loader.hide();
-          this.$emit("on-next");
+          emit("on-next");
         });
     } else {
-      this.$emit("on-next");
+      emit("on-next");
     }
   }
-}
 </script>
 
 <style scoped lang="scss">

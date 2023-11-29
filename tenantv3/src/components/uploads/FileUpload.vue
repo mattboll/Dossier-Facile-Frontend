@@ -35,7 +35,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 const emit = defineEmits(["reset-files", "add-files"]);
 
-const props = withDefaults(defineProps<{ currentStatus: number, page: number, size: number }>(), {
+const props = withDefaults(defineProps<{ currentStatus: number, page?: number, size: number }>(), {
     currentStatus: UploadStatus.STATUS_INITIAL,
     page: 0,
     size: 10,

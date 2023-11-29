@@ -3,7 +3,7 @@
     <div v-if="editFinancialDocument">
       <CoTenantFinancialForm
         :coTenantId="coTenantId"
-        :financialDocument="financialDocument"
+        v-model="financialDocument"
         :allowNoIncome="allowNoIncome()"
         @on-edit="setEditFinancialDocument"
         @on-next="goNext"
