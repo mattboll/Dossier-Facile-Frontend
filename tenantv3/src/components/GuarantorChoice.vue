@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <div ref="guarantor-body-content">
+      <div ref="guarantorbodycontent">
         <NakedCard class="fr-p-md-5w">
           <div class="text-bold fr-mb-1w">
             <h1 class="fr-h5">
@@ -63,7 +63,7 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
 import useTenantStore from "@/stores/tenant-store";
-import { computed, onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, onUpdated, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -73,16 +73,15 @@ const guarantor = computed(() => store.guarantor);
 const coTenants = computed(() => store.coTenants);
 
   const tmpGuarantorType = ref("");
+const guarantorbodycontent = ref();
 
-  function updated() {
+  onUpdated(() => {
     // each dom update involved a scrollToEnd
-    // TODO
-    // this.$nextTick(() => this.scrollToEnd());
-  }
+    scrollToEnd();
+  })
+
   function scrollToEnd() {
-    // TODO
-    // const element: any = this.$refs["guarantor-body-content"];
-    // window.scrollTo(0, element.lastElementChild.offsetTop);
+    guarantorbodycontent.value?.scrollIntoView({ behavior: "smooth" });
   }
 
   onBeforeMount(() => {
