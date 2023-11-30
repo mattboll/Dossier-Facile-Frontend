@@ -9,6 +9,7 @@
         @on-next="goNext"
         @on-back="goBack"
       ></CoTenantFinancialForm>
+      {{  financialDocument }}
     </div>
     <div v-else>
       <NakedCard class="fr-p-md-5w fr-mb-3w">

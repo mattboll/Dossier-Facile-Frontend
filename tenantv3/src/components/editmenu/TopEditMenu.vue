@@ -150,7 +150,7 @@
         ref="td1"
         :co-tenant="coTenants[0]"
         document-type="IDENTITY"
-        substep="1"
+        :substep="1"
         :active="getCurrentSubStep() === 1"
       />
       <CoTenantDocumentLink
@@ -158,7 +158,7 @@
         ref="td1"
         :co-tenant="coTenants[0]"
         document-type="RESIDENCY"
-        substep="2"
+        :substep="2"
         :active="getCurrentSubStep() === 2"
       />
       <CoTenantDocumentLink
@@ -166,7 +166,7 @@
         ref="td1"
         :co-tenant="coTenants[0]"
         document-type="PROFESSIONAL"
-        substep="3"
+        :substep="3"
         :active="getCurrentSubStep() === 3"
       />
       <CoTenantDocumentLink
@@ -174,7 +174,7 @@
         ref="td1"
         :co-tenant="coTenants[0]"
         document-type="FINANCIAL"
-        substep="4"
+        :substep="4"
         :active="getCurrentSubStep() === 4"
       />
       <CoTenantDocumentLink
@@ -182,7 +182,7 @@
         ref="td1"
         :co-tenant="coTenants[0]"
         document-type="TAX"
-        substep="5"
+        :substep="5"
         :active="getCurrentSubStep() === 5"
       />
     </div>
@@ -202,7 +202,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTITY"
-          substep="1"
+          :substep="1"
           :active="getGuarantorCurrentStep(1, selectedGuarantor)"
         />
         <CoTenantGuarantorDocumentLink
@@ -211,7 +211,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="RESIDENCY"
-          substep="2"
+          :substep="2"
           :active="getGuarantorCurrentStep(2, selectedGuarantor)"
         />
         <CoTenantGuarantorDocumentLink
@@ -220,7 +220,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="PROFESSIONAL"
-          substep="3"
+          :substep="3"
           :active="getGuarantorCurrentStep(3, selectedGuarantor)"
         />
         <CoTenantGuarantorDocumentLink
@@ -229,7 +229,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="FINANCIAL"
-          substep="4"
+          :substep="4"
           :active="getGuarantorCurrentStep(4, selectedGuarantor)"
         />
         <CoTenantGuarantorDocumentLink
@@ -238,7 +238,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="TAX"
-          substep="5"
+          :substep="5"
           :active="getGuarantorCurrentStep(5, selectedGuarantor)"
         />
       </div>
@@ -253,7 +253,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTIFICATION_LEGAL_PERSON"
-          substep="0"
+          :substep="0"
           :active="getGuarantorCurrentStep(0, selectedGuarantor)"
         />
         <CoTenantGuarantorDocumentLink
@@ -262,7 +262,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTIFICATION"
-          substep="1"
+          :substep="1"
           :active="getGuarantorCurrentStep(1, selectedGuarantor)"
         />
       </div>
@@ -277,7 +277,7 @@
           :guarantor="selectedGuarantor"
           :co-tenant="getCoTenant(0)"
           document-type="IDENTIFICATION_ORGANISM"
-          substep="0"
+          :substep="0"
           :active="getGuarantorCurrentStep(0, selectedGuarantor)"
         />
       </div>

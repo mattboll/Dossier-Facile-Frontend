@@ -237,12 +237,12 @@ const store = useTenantStore();
     editedDocumentId?: number;
     dispatchMethodName: string;
     typeDocument: string;
-    listType: string;
-    showDownloader: boolean;
-    allowNoDocument: boolean;
-    forceShowDownloader: boolean;
+    listType?: string;
+    showDownloader?: boolean;
+    allowNoDocument?: boolean;
+    forceShowDownloader?: boolean;
     testAvisSituation?: boolean;
-    translationKeyPrefix: string;
+    translationKeyPrefix?: string;
   }>(), {
     listType: "default",
     showDownloader: true,

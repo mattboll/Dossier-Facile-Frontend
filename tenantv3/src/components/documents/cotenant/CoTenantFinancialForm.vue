@@ -32,7 +32,7 @@
             name="monthlySum"
             v-slot="{ field, meta }"
                   :value="modelValue.monthlySum"
-                  v-on:input="emit('update:modelValue', $event)"
+                  v-on:input="setMonthlySum($event)"
             :rules="{
               required: true,
             }"
@@ -55,7 +55,6 @@
                     'fr-input--valid': meta.valid,
                     'fr-input--error': !meta.valid,
                   }"
-                  @input="updateMonthlySum"
                   required
                 />
               </Field>
@@ -179,7 +178,7 @@ const { t } = useI18n();
   }
 
   function updateMonthlySum() {
-    console.dir(documentType.value)
+    // console.dir(document.value)
     showDownloader.value = Boolean(
       documentType.value?.key &&
         documentType.value?.key !== "no-income" &&
@@ -215,6 +214,14 @@ const { t } = useI18n();
       );
     }
   }
+
+function setMonthlySum($event: any) {
+  console.dir(document.value)
+  document.value.monthlySum = $event.target.value
+  console.dir(document.value)
+  emit('update:modelValue', document.value)
+  updateMonthlySum()
+}
 
   function getMonthlySumLabel() {
     const docType = documentType.value?.key;

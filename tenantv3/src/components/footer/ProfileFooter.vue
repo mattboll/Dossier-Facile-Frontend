@@ -18,8 +18,8 @@ import BackNext from "./BackNext.vue";
 
   const props = withDefaults(
     defineProps<{
-      showBack: boolean;
-      disabled: boolean;
+      showBack?: boolean;
+      disabled?: boolean;
       nextLabel?: string;
     }>(),
     {
