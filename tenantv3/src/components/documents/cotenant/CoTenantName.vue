@@ -14,7 +14,7 @@
             <div class="fr-col-12 fr-mb-3w">
               <TextField
                 name="lastname"
-                :fieldLabel="$tc('cotenantname.lastname')"
+                :fieldLabel="$t('cotenantname.lastname')"
                 validation-rules="onlyAlpha"
                 v-model.trim="lastName"
                 :required="true"
@@ -31,7 +31,7 @@
             <div class="fr-col-12 fr-mb-3w" v-if="displayPreferredNameField">
               <TextField
                 name="preferredname"
-                :fieldLabel="$tc('cotenantname.preferredname')"
+                :fieldLabel="$t('cotenantname.preferredname')"
                 validation-rules="onlyAlpha"
                 v-model.trim="preferredName"
               >
@@ -49,7 +49,7 @@
             <div class="fr-col-12 fr-mb-3w">
               <TextField
                 name="firstname"
-                :fieldLabel="$tc('cotenantname.firstname')"
+                :fieldLabel="$t('cotenantname.firstname')"
                 validation-rules="onlyAlpha"
                 v-model.trim="firstName"
                 :required="true"
