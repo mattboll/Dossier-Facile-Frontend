@@ -109,7 +109,7 @@ const route = useRoute();
         name: "CoTenantDocuments",
         params: {
           substep: Number(getSubStep() - 1).toString(),
-          tenantId: getTenantId(),
+          tenantId: getTenantId().toString(),
         },
       });
       return;
@@ -125,7 +125,7 @@ const route = useRoute();
         name: "CoTenantDocuments",
         params: {
           substep: Number(getSubStep() + 1).toString(),
-          tenantId: getTenantId(),
+          tenantId: getTenantId().toString(),
         },
       });
       return;
