@@ -11,7 +11,7 @@
       <ul class="fr-btns-group">
         <li>
           <DfButton
-            v-if="hasClickEditionListener"
+            v-if="onClickEdit"
             @on-click="$emit('click-edit')"
           >
             <i class="ri-pencil-line fr-mr-1w" aria-hidden="true"></i>
@@ -22,7 +22,7 @@
     </div>
     <div class="desktop fr-col-12 fr-col-md-2 fr-btns-group--right">
       <DfButton
-        v-if="hasClickEditionListener"
+        v-if="onClickEdit"
         @on-click="$emit('click-edit')"
       >
         <i class="ri-pencil-line fr-mr-1w" aria-hidden="true"></i>
@@ -39,13 +39,9 @@ const props =
   defineProps<{
     label: string,
     subLabel?: string,
+    onClickEdit?: Function
   }>();
 
-  function hasClickEditionListener() {
-    // TODO
-    // return props.$listeners && props.$listeners["click-edit"];
-    return false;
-  }
 </script>
 
 <style lang="scss">

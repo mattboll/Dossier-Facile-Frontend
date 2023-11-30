@@ -146,16 +146,6 @@ const router = useRouter();
   })
 
   async function handleOthersInformation() {
-    // const isValid = await (
-      // TODO
-      // this.$refs.observer as Vue & {
-      //   validate: () => boolean;
-      // }
-    // ).validate();
-    const isValid = true;
-
-    if (!isValid) return;
-
     if (hasNothingToSave()) {
       router.push({
         name: "TenantDocuments",
