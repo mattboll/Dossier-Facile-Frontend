@@ -195,7 +195,7 @@ const emit = defineEmits(["update:modelValue"]);
   const showCheckBox = ref(false);
   const disableNameFields = ref(false);
   const disableEmailField = ref(false);
-const checkboxauthorize = ref(null);
+const checkboxauthorize = ref();
 
   onMounted(() => {
     if ((user.value.apartmentSharing?.tenants.length || 0) > 1) {
@@ -215,18 +215,17 @@ const checkboxauthorize = ref(null);
   })
 
   function scrollToEnd() {
-    // TODO
-    // window.scrollTo(0, checkboxauthorize.value?.lastElementChild.offsetTop);
+    if (!checkboxauthorize.value) {
+      return;
+    }
+    checkboxauthorize.value.scrollIntoView({ behavior: "smooth" });
   }
 
   function handleInput() {
     emit("update:modelValue", [coTenant.value]);
     if (coTenant.value.email?.length > 0) {
       showCheckBox.value = true;
-      // TODO
-      // this.$nextTick(function () {
-      //   scrollToEnd();
-      // });
+      scrollToEnd();
     } else {
       showCheckBox.value = false;
     }
