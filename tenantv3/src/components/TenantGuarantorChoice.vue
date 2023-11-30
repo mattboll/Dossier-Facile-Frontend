@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <div ref="guarantor-body-content">
+      <div ref="guarantorbodycontent">
         <NakedCard class="fr-p-md-5w">
           <div class="text-bold fr-mb-1w">
             <h1 class="fr-h5">
@@ -31,7 +31,7 @@
         </NakedCard>
         <div
           v-if="tmpGuarantorType === 'NO_GUARANTOR'"
-          class="bg-purple fr-mt-3w fr-p-5w"
+          class="bg-purple fr-mt-3w fr-mb-5w fr-p-5w"
         >
           <div class="fr-grid-row space-between">
             <div class="fr-h5">
@@ -67,7 +67,7 @@ import { AnalyticsService } from "../services/AnalyticsService";
 import GuarantorFooter from "./footer/GuarantorFooter.vue";
 import GuarantorTypeSelector from "@/components/GuarantorTypeSelector.vue";
 import { ToastService } from "@/services/ToastService";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, onUpdated, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
 
   const props = withDefaults(defineProps<{
@@ -80,25 +80,18 @@ import useTenantStore from "@/stores/tenant-store";
   const store = useTenantStore();
 
   const tmpGuarantorType = ref("");
-
-  function getLocalStorageKey() {
-    return "cotenantGuarantorType_" + props.tenantId;
-  }
+const guarantorbodycontent = ref();
 
   onBeforeMount(() => {
     store.updateSelectedGuarantor(props.tenantId);
   })
 
-  function updated() {
-    // each dom update involved a scrollToEnd
-    // TODO
-    // this.$nextTick(() => this.scrollToEnd());
-  }
+  onUpdated(() => {
+    scrollToEnd();
+  })
 
   function scrollToEnd() {
-    // TODO
-    // const element: any = this.$refs["guarantor-body-content"];
-    // window.scrollTo(0, element.lastElementChild.offsetTop);
+    guarantorbodycontent.value?.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
   function setGuarantorType() {

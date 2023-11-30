@@ -98,14 +98,13 @@
 
         <div class="fr-col-12 fr-col-xl-5 btn-container">
           <div class="fr-grid-row fr-grid-row--right">
-            <!-- TODO
-                :disabled="invalid" -->
             <v-gouv-fr-button
               class="full-width-xs"
               :fullWidth="isMobile()"
               :secondary="true"
               :label="$t('roommatesinformation.add-a-roommate')"
               :btn-type="'button'"
+              :disabled="invalidEmail || !newRoommate"
               @click="addMail"
             ></v-gouv-fr-button>
           </div>
@@ -156,7 +155,7 @@ import VGouvFrModal from "df-shared-next/src/GouvFr/v-gouv-fr-modal/VGouvFrModal
 import { UtilsService } from "../services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onMounted, ref } from "vue";
-import { Field, ErrorMessage } from "vee-validate";
+import { Field, ErrorMessage, useFieldError } from "vee-validate";
 
 const emit = defineEmits(["update:modelValue"]);
 
@@ -171,6 +170,8 @@ const props = withDefaults(defineProps<{ modelValue: User[] }>(), {
 const authorize = ref(false);
 const newRoommate = ref("");
 const showEmailExists = ref(false);
+
+const invalidEmail = useFieldError("email");
 
 onMounted(() => {
   authorize.value = coTenantAuthorize.value;
