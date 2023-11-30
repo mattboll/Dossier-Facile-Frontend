@@ -179,6 +179,7 @@ const { t } = useI18n();
   }
 
   function updateMonthlySum() {
+    console.dir(documentType.value)
     showDownloader.value = Boolean(
       documentType.value?.key &&
         documentType.value?.key !== "no-income" &&

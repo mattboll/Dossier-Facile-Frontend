@@ -241,7 +241,7 @@ const store = useTenantStore();
     showDownloader: boolean;
     allowNoDocument: boolean;
     forceShowDownloader: boolean;
-    testAvisSituation: boolean;
+    testAvisSituation?: boolean;
     translationKeyPrefix: string;
   }>(), {
     listType: "default",

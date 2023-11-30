@@ -166,7 +166,7 @@ const route = useRoute();
   }
 
   function getTenantId() {
-    return route.params.tenantId;
+    return Number(route.params.tenantId);
   }
 
   function getStep() {
