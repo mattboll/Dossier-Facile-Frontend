@@ -9,34 +9,21 @@
 
         <div class="fr-mt-3w">
           <div v-if="listType == 'dropDownList'">
-            <validation-provider
-              rules="select"
-              name="professionalDocument"
-              v-slot="{ errors, valid }"
-            >
               <select
-                v-model="document"
+                :value="document"
+            @input="onSelectChange($event)"
                 class="fr-select fr-mb-3w fr-mt-3w"
-                :class="{
-                  'fr-select--valid': valid,
-                  'fr-select--error': errors[0],
-                }"
                 id="select"
                 as="select"
-                @change="onSelectChange()"
               >
                 <option
                   v-for="d in documentsDefinitions"
                   :value="d"
                   :key="d.key"
                 >
-                  {{ $parent.$t(d.key) }}
+                  {{ $t(d.key) }}
                 </option>
               </select>
-              <span class="fr-error-text" v-if="errors[0]">
-                {{ $t(errors[0]) }}
-              </span>
-            </validation-provider>
           </div>
           <SimpleRadioButtons
             v-if="listType !== 'dropDownList'"
@@ -119,20 +106,24 @@
           !forceShowDownloader && (dfDocument ? dfDocument.noDocument : null)
         "
       >
-        <validation-provider
-          :rules="{ required: true }"
-          v-slot="{ errors, valid }"
-        >
           <div class="fr-input-group">
             <label class="fr-label" for="customText">
               {{ $t(`cotenantfinancialform.customText-${document.key}`) }}
             </label>
+          <Field
+            name="customText"
+            v-model="dfDocument.customText"
+            v-slot="{ field, meta }"
+            :rules="{
+              required: true,
+            }"
+          >
             <textarea
-              v-model="dfDocument.customText"
+              v-bind="field"
               class="form-control fr-input validate-required"
               :class="{
-                'fr-input--valid': valid,
-                'fr-input--error': errors[0],
+                'fr-input--valid': meta.valid,
+                'fr-input--error': !meta.valid,
               }"
               id="customText"
               name="customText"
@@ -152,11 +143,11 @@
               }}
               / 2000</span
             >
-            <span class="fr-error-text" v-if="errors[0]">{{
-              $t(errors[0])
-            }}</span>
+              </Field>
+            <ErrorMessage name="customText" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
           </div>
-        </validation-provider>
       </div>
 
       <slot name="after-downloader"></slot>
@@ -220,10 +211,8 @@ import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedR
 import { UploadStatus } from "df-shared-next/src/models/UploadStatus";
 import { User } from "df-shared-next/src/models/User";
 import { cloneDeep } from "lodash";
-import DocumentInsert from "../share/DocumentInsert.vue";
 import FileUpload from "../../uploads/FileUpload.vue";
 import ListItem from "../../uploads/ListItem.vue";
-import { ValidationProvider } from "vee-validate";
 import ConfirmModal from "df-shared-next/src/components/ConfirmModal.vue";
 import DfButton from "df-shared-next/src/Button/Button.vue";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
@@ -237,6 +226,7 @@ import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 const store = useTenantStore();
 

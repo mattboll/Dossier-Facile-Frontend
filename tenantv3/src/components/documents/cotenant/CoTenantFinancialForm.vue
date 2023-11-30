@@ -25,16 +25,19 @@
           "
         >
           <div>
-            <validation-provider
-              :rules="{ required: true, regex: /^[0-9 ]+$/ }"
-              v-slot="{ errors, valid }"
-            >
               <div
                 class="fr-input-group"
-                :class="{
-                  'fr-input-group--error': errors[0],
-                }"
               >
+          <Field
+            name="monthlySum"
+            v-slot="{ field, meta }"
+                  :value="modelValue.monthlySum"
+                  @on-update="emit('update:modelValue', $event)"
+            :rules="{
+              required: true,
+              numeric: true
+            }"
+          >
                 <label for="monthlySum" class="fr-label">
                   {{ getMonthlySumLabel() }} :
                 </label>
@@ -46,20 +49,20 @@
                   type="number"
                   min="0"
                   step="1"
-                  :value="modelValue.monthlySum"
-                  @on-update="emit('update:modelValue', $event)"
+                  v-bind="field"
                   name="monthlySum"
                   class="validate-required form-control fr-input"
                   :class="{
-                    'fr-input--valid': valid,
-                    'fr-input--error': errors[0],
+                    'fr-input--valid': meta.valid,
+                    'fr-input--error': !meta.valid,
                   }"
                   @input="updateMonthlySum"
                   required
                 />
-                <span class="fr-error-text" v-if="errors[0]">{{
-                  t(errors[0])
-                }}</span>
+              </Field>
+            <ErrorMessage name="monthlySum" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
                 <span
                   class="fr-error-text"
                   v-if="
@@ -73,7 +76,6 @@
                   {{ t("cotenantfinancialform.high-salary") }}
                 </span>
               </div>
-            </validation-provider>
           </div>
         </NakedCard>
 
@@ -81,22 +83,26 @@
           v-else-if="documentType ? documentType.key === 'no-income' : false"
           class="fr-p-md-5w fr-mb-3w fr-mt-3w"
         >
-          <ValidationObserver v-slot="{ validate, valid }">
-            <form
+            <Form
               name="customTextForm"
-              @submit.prevent="validate().then(goNext())"
+              @submit="goNext"
             >
               <div class="fr-input-group">
                 <label class="fr-label" for="customTextNoDocument">
                   {{ t("cotenantfinancialform.has-no-income") }}
                 </label>
+          <Field
+            name="customTextNoDocument"
+            v-model="document.customText"
+            v-slot="{ field, meta }"
+          >
                 <textarea
-                  v-model="document.customText"
+                  v-bind="field"
                   maxlength="2000"
                   rows="3"
                   class="form-control fr-input validate-required"
                   :class="{
-                    'fr-input--valid': valid,
+                    'fr-input--valid': meta.valid,
                   }"
                   id="customTextNoDocument"
                   name="customText"
@@ -111,9 +117,12 @@
                   }}
                   / 2000</span
                 >
+              </Field>
+            <ErrorMessage name="customTextNoDocument" v-slot="{ message }">
+              <span role="alert" class="fr-error-text">{{ $t(message || "") }}</span>
+            </ErrorMessage>
               </div>
-            </form>
-          </ValidationObserver>
+            </Form>
         </NakedCard>
       </template>
       <template v-slot:after-downloader> </template>
@@ -129,7 +138,6 @@
 import { DfDocument } from "df-shared-next/src/models/DfDocument";
 import { DocumentType } from "df-shared-next/src/models/Document";
 import DocumentDownloader from "./DocumentDownloader.vue";
-// import { ValidationObserver, ValidationProvider } from "vee-validate";
 import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import FooterContainer from "../../footer/FooterContainer.vue";
 import BackNext from "../../footer/BackNext.vue";
@@ -140,6 +148,7 @@ import useTenantStore from "@/stores/tenant-store";
 import { useI18n } from "vue-i18n";
 import { DocumentTypeConstants } from "../share/DocumentTypeConstants";
 import { ToastService } from "@/services/ToastService";
+import { Form, Field, ErrorMessage } from "vee-validate";
 const store = useTenantStore();
 const emit = defineEmits(["on-next", "on-back", "update:modelValue"]);
 const { t } = useI18n();
