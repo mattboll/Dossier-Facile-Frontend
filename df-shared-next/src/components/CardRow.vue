@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import NakedCard from "./NakedCard.vue";
 
-const props = withDefaults(defineProps<{ danger: boolean }>(), {
+const props = withDefaults(defineProps<{ danger?: boolean }>(), {
   danger: false,
 });
 const emit = defineEmits(["edit", "remove"]);
