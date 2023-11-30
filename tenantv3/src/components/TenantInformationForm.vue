@@ -189,20 +189,21 @@ const router = useRouter();
       .then(
         () => {
           AnalyticsService.confirmType();
+          loader.hide();
+          // TODO : keep toast when changing route
+          if (applicationType.value === "COUPLE") {
+            ToastService.info("tenantinformationform.couple-saved");
+          }
+          if (applicationType.value === "GROUP") {
+            ToastService.info("tenantinformationform.roommates-saved");
+          }
           router.push({
             name: "TenantDocuments",
             params: { substep: "1" },
           });
-          if (applicationType.value === "COUPLE") {
-            ToastService.info("tenantinformationform.couple-saved");
-            return;
-          }
-          if (applicationType.value === "GROUP") {
-            ToastService.info("tenantinformationform.roommates-saved");
-            return;
-          }
         },
         (error) => {
+          loader.hide();
           if (error.response.data.message.includes("are already being used")) {
             ToastService.error("tenantinformationform.email-exists")
             return;
@@ -212,9 +213,6 @@ const router = useRouter();
           }
         }
       )
-      .finally(() => {
-        loader.hide();
-      });
   }
 
   function updateApplicationType(value: string) {
