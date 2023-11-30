@@ -10,8 +10,8 @@
         <div class="fr-mt-3w">
           <div v-if="listType == 'dropDownList'">
               <select
-                :value="document"
-            @input="onSelectChange($event)"
+                v-model="document"
+                @input="onSelectChange($event.target?.value)"
                 class="fr-select fr-mb-3w fr-mt-3w"
                 id="select"
                 as="select"
@@ -226,7 +226,7 @@ import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
 import { computed, onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
-import { Form, Field, ErrorMessage } from "vee-validate";
+import { Field, ErrorMessage } from "vee-validate";
 
 const store = useTenantStore();
 

@@ -32,10 +32,9 @@
             name="monthlySum"
             v-slot="{ field, meta }"
                   :value="modelValue.monthlySum"
-                  @on-update="emit('update:modelValue', $event)"
+                  v-on:input="emit('update:modelValue', $event)"
             :rules="{
               required: true,
-              numeric: true
             }"
           >
                 <label for="monthlySum" class="fr-label">
