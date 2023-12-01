@@ -1065,7 +1065,8 @@
   },
   "showdoc": {
     "preview": "Document Preview",
-    "number-of-pages": "Preview page 1 / {0}"
+    "number-of-pages": "Preview page 1 / {0}",
+    "loading": "Loading"
   },
   "signuppage": {
     "connect": "Already registered? Log in",

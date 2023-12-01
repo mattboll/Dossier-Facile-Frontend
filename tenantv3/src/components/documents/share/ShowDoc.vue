@@ -8,11 +8,12 @@
             v-if="isImage()"
             :alt="$t('showdoc.preview')"
           />
-          <!-- TODO -->
-          <!-- <PdfViewer
+          <div v-if="!isImage()">
+          <div v-if="!isLoaded">{{ $t("showdoc.loading") }}</div>
+          <PdfViewer v-if="isLoaded"
             :src="pdfContent"
-            v-if="!isImage() && isLoaded"
-          ></PdfViewer> -->
+          ></PdfViewer>
+          </div>
         </div>
         <div v-else>
           <div v-if="file?.numberOfPages && file?.numberOfPages > 0">
@@ -27,7 +28,7 @@
 
 <script setup lang="ts">
 import { DfFile } from "df-shared-next/src/models/DfFile";
-// import PdfViewer from "../../PdfViewer.vue";
+import PdfViewer from "../../PdfViewer.vue";
 import AuthImage from "df-shared-next/src/components/AuthImage.vue";
 import { ImageService } from "../../../services/ImageService";
 import axios from "axios";

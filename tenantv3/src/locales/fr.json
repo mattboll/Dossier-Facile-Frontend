@@ -1125,7 +1125,8 @@
   },
   "showdoc": {
     "preview": "Prévisualisation du document",
-    "number-of-pages": "Prévisualisation page 1 / {0}"
+    "number-of-pages": "Prévisualisation page 1 / {0}",
+    "loading": "Chargement du fichier en cours"
   },
   "signuppage": {
     "connect": "Déjà inscrit ? Se connecter",
