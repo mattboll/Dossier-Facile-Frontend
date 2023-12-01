@@ -10,15 +10,15 @@
         <div class="fr-mt-3w">
           <div v-if="listType == 'dropDownList'">
               <select
-                v-model="document"
-                @input="onSelectChange($event.target?.value)"
+                :value="document.key"
+                @change="onSelectChange($event.target?.value)"
                 class="fr-select fr-mb-3w fr-mt-3w"
                 id="select"
                 as="select"
               >
                 <option
                   v-for="d in documentsDefinitions"
-                  :value="d"
+                  :value="d.key"
                   :key="d.key"
                 >
                   {{ $t(d.key) }}
@@ -29,7 +29,7 @@
             v-if="listType !== 'dropDownList'"
             name="application-type-selector"
             :value="document"
-            @input="onSelectChange($event)"
+            @input="onEventChange($event)"
             :elements="mapDocuments()"
           ></SimpleRadioButtons>
         </div>
@@ -288,8 +288,13 @@ const store = useTenantStore();
     }
     emit("on-change-document", document.value, dfDocument.value);
   }
+function onSelectChange($event: any) {
+    const d = props.documentsDefinitions.find((d: any) => d.key === $event);
+    console.dir(d)
+    onEventChange(d)
+}
 
-  function onSelectChange($event: any) {
+  function onEventChange($event: any) {
     document.value = $event
     if (selectedCoTenant.value?.documents !== null) {
       const doc = getDocument();

@@ -16,26 +16,25 @@
         <template v-slot:after-select-block>
           <NakedCard
             class="fr-p-md-5w fr-mb-3w fr-mt-3w"
-            v-if="documentType ? documentType.key === 'other-residency' : false"
+            v-if="documentType.key === 'other-residency'"
           >
               <div
                 class="fr-input-group"
               >
+                <label class="fr-label" for="customText">{{
+                  $t("residency-page.custom-text")
+                }}</label>
                       <Field
                         name="customText"
                         v-model="document.customText"
-                        v-slot="{ field, meta }"
+                        v-slot="{ field, meta, errors }"
                         :rules="{
                           required: true
                         }"
                       >
-                <label class="fr-label" for="customText">{{
-                  $t("residency-page.custom-text")
-                }}</label>
-                <textarea
+                      <textarea
                   v-bind="field"
                   class="form-control fr-input validate-required"
-                  id="customText"
                             :class="{
                               'fr-input--valid': meta.valid,
                               'fr-input--error': !meta.valid
@@ -45,22 +44,19 @@
                   required
                   maxlength="2000"
                   rows="4"
-                />
+                      ></textarea>
+                       <div v-if="errors[0]">
+              <span role="alert" class="fr-error-text">{{ $t(errors[0] || "") }}</span>
+</div>
                       </Field>
-                        <ErrorMessage name="customText" v-slot="{ message }">
-                          <span role="alert" class="fr-error-text">{{
-                            t(message || "")
-                          }}</span>
-                        </ErrorMessage>
               </div>
           </NakedCard>
         </template>
       </DocumentDownloader>
       <FooterContainer>
-      <!-- TODO validate before gonext (submit ?) -->
         <BackNext
           :showBack="true"
-          @on-next="goNext"
+          @on-next="!invalidCustomText && goNext"
           @on-back="goBack()"
         >
         </BackNext>
@@ -82,6 +78,9 @@ import { ToastService } from "@/services/ToastService";
 import { useLoading } from 'vue-loading-overlay';
 import { onBeforeMount, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
+import { Field, ErrorMessage, useFieldError } from "vee-validate";
+
+const invalidCustomText = useFieldError("customText");
 
   const props = defineProps<{
     coTenantId: number
