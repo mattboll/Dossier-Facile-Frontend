@@ -2,19 +2,9 @@
   <div>
     <NakedCard class="fr-p-md-5w">
       <div>
-        <!-- <validation-provider
-          rules="select"
-          name="professionalDocument"
-          v-slot="{ errors, valid }"
-        > -->
           <h1 class="fr-h6">
             {{ t("professional-page.select-label") }}
           </h1>
-          <!-- TODO -->
-            <!-- :class="{
-              'fr-select--valid': valid,
-              'fr-select--error': errors[0],
-            }" -->
           <select
             v-model="professionalDocument"
             class="fr-select fr-mb-3w fr-mt-3w"
@@ -27,11 +17,6 @@
               {{ t(d.key) }}
             </option>
           </select>
-          <!-- TODO -->
-          <!-- <span class="fr-error-text" v-if="errors[0]">
-            {{ t(errors[0]) }}
-          </span> -->
-        <!-- </validation-provider> -->
       </div>
     </NakedCard>
     <NakedCard
@@ -93,8 +78,6 @@ import NakedCard from "df-shared-next/src/components/NakedCard.vue";
 import AllDeclinedMessages from "../share/AllDeclinedMessages.vue";
 import { DocumentDeniedReasons } from "df-shared-next/src/models/DocumentDeniedReasons";
 import { cloneDeep } from "lodash";
-// import { ValidationProvider } from "vee-validate";
-// import { extend } from "vee-validate";
 import { UtilsService } from "@/services/UtilsService";
 import useTenantStore from "@/stores/tenant-store";
 import { computed, onBeforeMount, ref } from "vue";
