@@ -17,6 +17,14 @@ import axios from 'axios';
 import {LoadingPlugin} from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import { defineRule } from 'vee-validate';
+import MatomoPlugin from './plugin/matomo';
+
+declare global {
+  interface Window {
+    _paq: any;
+    Beacon: any;
+  }
+}
 
 defineRule('onlyAlpha', (value: any) => {
   if (!value.match("^[a-zA-Z \\-'’àâäçéèêëîïôöùûüÿæœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸÆŒ]*$")) {
@@ -164,6 +172,7 @@ keycloak
       autoClose: 6000,
       theme: "colored"
     } as ToastContainerOptions);
+    app.use(MatomoPlugin);
     app.mount('#app')
   })
     .catch(() => {

@@ -1,7 +1,9 @@
+// import useTenantStore from "@/stores/tenant-store";
 
+// const tenantStore = useTenantStore();
 export const AnalyticsService = {
   sendEvent(name: string, data: any) {
-    if (!import.meta.env.VITE_MATOMO_ENABLE) {
+    if (import.meta.env.VITE_MATOMO_ENABLE === 'false') {
       return;
     }
     // TODO : always use store before analyticsService and send user id
@@ -10,12 +12,12 @@ export const AnalyticsService = {
     // }
     // Matomo already manage consent
     // TODO _paq is undefined
-    // window._paq.push([
-    //   "trackEvent",
-    //   data.event_category,
-    //   name,
-    //   data.event_label,
-    // ]);
+    window._paq.push([
+      "trackEvent",
+      data.event_category,
+      name,
+      data.event_label,
+    ]);
   },
 
   loginSuccess() {
