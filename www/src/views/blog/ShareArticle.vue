@@ -60,6 +60,10 @@
 
 <script setup lang="ts">
 import { withDefaults } from "vue";
+import { useI18n } from "vue-i18n";
+import { toast } from 'vue3-toastify';
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -71,8 +75,7 @@ const props = withDefaults(
   }
 );
 
-  // const articleUrl = window.location.href;
-  const articleUrl = "https://dossierfacile.logement.gouv.fr";
+  const articleUrl = window.location.href;
 
   function getFacebookUrl() {
     return `https://www.facebook.com/sharer.php?u=${articleUrl}`;
@@ -103,10 +106,7 @@ const props = withDefaults(
 
   function copyToClipboard() {
     navigator.clipboard.writeText(articleUrl);
-    // TODO
-    // Vue.toasted.success("Le lien a été copié dans le presse-papier", {
-    //   className: ["success-toast"],
-    // });
+		toast.success(t("copy-success"));
   }
 </script>
 
