@@ -75,7 +75,8 @@ const props = withDefaults(
   }
 );
 
-  const articleUrl = window.location.href;
+const articleUrl = ""
+  // const articleUrl = window.location.href;
 
   function getFacebookUrl() {
     return `https://www.facebook.com/sharer.php?u=${articleUrl}`;
@@ -110,4 +111,5 @@ const props = withDefaults(
   }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

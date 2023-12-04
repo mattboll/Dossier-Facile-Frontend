@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-  import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
-  import { globalCookiesConfig } from 'vue3-cookies';
+import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
+import { globalCookiesConfig } from 'vue3-cookies';
 
 import App from './App.vue'
 import router from './router'
