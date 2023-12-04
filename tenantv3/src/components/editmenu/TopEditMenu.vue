@@ -12,40 +12,40 @@
       <div class="hline" :class="getClass(5)" v-if="isCouple()"></div>
     </div>
     <hr v-if="step === 2 || step === 3" />
-    <div class="menu-grid-row" v-if="step === 2" ref="tcontainer">
+    <div class="menu-grid-row" v-if="step === 2" id="tcontainer">
       <TenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         document-type="IDENTITY"
-        substep="1"
+        :substep="1"
         :active="getTenantCurrentStep(1)"
       />
       <TenantDocumentLink
         class="ml-5"
-        ref="td2"
+        id="td2"
         document-type="RESIDENCY"
-        substep="2"
+        :substep="2"
         :active="getTenantCurrentStep(2)"
       />
       <TenantDocumentLink
         class="ml-5"
-        ref="td3"
+        id="td3"
         document-type="PROFESSIONAL"
-        substep="3"
+        :substep="3"
         :active="getTenantCurrentStep(3)"
       />
       <TenantDocumentLink
         class="ml-5"
-        ref="td4"
+        id="td4"
         document-type="FINANCIAL"
-        substep="4"
+        :substep="4"
         :active="getTenantCurrentStep(4)"
       />
       <TenantDocumentLink
         class="ml-5"
-        ref="td5"
+        id="td5"
         document-type="TAX"
-        substep="5"
+        :substep="5"
         :active="getTenantCurrentStep(5)"
       />
     </div>
@@ -59,7 +59,7 @@
     <div v-if="step === 3 && selectedGuarantor">
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="
           selectedGuarantor.typeGuarantor === 'NATURAL_PERSON' &&
           selectedGuarantor.firstName !== undefined &&
@@ -68,86 +68,86 @@
       >
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd1"
+          id="gd1"
           :guarantor="selectedGuarantor"
           document-type="IDENTITY"
-          substep="1"
+          :substep="1"
           :active="getGuarantorCurrentStep(1, selectedGuarantor)"
         />
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd2"
+          id="gd2"
           :guarantor="selectedGuarantor"
           document-type="RESIDENCY"
-          substep="2"
+          :substep="2"
           :active="getGuarantorCurrentStep(2, selectedGuarantor)"
         />
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd3"
+          id="gd3"
           :guarantor="selectedGuarantor"
           document-type="PROFESSIONAL"
-          substep="3"
+          :substep="3"
           :active="getGuarantorCurrentStep(3, selectedGuarantor)"
         />
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd4"
+          id="gd4"
           :guarantor="selectedGuarantor"
           document-type="FINANCIAL"
-          substep="4"
+          :substep="4"
           :active="getGuarantorCurrentStep(4, selectedGuarantor)"
         />
         <GuarantorDocumentLink
           class="ml-5 mr-5"
-          ref="gd5"
+          id="gd5"
           :guarantor="selectedGuarantor"
           document-type="TAX"
-          substep="5"
+          :substep="5"
           :active="getGuarantorCurrentStep(5, selectedGuarantor)"
         />
       </div>
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="selectedGuarantor.typeGuarantor === 'LEGAL_PERSON'"
       >
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd0"
+          id="gd0"
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION_LEGAL_PERSON"
-          substep="0"
+          :substep="0"
           :active="getGuarantorCurrentStep(0, undefined)"
         />
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd1"
+          id="gd1"
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION"
-          substep="1"
+          :substep="1"
           :active="getGuarantorCurrentStep(1, undefined)"
         />
       </div>
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="selectedGuarantor.typeGuarantor === 'ORGANISM'"
       >
         <GuarantorDocumentLink
           class="ml-5"
-          ref="gd0"
+          id="gd0"
           :guarantor="selectedGuarantor"
           document-type="IDENTIFICATION_ORGANISM"
-          substep="0"
+          :substep="0"
           :active="getGuarantorCurrentStep(0, undefined)"
         />
       </div>
     </div>
-    <div class="menu-grid-row" v-if="step === 4 && isCouple()" ref="tcontainer">
+    <div class="menu-grid-row" v-if="step === 4 && isCouple()" id="tcontainer">
       <CoTenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         :co-tenant="coTenants[0]"
         document-type="IDENTITY"
         :substep="1"
@@ -155,7 +155,7 @@
       />
       <CoTenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         :co-tenant="coTenants[0]"
         document-type="RESIDENCY"
         :substep="2"
@@ -163,7 +163,7 @@
       />
       <CoTenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         :co-tenant="coTenants[0]"
         document-type="PROFESSIONAL"
         :substep="3"
@@ -171,7 +171,7 @@
       />
       <CoTenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         :co-tenant="coTenants[0]"
         document-type="FINANCIAL"
         :substep="4"
@@ -179,7 +179,7 @@
       />
       <CoTenantDocumentLink
         class="ml-5"
-        ref="td1"
+        id="td1"
         :co-tenant="coTenants[0]"
         document-type="TAX"
         :substep="5"
@@ -189,7 +189,7 @@
     <div v-if="step === 5 && isCouple() && selectedGuarantor">
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="
           selectedGuarantor.typeGuarantor === 'NATURAL_PERSON' &&
           selectedGuarantor.firstName !== undefined &&
@@ -198,7 +198,7 @@
       >
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd1"
+          id="gd1"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTITY"
@@ -207,7 +207,7 @@
         />
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd2"
+          id="gd2"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="RESIDENCY"
@@ -216,7 +216,7 @@
         />
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd3"
+          id="gd3"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="PROFESSIONAL"
@@ -225,7 +225,7 @@
         />
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd4"
+          id="gd4"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="FINANCIAL"
@@ -234,7 +234,7 @@
         />
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd5"
+          id="gd5"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="TAX"
@@ -244,12 +244,12 @@
       </div>
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="selectedGuarantor.typeGuarantor === 'LEGAL_PERSON'"
       >
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd0"
+          id="gd0"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTIFICATION_LEGAL_PERSON"
@@ -258,7 +258,7 @@
         />
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd1"
+          id="gd1"
           :guarantor="selectedGuarantor"
           :co-tenant="coTenants[0]"
           document-type="IDENTIFICATION"
@@ -268,12 +268,12 @@
       </div>
       <div
         class="menu-grid-row"
-        ref="gcontainer"
+        id="gcontainer"
         v-if="selectedGuarantor.typeGuarantor === 'ORGANISM'"
       >
         <CoTenantGuarantorDocumentLink
           class="ml-5"
-          ref="gd0"
+          id="gd0"
           :guarantor="selectedGuarantor"
           :co-tenant="getCoTenant(0)"
           document-type="IDENTIFICATION_ORGANISM"
@@ -294,7 +294,7 @@ import CoTenantDocumentLink from "./documents/CoTenantDocumentLink.vue";
 import CoTenantGuarantorDocumentLink from "./documents/CoTenantGuarantorDocumentLink.vue";
 import { useI18n } from "vue-i18n";
 import useTenantStore from "@/stores/tenant-store";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 const store = useTenantStore();
@@ -304,6 +304,26 @@ const coTenants = computed(() => store.coTenants);
 const route = useRoute();
 
 const { t } = useI18n();
+
+const tds = {
+ td0 : ref(),
+ td1 : ref(),
+ td2 : ref(),
+ td3 : ref(),
+ td4 : ref(),
+ td5 : ref()
+}
+
+const gds = {
+   gd0 : ref(),
+ gd1 : ref(),
+ gd2 : ref(),
+ gd3 : ref(),
+ gd4 : ref(),
+ gd5 : ref()
+}
+// const tcontainer = ref();
+// const gcontainer = ref();
 
   const props = withDefaults(
     defineProps<{
@@ -316,8 +336,10 @@ const { t } = useI18n();
 
 
   onMounted(() => {
-    autoScroll("td", "tcontainer");
-    autoScroll("gd", "gcontainer");
+    const tel = document.getElementById("td" + route.params.substep)
+    tel?.scrollIntoView();
+    const gel = document.getElementById("gd" + route.params.substep)
+    gel?.scrollIntoView();
   })
 
   function displayGuarantorName(): boolean {
@@ -330,21 +352,6 @@ const { t } = useI18n();
       return isGuarantorSelected;
     }
     return false;
-  }
-
-  function autoScroll(refd: string, refContainer: string) {
-    // TODO
-    // const element = this.$refs[refd + route.params.substep] as any;
-    // if (element === undefined) {
-    //   return;
-    // }
-    // const container = this.$refs[refContainer] as any;
-    // if (container === undefined) {
-    //   return;
-    // }
-    // const left =
-    //   element.offsetLeft - (container.offsetWidth - element.offsetWidth) / 2;
-    // container.scrollTo(left, 0);
   }
 
   function getClass(s: number) {
