@@ -49,12 +49,11 @@ const store = useTenantStore();
 const user = computed(() => { return store.user });
 
   onMounted(() => {
-    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
   })
 
   onBeforeUnmount(() => {
-    // TODO
-    // window.Beacon("destroy");
+    window.Beacon("destroy");
   })
 
 </script>

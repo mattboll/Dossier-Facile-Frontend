@@ -10,11 +10,10 @@ import ProfileContainer from "../components/ProfileContainer.vue";
 import { onBeforeUnmount, onMounted } from "vue";
 
   onMounted(() => {
-    // TODO
-    // window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
+    window.Beacon("init", "e9f4da7d-11be-4b40-9514-ac7ce3e68f67");
   })
 
   onBeforeUnmount(() => {
-    // window.Beacon("destroy");
+    window.Beacon("destroy");
   })
   </script>

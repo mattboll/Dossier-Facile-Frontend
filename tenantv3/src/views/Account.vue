@@ -180,22 +180,21 @@ import { UtilsService } from "@/services/UtilsService";
 import TenantPanel from "@/components/account/TenantPanel.vue";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import useTenantStore from "@/stores/tenant-store";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
   const FORCE_FAKE_ANNOUNCEMENT_VISIBILITY = import.meta.env.VITE_FORCE_ANNOUNCEMENT_VISIBILITY || false;
   const isAnnouncementVisible = ref(false);
   const store = useTenantStore();
   const user = computed(() => store.user);
   const tabIndex = ref(0);
-  // const router = useRouter();
+  const router = useRouter();
 
   const tenantFullName = computed(() => {
     return UtilsService.tenantFullName(user.value);
   });
 
   onMounted(() => {
-    // TODO
-    // window.Beacon("init", "d949ac15-a9eb-4316-b0c5-f92cecc7118f");
+    window.Beacon("init", "d949ac15-a9eb-4316-b0c5-f92cecc7118f");
     const today = new Date();
     if (
       (today.getMonth() >= 5 && today.getMonth() <= 8) ||
@@ -206,8 +205,7 @@ import useTenantStore from "@/stores/tenant-store";
   })
 
   onBeforeUnmount(() => {
-    // TODO
-    // window.Beacon("destroy");
+    window.Beacon("destroy");
   })
 
   function getTenants() {
@@ -224,8 +222,7 @@ import useTenantStore from "@/stores/tenant-store";
   }
 
   function goToMessaging() {
-    // TODO
-    // router.push("/messaging");
+    router.push("/messaging");
   }
 
   function getFirstName() {

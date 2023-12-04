@@ -5,13 +5,10 @@ export const AnalyticsService = {
     if (import.meta.env.VITE_MATOMO_ENABLE === 'false') {
       return;
     }
-    // TODO : always use store before analyticsService and send user id
     const tenantStore = useTenantStore();
     if (tenantStore.getUser.id !== undefined) {
       data.event_label = tenantStore.user.id;
     }
-    // Matomo already manage consent
-    // TODO _paq is undefined
     window._paq.push([
       "trackEvent",
       data.event_category,
