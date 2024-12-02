@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="fr-grid-col main-content">
+    <div class="fr-grid-col">
       <div ref="pdfcontent" class="pdf-content">
         <div
           v-if="loadedRatio > 0 && loadedRatio < 1"

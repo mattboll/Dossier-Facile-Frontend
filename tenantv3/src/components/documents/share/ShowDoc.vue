@@ -2,19 +2,25 @@
   <div class="fr-container">
     <div class="fr-grid-row justify-content-center">
       <div class="fr-col-12">
-        <div v-if="file?.path">
-          <AuthImage :src="file?.path" v-if="isImage()" :alt="t('showdoc.preview')" />
-          <div v-if="!isImage()">
-            <div v-if="!isLoaded">{{ t('showdoc.loading') }}</div>
-            <PdfViewer v-if="isLoaded" :src="pdfContent"></PdfViewer>
-          </div>
-        </div>
-        <div v-else>
-          <div v-if="file?.numberOfPages && file?.numberOfPages > 0">
-            {{ t('showdoc.number-of-pages', [file?.numberOfPages]) }}
-          </div>
+        <template v-if="file?.preview">
+          <div>preview : {{ file?.preview }}</div>
           <AuthImage :src="file?.preview || ''" :alt="t('showdoc.preview')" />
-        </div>
+        </template>
+        <template v-else>
+          <div v-if="file?.path">
+            <AuthImage :src="file?.path" v-if="isImage()" :alt="t('showdoc.preview')" />
+            <div v-if="!isImage()">
+              <div v-if="!isLoaded">{{ t('showdoc.loading') }}</div>
+              <PdfViewer v-if="isLoaded" :src="pdfContent"></PdfViewer>
+            </div>
+          </div>
+          <div v-else>
+            <div v-if="file?.numberOfPages && file?.numberOfPages > 0">
+              {{ t('showdoc.number-of-pages', [file?.numberOfPages]) }}
+            </div>
+            <AuthImage :src="file?.preview || ''" :alt="t('showdoc.preview')" />
+          </div>
+        </template>
       </div>
     </div>
   </div>

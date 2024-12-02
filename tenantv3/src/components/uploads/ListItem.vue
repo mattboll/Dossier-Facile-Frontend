@@ -1,44 +1,37 @@
 <template>
   <div class="list-item fr-mb-1w doc-container">
-    <div class="fr-grid-row" style="align-items: center">
-      <RiArticleLine
-        size="32px"
-        class="color--focus fr-mr-md-2w fr-mr-1w cursor--pointer"
-        @click="openDoc"
-      />
-      <div class="text fr-pr-2w cursor--pointer" @click="openDoc()">
-        <div class="text-bold">{{ getName() }}</div>
-        <div class="size">{{ getSize() }}</div>
+    <div class="fr-grid-col">
+      <div>
+        <div class="fr-grid-row" style="align-items: center">
+          <RiArticleLine size="32px" class="color--focus fr-mr-md-2w fr-mr-1w cursor--pointer" />
+          <div class="text fr-pr-2w cursor--pointer">
+            <div class="text-bold">{{ getName() }}</div>
+            <div class="size">{{ getSize() }}</div>
+          </div>
+          <div class="progress">
+            <ProgressIndicator :percentage="percentage" :state="uploadState" />
+          </div>
+          <DfButton
+            @on-btn-click="remove()"
+            class="fr-btn--icon-left fr-icon-delete-line"
+            type="button"
+            :title="t('listitem.remove')"
+          >
+            <span class="fr-hidden fr-unhidden-lg">{{ t('listitem.delete') }}</span>
+          </DfButton>
+        </div>
+        <ConfirmModal
+          v-if="confirmDeleteFile"
+          @valid="validDeleteFile()"
+          @cancel="undoDeleteFile()"
+        >
+          {{ t('listitem.will-delete-file') }}
+        </ConfirmModal>
       </div>
-      <div class="progress">
-        <ProgressIndicator :percentage="percentage" :state="uploadState" />
-      </div>
-      <DfButton
-        v-if="file.path || file.preview"
-        class="fr-btn--icon-left fr-fi-eye-line fr-mr-md-2w fr-mr-1w"
-        @on-click="openDoc()"
-        type="button"
-        :title="t('listitem.show')"
-      >
-        <span class="fr-hidden fr-unhidden-lg">{{ t('listitem.see') }}</span>
-      </DfButton>
-      <DfButton
-        @on-click="remove()"
-        class="fr-btn--icon-left fr-icon-delete-line"
-        type="button"
-        :title="t('listitem.remove')"
-      >
-        <span class="fr-hidden fr-unhidden-lg">{{ t('listitem.delete') }}</span>
-      </DfButton>
-    </div>
-    <Modal @close="isDocModalVisible = false" v-if="isDocModalVisible">
-      <template #body>
+      <div>
         <ShowDoc :file="file"></ShowDoc>
-      </template>
-    </Modal>
-    <ConfirmModal v-if="confirmDeleteFile" @valid="validDeleteFile()" @cancel="undoDeleteFile()">
-      {{ t('listitem.will-delete-file') }}
-    </ConfirmModal>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -46,8 +39,6 @@
 import { DfFile } from 'df-shared-next/src/models/DfFile'
 import ProgressIndicator from './ProgressIndicator.vue'
 import ShowDoc from '../documents/share/ShowDoc.vue'
-import Modal from 'df-shared-next/src/components/ModalComponent.vue'
-import { AnalyticsService } from '../../services/AnalyticsService'
 import ConfirmModal from 'df-shared-next/src/components/ConfirmModal.vue'
 import DfButton from 'df-shared-next/src/Button/DfButton.vue'
 import { useI18n } from 'vue-i18n'
@@ -84,11 +75,6 @@ function validDeleteFile() {
 function undoDeleteFile() {
   confirmDeleteFile.value = false
   return false
-}
-
-function openDoc() {
-  AnalyticsService.viewFromMain()
-  isDocModalVisible.value = true
 }
 
 function getSize() {

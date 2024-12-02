@@ -174,7 +174,7 @@ function addFiles(fileList: File[]) {
     return { name: f.name, file: f, size: f.size }
   })
   files.value = [...files.value, ...nf]
-  save()
+  // save()
 }
 
 function resetFiles() {
