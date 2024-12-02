@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits<{ 'on-click': [] }>()
+const emit = defineEmits<{ 'on-click': [], 'on-btn-click': [] }>()
 
 const props = withDefaults(
   defineProps<{
@@ -48,6 +48,7 @@ function classes() {
 
 function onClick() {
   emit('on-click')
+  emit('on-btn-click')
 }
 </script>
 

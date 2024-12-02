@@ -1,11 +1,6 @@
 <template>
   <div class="modal-backdrop">
-    <div
-      class="modal fr-pt-2w"
-      role="dialog"
-      aria-labelledby="modalTitle"
-      :aria-describedby="descriptionId"
-    >
+    <dialog class="modal fr-pt-2w" aria-labelledby="modalTitle" :aria-describedby="descriptionId">
       <button
         class="fr-btn--close fr-btn fr-mr-1w"
         title="Fermer la fenêtre modale"
@@ -25,7 +20,7 @@
       <footer class="modal-footer">
         <slot name="footer"> </slot>
       </footer>
-    </div>
+    </dialog>
   </div>
 </template>
 
