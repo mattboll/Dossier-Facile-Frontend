@@ -43,6 +43,17 @@
           @reset-files="resetFiles"
         ></FileUpload>
       </div>
+      <div v-for="(f, k) in previewFiles" :key="k">
+        <div v-if="f.type === 'image'" class="fr-mt-3w">
+          <img width="150px" :src="f.data" alt="Fichier ajouté" />
+        </div>
+        <div v-else></div>
+      </div>
+      <div v-if="previewFiles.length > 0" class="fr-mt-3w">
+        <button class="fr-btn" type="button" @click="save()" @keypress.enter="save()">
+          Enregistrer
+        </button>
+      </div>
     </NakedCard>
     <ConfirmModal v-if="isDocDeleteVisible" @valid="validSelect()" @cancel="undoSelect()">
       <span>{{ t('identification-page.will-delete-files') }}</span>
@@ -95,6 +106,8 @@ function getLocalStorageKey() {
 const documentStatus = computed(() => {
   return tenantIdentificationDocument.value?.documentStatus
 })
+
+const previewFiles = ref([] as any[])
 
 onBeforeMount(() => {
   if (user.value?.documents !== null) {
@@ -174,7 +187,21 @@ function addFiles(fileList: File[]) {
     return { name: f.name, file: f, size: f.size }
   })
   files.value = [...files.value, ...nf]
-  // save()
+
+  const file = fileList[0]
+  if (!file) return
+
+  const isImage = file.type.startsWith('image/')
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    if (e.target) {
+      if (isImage) {
+        previewFiles.value.push({ type: 'image', data: e.target.result })
+      }
+    }
+  }
+  reader.readAsDataURL(file) // Pour les images
 }
 
 function resetFiles() {
@@ -227,6 +254,7 @@ function save() {
     .finally(() => {
       loader.hide()
     })
+  previewFiles.value = []
 }
 
 function identificationFiles() {
@@ -243,7 +271,8 @@ function identificationFiles() {
     store.getTenantDocuments?.find((d: DfDocument) => {
       return d.documentCategory === 'IDENTIFICATION'
     })?.files || []
-  return [...newFiles, ...existingFiles]
+  return existingFiles
+  // return [...newFiles, ...existingFiles]
 }
 
 async function remove(file: DfFile, silent = false) {
