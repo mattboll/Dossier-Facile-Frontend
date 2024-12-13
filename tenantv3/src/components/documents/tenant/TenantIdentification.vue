@@ -47,7 +47,15 @@
         <div v-if="f.type === 'image'" class="fr-mt-3w">
           <img width="150px" :src="f.data" alt="Fichier ajouté" />
         </div>
-        <div v-else></div>
+        <div v-else>
+          <div v-if="isLoaded" ref="pdfcontent" class="pdf-content">
+            <vue-pdf-embed
+              style="border: 1px solid red"
+              :source="f.data"
+              :width="pdfcontent?.width"
+            ></vue-pdf-embed>
+          </div>
+        </div>
       </div>
       <div v-if="previewFiles.length > 0" class="fr-mt-3w">
         <button class="fr-btn" type="button" @click="save()" @keypress.enter="save()">
@@ -82,6 +90,9 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ToastService } from '@/services/ToastService'
 import { useLoading } from 'vue-loading-overlay'
+import VuePdfEmbed from 'vue-pdf-embed'
+const pdfcontent = ref()
+const isLoaded = ref(false)
 
 const store = useTenantStore()
 const user = computed(() => {
@@ -195,9 +206,14 @@ function addFiles(fileList: File[]) {
 
   const reader = new FileReader()
   reader.onload = (e) => {
-    if (e.target) {
+    if (e.target && e.target.result) {
       if (isImage) {
         previewFiles.value.push({ type: 'image', data: e.target.result })
+      } else {
+        const blob = new Blob([e.target.result], { type: 'application/pdf' })
+        pdfcontent.value = window.URL.createObjectURL(blob)
+        isLoaded.value = true
+        previewFiles.value.push({ type: 'pdf', data: e.target.result })
       }
     }
   }
